@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import AppProvider from '../lib/redux/AppProvider'
 import AboutWrapper from '../components/_about/AboutWrapper'
 import TopSubMenu from '../components/layout/TopSubMenu'
-import withData from '../lib/withData'
+import withData from '../lib/apollo/withData'
 
 class About extends Component {
   // static async getInitialProps (props) {

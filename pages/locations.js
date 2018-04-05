@@ -1,11 +1,11 @@
 import AppProvider from '../lib/redux/AppProvider'
 import LocationsWrapper from '../components/_locations/LocationsWrapper'
-import withData from '../lib/withData'
+import withData from '../lib/apollo/withData'
 
-const Locations = ({ url }) => {
+const Locations = props => {
   return (
-    <AppProvider url={url} title='Location'>
-      <LocationsWrapper url={url} />
+    <AppProvider url={props.url} title='Location'>
+      <LocationsWrapper {...props} />
     </AppProvider>
   )
 }

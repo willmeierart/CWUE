@@ -1,5 +1,5 @@
 import React from 'react'
-import withData from '../lib/withData'
+import withData from '../lib/apollo/withData'
 
 const Legal = () => {
   return (

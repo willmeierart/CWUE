@@ -11,7 +11,9 @@ const TemplateSwitcher = ({
   onSetActiveLocation,
   activeLocation,
   activeResults,
-  setActiveResults
+  setActiveResults,
+  searchPhrase,
+  url
 }) => {
   const componentSwitcher = () => {
     switch (template) {
@@ -28,7 +30,9 @@ const TemplateSwitcher = ({
           <Results
             activeResults={activeResults}
             setActiveResults={setActiveResults}
-            onSetActiveLocation={onSetActiveLocation}>
+            onSetActiveLocation={onSetActiveLocation}
+            searchPhrase={searchPhrase}
+            url={url}>
             { children }
           </Results>
         )

@@ -1,5 +1,5 @@
 import AppProvider from '../lib/redux/AppProvider'
-import withData from '../lib/withData'
+import withData from '../lib/apollo/withData'
 
 const FastPass = ({ url }) => (
   <AppProvider url={url} title='FastPass'>

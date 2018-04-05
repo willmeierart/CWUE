@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import ReactDOM from 'react-dom'
 import MapManager from './data_managers/Map'
 import { binder } from '../../lib/_utils'
-import { getCoordsFromAddress } from './_locationUtils'
+import { getCoordsFromAddress } from '../../lib/_locationUtils'
 import locData from '../../lib/_data/locData'
 // import { flip } from 'geojson-flip'
 // const geoJSON = require('/static/geoData/US_GEO.js')
@@ -22,7 +22,6 @@ class GoogleMap extends Component {
   }
 
   componentDidMount () {
-    console.log(this.props)
     const init = () => {
       const { template, onIdle, InitialMapStyles, markers } = this.props
       if (!window.google) {
@@ -45,7 +44,6 @@ class GoogleMap extends Component {
           styles: template === 'initial' ? InitialMapStyles : null,
           gestureHandling: 'none'
         })
-        console.log(this.map)
         if (onIdle) {
           google.maps.event.addListener(this.map, 'idle', () =>
             onIdle(this.map, markers)
@@ -58,7 +56,7 @@ class GoogleMap extends Component {
         if (template === 'results') {
           this.setCenterViaMarkers(locData)
         } else if (template === 'initial') {
-          this.setCenter('geographic center of the united states')
+          // this.setCenter('geographic center of the united states')
 
           // this.map.data.addGeoJson(flippedGeoJson)
           this.map.data.loadGeoJson('/static/geoData/US_GEO.json')
@@ -75,7 +73,6 @@ class GoogleMap extends Component {
   }
 
   componentDidUpdate (prevProps, prevState) {
-    console.log(this.props.markers, this.state.markers)
     if (JSON.stringify(this.props) !== JSON.stringify(prevProps)) {
       this.setState({
         markers: this.props.markers || [],
@@ -84,7 +81,7 @@ class GoogleMap extends Component {
       })
     }
     if (JSON.stringify(this.state) !== JSON.stringify(prevState)) {
-      if (this.map.getZoom() !== this.state.zoom){
+      if (this.map.getZoom() !== this.state.zoom) {
         this.map.setZoom(this.state.zoom)
       }
       if (JSON.stringify(prevState.center) !== JSON.stringify(this.state.center)) {
@@ -139,7 +136,6 @@ class GoogleMap extends Component {
         getCoordsFromAddress(center)
           .then(coords => {
             this.setState({ center: coords })
-            console.log(this.state.center)
           })
       } else {
         this.setState({ center: this.props.center })
@@ -159,7 +155,6 @@ class GoogleMap extends Component {
   setMarkers () {
     // if (this.props.markers !== undefined) {
     this.props.markers.forEach((marker, i) => {
-      console.log(marker)
       if (typeof marker.position === 'string') {
         getCoordsFromAddress(marker.position)
           .then(coords => {

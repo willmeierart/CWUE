@@ -8,7 +8,9 @@ export default class Results extends Component {
     binder(this, ['pickLocation'])
   }
 
-  componentDidMount () { this.props.setActiveResults() }
+  componentDidMount () {
+    // this.props.setActiveResults()
+  }
   // componentWillUnmount () { this.props.setActiveResults() }
 
   pickLocation (location) {
@@ -22,17 +24,32 @@ export default class Results extends Component {
   }
 
   render () {
-    const { children, activeResults } = this.props
+    const { children, activeResults, searchPhrase, url: { query: { spec } } } = this.props
     const Title = children[0]
     const SearchBar = children[1]
     const Map = children[2]
+    const formatQS = qs => {
+      const splitta = qs.split('-')
+      // splitta.reduce((a, b) => {}, [])
+      return splitta.map(wd => {
+        // const firstCap = wd[0].toUpperCase()
+        // const rest = wd.substring(1, wd.length)
+        // return [firstCap, rest].join('')
+        return wd.toUpperCase()
+      }).join(', ')
+    }
+    const locationsNear = searchPhrase
+      ? `Locations Near ${searchPhrase}`
+      : spec
+        ? `Locations Near ${formatQS(spec)}`
+        : 'Locations'
     return (
       <section className='template-wrapper'>
         <div className='title-wrapper'>{ Title }</div>
         <section className='content-wrapper'>
           <div className='col col-left'>
             <h2 className='locations-near content'>
-              Locations Near [search]
+              { locationsNear }
               <hr />
             </h2>
             <div className='results-container content'>

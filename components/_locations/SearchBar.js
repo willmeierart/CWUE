@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import debounce from 'lodash.debounce'
 import NextRouter from 'next/router'
-import { geocodeByAddress, getLatLng } from './_locationUtils'
+import { geocodeByAddress, getLatLng } from '../../lib/_locationUtils'
 import { binder } from '../../lib/_utils'
 import SearchManager from './data_managers/Search'
 
@@ -65,7 +65,6 @@ class SearchBar extends Component {
 
   selectActiveItemAtIndex (index) {
     // this is what points at a certain item and selects that one specifically
-    console.log(this.state.autocompleteItems)
     const activeName = this.state.autocompleteItems.find(item => item.index === index).suggestion
     this.setActiveItemAtIndex(index) // below
     this.handleInput(activeName) // above
@@ -179,7 +178,6 @@ class SearchBar extends Component {
     // called by this.fetchPredictions, used as callback to native google autocomplete func
     // predictions are each full object returned from autocompleteservice
     if (status !== this.props.autocompleteOK) {
-      console.error(status)
       this.clearSuggestions()
       return
     }

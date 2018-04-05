@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import AppProvider from '../lib/redux/AppProvider'
 import HomeWrapper from '../components/_home-global/HomeWrapper'
-import withData from '../lib/withData'
+import withData from '../lib/apollo/withData'
 
 class HomePage extends Component {
   render () {

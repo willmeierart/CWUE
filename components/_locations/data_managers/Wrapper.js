@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { graphql, compose } from 'react-apollo'
 import NextRouter from 'next/router'
 import ExecutionEnvironment from 'exenv'
-import { allLocations } from '../../../lib/queries'
+import { allLocations } from '../../../lib/apollo/queries'
 import {
   getUserLocation,
   setMapZoom,
@@ -12,8 +12,11 @@ import {
   setMapCenter,
   setActiveLocation,
   setLocPageState,
-  setActiveResultsList
+  setActiveResultsList,
+  setActiveSearchPhrase,
+  setStaticLocList
 } from '../../../lib/redux/actions'
+import WithApolloLoader from '../../hoc/WithApolloLoader'
 import { binder } from '../../../lib/_utils'
 
 export default function DataManager (ComposedComponent) {
@@ -35,7 +38,6 @@ export default function DataManager (ComposedComponent) {
       ) {
         this.setPageStateViaUrl()
       }
-      console.log(this.props);
     }
 
     componentWillUnmount () {
@@ -47,8 +49,6 @@ export default function DataManager (ComposedComponent) {
       const { query: { state, spec } } = url
       const isServer = !ExecutionEnvironment.canUseDOM
       const initial = !state || state === '' || state === 'initial'
-
-      console.log('client-rendered? ', isServer)
 
       switch (true) {
         case (initial || (state === 'results' && isServer)):
@@ -107,14 +107,18 @@ export default function DataManager (ComposedComponent) {
     }
   }
   return compose(
-    graphql(allLocations, { name: 'allLocations' })
+    graphql(allLocations)
   )(
-    connect(mapStateToProps, mapDispatchToProps)(WrappedComponent)
+    connect(mapStateToProps, mapDispatchToProps)(
+      WithApolloLoader(
+        WrappedComponent
+      )
+    )
   )
 }
 
 function mapStateToProps (state) {
-  const { location: { userLocation, mapCenter, mapZoom, mapMarkers, activeLocation, pageState, activeResults } } = state
+  const { location: { userLocation, mapCenter, mapZoom, mapMarkers, activeLocation, pageState, activeResults, activeSearchPhrase, staticLocationList } } = state
   return {
     userLocation,
     mapCenter,
@@ -122,7 +126,9 @@ function mapStateToProps (state) {
     mapMarkers,
     activeLocation,
     pageState,
-    activeResults
+    activeResults,
+    activeSearchPhrase,
+    staticLocationList
   }
 }
 
@@ -134,7 +140,9 @@ function mapDispatchToProps (dispatch) {
     onSetMapMarkers: markers => dispatch(setMapMarkers(markers)),
     onSetActiveLocation: location => dispatch(setActiveLocation(location)),
     onSetLocPageState: pageState => dispatch(setLocPageState(pageState)),
-    onSetActiveResultsList: list => dispatch(setActiveResultsList(list))
+    onSetActiveResultsList: list => dispatch(setActiveResultsList(list)),
+    onSetActiveSearchPhrase: phrase => dispatch(setActiveSearchPhrase(phrase)),
+    onSetStaticLocList: locObj => dispatch(setStaticLocList(locObj))
   }
 }
 
@@ -146,5 +154,9 @@ DataManager.propTypes = {
   activeLocation: PropTypes.object,
   pageState: PropTypes.string.isRequired,
   activeResults: PropTypes.array,
-  onSetLocPageState: PropTypes.func
+  onSetLocPageState: PropTypes.func,
+  activeSearchPhrase: PropTypes.string,
+  onSetActiveSearchPhrase: PropTypes.func,
+  onSetStaticLocList: PropTypes.func,
+  staticLocationList: PropTypes.array
 }

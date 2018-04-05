@@ -13,13 +13,16 @@ class LocationsWrapper extends Component {
   constructor (props) {
     super(props)
     binder(this, ['setCenter', 'setMarkers', 'setActiveResults'])
-    this.fakeData = true
+    this.fakeData = false
   }
-  componentDidMount () { this.setActiveResults() }
+  componentDidMount () {
+    const { data: { _Carwash_USA_Express, _Cloned_CWUE } } = this.props
+    this.props.onSetStaticLocList({ _Carwash_USA_Express, _Cloned_CWUE })
+    this.setActiveResults()
+  }
 
   shouldComponentUpdate (newProps) {
     if (this.props !== newProps) {
-      console.log(this.props)
       return true
     }
   }
@@ -28,24 +31,24 @@ class LocationsWrapper extends Component {
   setMarkers (markers) { this.props.onSetMapMarkers(markers) } // leave in case middleware logic needed
 
   setActiveResults (results) {
-    console.log(this.props)
-    const { onSetActiveResultsList } = this.props
+    const { onSetActiveResultsList, data: { _Carwash_USA_Express, _Cloned_CWUE } } = this.props
+    const data = {
+      CarwashUSAExpress: _Carwash_USA_Express,
+      Clone: _Cloned_CWUE
+    }
     if (this.fakeData) {
       onSetActiveResultsList(locData)
     } else if (results) {
       onSetActiveResultsList(results)
     } else {
-      onSetActiveResultsList([])
+      onSetActiveResultsList(data)
     }
   }
 
-  goToRegion () {
-    const query = { state: 'region' }
-    ImperativeRouter.push('locations', query, false)
-  }
+  goToRegion () { ImperativeRouter.push('locations', { state: 'region' }, false) }
 
   render () {
-    const { mapCenter, mapZoom, mapMarkers, onGetUserLocation, userLocation, onSetActiveLocation, activeResults, activeLocation, pageState } = this.props
+    const { mapCenter, mapZoom, mapMarkers, onGetUserLocation, userLocation, onSetActiveLocation, activeResults, activeLocation, pageState, activeSearchPhrase, onSetActiveSearchPhrase, url, data, staticLocationList } = this.props
     const getMapDims = template => {
       const large = { width: '96vw', height: '40vw' }
       const small = { width: '40vw', height: '40vw' }
@@ -67,9 +70,11 @@ class LocationsWrapper extends Component {
           setActiveResults={this.setActiveResults}
           activeResults={activeResults}
           userLocation={userLocation}
-          activeLocation={activeLocation} >
+          activeLocation={activeLocation}
+          searchPhrase={activeSearchPhrase}
+          url={url}>
           <h1>LOCATIONS</h1>
-          <SearchBar setCenter={this.setCenter} setMarkers={this.setMarkers} setTemplate={this.props.setTemplate} activeResults={activeResults} />
+          <SearchBar setCenter={this.setCenter} setMarkers={this.setMarkers} setTemplate={this.props.setTemplate} activeResults={activeResults} onSetActiveSearchPhrase={onSetActiveSearchPhrase} data={data} staticLocationList={staticLocationList} />
           <GoogleMap template={pageState} center={mapCenter} zoom={mapZoom} markers={mapMarkers} dims={getMapDims(pageState)} setTemplate={this.props.setTemplate} />
         </TemplateSwitcher>
         <style jsx>{`
