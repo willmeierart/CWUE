@@ -10,14 +10,18 @@ export default class Results extends Component {
 
   componentDidMount () {
     // this.props.setActiveResults()
-    console.log(this.props)
   }
-  componentDidUpdate (nextProps) {
-    console.log(this.props)
+  shouldComponentUpdate (nextProps) {
+    // console.log(this.props)
+    if (this.props.activeResults !== nextProps.activeResults) {
+      return true
+    }
+    return false
   }
   // componentWillUnmount () { this.props.setActiveResults() }
 
   pickLocation (location) {
+    console.log(location)
     if (typeof location === 'string') {
       this.props.onSetActiveLocation(location)
     } else if (typeof location === 'object' && location.name) {

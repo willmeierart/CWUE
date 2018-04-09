@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
+import equal from 'deep-equal'
 import TemplateSwitcher from './templates/TemplateSwitcher'
 import GoogleMap from './GoogleMap'
 import SearchBar from './SearchBar'
@@ -22,10 +23,11 @@ class LocationsWrapper extends Component {
   }
 
   shouldComponentUpdate (newProps) {
-    if (this.props !== newProps) {
+    if (!equal(newProps, this.props)) {
       console.log(newProps)
       return true
     }
+    return true
   }
 
   setCenter (center) { this.props.onSetMapCenter(center) }

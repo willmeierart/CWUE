@@ -92,7 +92,13 @@ class SearchBar extends Component {
   }
 
   handleEnterKeyWithoutActiveItem () {
-    console.warn('no active item')
+    const { autocompleteItems } = this.state
+    if (autocompleteItems.length > 0) {
+      const activeItem = autocompleteItems[0]
+      this.selectAddress(activeItem.suggestion, activeItem.placeId)
+    } else {
+      console.warn('no active item')
+    }
     // this.props.setMarkers([])
   }
 

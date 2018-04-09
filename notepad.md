@@ -35,9 +35,9 @@
     [] and map shows markers
   [x] if you search for an address within 5 miles the nearby locations show up in list view
     [] and map shows markers
-  [] **if you search for a city that contains a location it shows up in list view**
+  [x] if you search for a city that contains a location it shows up in list view
   + parsed by bounds and region
-  [] if you search for a state that contains location it shows up in list view
+  [x] if you search for a state that contains location it shows up in list view
   + parsed by bounds and region
   [] if you navigate directly to a 'search' link (SSR), its query string is parsed into a valid search
     +
@@ -45,5 +45,8 @@
 
 ## problems with above
 1. [x] no search results rendering at all
+2. [x] results not rendering on first search
 2. [] no map markers rendering at all
 3. [] map not centering correctly
+4. [] activeResult not being picked
+5. [] handle all incomplete paths (no 404 on locations/detail etc)

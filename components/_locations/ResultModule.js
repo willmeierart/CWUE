@@ -5,13 +5,14 @@ import ImperativeRouter from '../../server/ImperativeRouter'
 
 const ResultModule = ({ location, pickLocation, detail }) => {
   const { details, phone, addressStreet, addressCity, addressState, addressZip, openHours, name, brand } = location
-  console.log(location)
   const addrLine2 = `${addressCity}, ${addressState}, ${addressZip}`
-  const onPickLocation = location => {
+  const onPickLocation = () => {
+    console.log(location)
     const query = { state: 'detail', spec: location.name }
+    pickLocation(location)
     ImperativeRouter.push('locations', query, false)
 
-    if (pickLocation) setTimeout(() => { pickLocation(location) })
+    // if (pickLocation) setTimeout(() => { pickLocation(location) })
   }
   return location !== null ? (
     <div className='result-outer'>

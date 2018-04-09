@@ -25,6 +25,7 @@
     "babel-plugin-module-resolver": "^3.1.0",
     "babel-plugin-wrap-in-js": "^1.1.1",
     "compression": "^1.7.1",
+    "deep-equal": "^1.0.1",
     "exenv": "^1.2.2",
     "express": "^4.16.2",
     "geojson-flip": "^1.0.0",

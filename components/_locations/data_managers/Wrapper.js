@@ -41,7 +41,7 @@ export default function DataManager (ComposedComponent) {
     }
 
     componentWillUnmount () {
-      NextRouter.onRouteChangeComplete = url => { this.props.onSetActiveLocation(null) }
+      // NextRouter.onRouteChangeComplete =  url => { this.props.onSetActiveLocation(null) }
     }
 
     setPageStateViaUrl () {

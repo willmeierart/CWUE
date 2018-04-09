@@ -1,15 +1,16 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
+import equal from 'deep-equal'
 import ImperativeRouter from '../../../server/ImperativeRouter'
-import { geocodeByAddress, getLatLng, makeMarker } from '../../../lib/_locationUtils'
+import { geocodeByAddress, getLatLng, makeMarker, normalizeRegionInputs } from '../../../lib/_locationUtils'
 import { binder } from '../../../lib/_utils'
 
 export default function SearchManager (ComposedComponent) {
   class WrappedComponent extends Component {
     constructor (props) {
       super(props)
-      this.state = { searchIsRegion: false, nearbyResults: [], placeHasBounds: false }
-      binder(this, ['handleSelection', 'findResultsInRadius', 'getRelevantCoords', 'distanceServiceCallback', 'setTheResults', 'checkIfInBounds', 'searchIsRegion'])
+      this.state = { searchIsRegion: false, nearbyResults: [], placeBounds: null }
+      binder(this, ['handleSelection', 'findResultsInRadius', 'getRelevantCoords', 'distanceServiceCallback', 'setTheResults', 'isInBounds', 'searchIsRegion'])
       const mile = 1610
       this.radius = 5 * mile
     }
@@ -30,8 +31,7 @@ export default function SearchManager (ComposedComponent) {
         }
       }
       init()
-      console.log(this.props)
-      this.setState({ nearbyResults: [] })
+      this.setState({ nearbyResults: [], isRegion: false })
     }
 
     routeToResults (place) {
@@ -45,7 +45,7 @@ export default function SearchManager (ComposedComponent) {
     }
 
     handleSelection (address, placeId, handleInput) { // passed as props to searchbar component (handleInput lives there), triggers everything below
-      this.setState({ nearbyResults: [] })
+      this.setState({ nearbyResults: [], isRegion: false, placeBounds: null })
       handleInput(address)
       this.geocode(address)
       this.props.onSetActiveSearchPhrase(address)
@@ -69,8 +69,6 @@ export default function SearchManager (ComposedComponent) {
               this.findResultsInRadius(place, this.props.staticLocationList)
 
               this.routeToResults(place)
-            }).then(() => {
-              console.log(this.props.url)
             })
           )
         } else {
@@ -80,7 +78,7 @@ export default function SearchManager (ComposedComponent) {
     }
 
     searchIsRegion (types) {
-      types.reduce((bool, type) => {
+      return types.reduce((bool, type) => {
         if ((type === 'locality' ||
           type === 'administrative_area_level_1') &&
           type === 'political') {
@@ -92,51 +90,43 @@ export default function SearchManager (ComposedComponent) {
 
     findResultsInRadius (place, locations) {
       this.setState({ searchIsRegion: this.searchIsRegion(place.types) })
-
-      console.log(locations) // this is right around where logic needs to happen handling regions
-
       const locationCoords = locations.map(location => location.coordinates)
       this.getRelevantCoords(place, locationCoords)
     }
 
     getRelevantCoords (place, locationCoords) {
-      console.log(place, locationCoords)
       if (place.geometry.bounds) {
         const { b, f } = place.geometry.bounds
-        console.log(f, b)
         const bounds = [
           { lat: f.b, lng: b.b },
           { lat: f.f, lng: b.f }
         ]
-        this.setState({ placeHasBounds: true })
-        this.checkIfInBounds(bounds, locationCoords)
+        this.setState({ placeBounds: bounds })
       }
-      // else {
       const asyncLatLng = async () => {
         let LAT_LNG = []
         await getLatLng(place).then(latLng => {
           LAT_LNG = [latLng]
         })
         this.doDistanceService(LAT_LNG, locationCoords)
-        // return LAT_LNG
       }
       return asyncLatLng()
-      // }
     }
 
-    checkIfInBounds (bounds, coords) {
+    isInBounds (bounds, coords) {
       return coords.lat > bounds[0].lat &&
         coords.lat < bounds[1].lat &&
         coords.lng > bounds[0].lng &&
         coords.lng < bounds[1].lng
     }
 
-    doDistanceService (coords1, coords2) {
-      this.distanceService.getDistanceMatrix({
+    async doDistanceService (coords1, coords2) {
+      await this.distanceService.getDistanceMatrix({
         origins: coords1,
         destinations: coords2,
         travelMode: window.google.maps.TravelMode.DRIVING
       }, this.distanceServiceCallback)
+      this.setTheResults()
     }
 
     distanceServiceCallback (response, status) {
@@ -151,22 +141,32 @@ export default function SearchManager (ComposedComponent) {
               if (this.state.nearbyResults.indexOf(location) === -1) {
                 const makeMarkers = true
                 this.geocode(origin, makeMarkers)
-                const newResults = [...this.state.nearbyResults]
-                newResults.push(location)
-                this.setState({ nearbyResults: newResults })
+                // const newResults = [...this.state.nearbyResults]
+                // newResults.push(location)
+                // this.setState({ nearbyResults: newResults })
+                this.pushNewNearbyResult(location)
               }
             }
           })
         })
-        this.setTheResults()
+        // this.setTheResults()
       }
     }
 
     setTheResults () { // this is where new results are actually set
-      if (this.state.isRegion) {
-        const splitSearch = this.props.onSetActiveSearchPhrase.toLowerCase().split(/[^a-z]/g)
+      const { placeBounds, isRegion } = this.state
+      const { staticLocationList, activeSearchPhrase } = this.props
+      if (placeBounds) {
+        staticLocationList.forEach(loc => {
+          if (this.isInBounds(placeBounds, loc.coordinates)) {
+            this.pushNewNearbyResult(loc)
+          }
+        })
+      }
+      if (isRegion) {
+        const splitSearch = activeSearchPhrase.toLowerCase().split(/[^a-z]/g)
         splitSearch.forEach(wd => {
-          this.props.staticLocationList.forEach(loc => {
+          staticLocationList.forEach(loc => {
             const usableProps = [
               loc.addressCity.toLowerCase(),
               loc.addressState.toLowerCase()
@@ -177,22 +177,32 @@ export default function SearchManager (ComposedComponent) {
                 if (usableProps.indexOf(lowName) === -1) {
                   usableProps.push(lowName)
                 }
+                if (normalizeRegionInputs('city', seo)) {
+                  this.pushNewNearbyResult(loc)
+                }
               })
             }
             usableProps.forEach(prop => {
               if (wd === prop) {
-                if (this.state.nearbyResults.indexOf(loc === -1)) {
-                  const newResults = [...this.state.nearbyResults]
-                  newResults.push(loc)
-                  this.setState({ nearbyResults: newResults })
-                }
+                this.pushNewNearbyResult(loc)
               }
             })
           })
         })
       }
-      console.log(this.state.nearbyResults)
       this.props.setActiveResults(this.state.nearbyResults)
+    }
+
+    pushNewNearbyResult (loc) {
+      const isInArr = this.state.nearbyResults.reduce((bool, val) => {
+        if (equal(loc, val)) { bool = true }
+        return bool
+      }, false)
+      if (!isInArr) {
+        const newResults = [...this.state.nearbyResults]
+        newResults.push(loc)
+        this.setState({ nearbyResults: newResults })
+      }
     }
 
     render () {
