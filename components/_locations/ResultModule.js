@@ -7,7 +7,6 @@ const ResultModule = ({ location, pickLocation, detail }) => {
   const { details, phone, addressStreet, addressCity, addressState, addressZip, openHours, name, brand } = location
   const addrLine2 = `${addressCity}, ${addressState}, ${addressZip}`
   const onPickLocation = () => {
-    console.log(location)
     const query = { state: 'detail', spec: location.name }
     pickLocation(location)
     ImperativeRouter.push('locations', query, false)
