@@ -118,7 +118,10 @@ export default function DataManager (ComposedComponent) {
 }
 
 function mapStateToProps (state) {
-  const { location: { userLocation, mapCenter, mapZoom, mapMarkers, activeLocation, pageState, activeResults, activeSearchPhrase, staticLocationList } } = state
+  const {
+    location: { userLocation, mapCenter, mapZoom, mapMarkers, activeLocation, pageState, activeResults, activeSearchPhrase, staticLocationList },
+    env: { vpDims }
+  } = state
   return {
     userLocation,
     mapCenter,
@@ -128,7 +131,8 @@ function mapStateToProps (state) {
     pageState,
     activeResults,
     activeSearchPhrase,
-    staticLocationList
+    staticLocationList,
+    vpDims
   }
 }
 
@@ -158,5 +162,6 @@ DataManager.propTypes = {
   activeSearchPhrase: PropTypes.string,
   onSetActiveSearchPhrase: PropTypes.func,
   onSetStaticLocList: PropTypes.func,
-  staticLocationList: PropTypes.array
+  staticLocationList: PropTypes.array,
+  vpDims: PropTypes.object
 }

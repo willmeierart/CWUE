@@ -5,10 +5,31 @@ import { binder } from '../../../lib/_utils'
 
 export default function MapManager (ComposedComponent) {
   class WrappedComponent extends Component {
-    // constructor (props) {
-    //   super(props)
-    // }
-    componentDidMount () {}
+    constructor (props) {
+      super(props)
+      binder(this, ['setZoomToScreenSize'])
+    }
+    componentDidMount () {
+      this.setZoomToScreenSize()
+      window.addEventListener('resize', this.setZoomToScreenSize)
+    }
+    setZoomToScreenSize () {
+      const { onSetMapZoom } = this.props
+      const w = window.innerWidth
+      switch (true) {
+        case w >= 1900:
+          onSetMapZoom(5)
+          return
+        case w < 1900 && w >= 700:
+          onSetMapZoom(4)
+          return
+        case w < 700:
+          onSetMapZoom(3)
+          return
+        default:
+          onSetMapZoom(4)
+      }
+    }
     render () {
       const InitialMapStyles = [
         {
@@ -49,8 +70,14 @@ export default function MapManager (ComposedComponent) {
           ]
         }
       ]
+      const geoJSONstyles = {
+        fillColor: 'red',
+        fillOpacity: 1,
+        zIndex: 2,
+        strokeWeight: 1
+      }
       return (
-        <ComposedComponent InitialMapStyles={InitialMapStyles} {...this.props} />
+        <ComposedComponent geoJSONstyles={geoJSONstyles} InitialMapStyles={InitialMapStyles} {...this.props} />
       )
     }
   }

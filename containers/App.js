@@ -2,13 +2,16 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { setLocPageState } from '../lib/redux/actions'
+import { setLocPageState, getVPDims } from '../lib/redux/actions'
 import Header from '../components/layout/Header'
 import Footer from '../components/layout/Footer'
 
 // import globalStyles from '../../styles/index.scss'
 
 class App extends Component {
+  componentDidMount () {
+    window.addEventListener('resize', this.props.onGetVPDims)
+  }
   render () {
     const { title, children, pageState, onSetLocPageState, url } = this.props
     return (
@@ -50,13 +53,15 @@ class App extends Component {
 
 function mapStateToProps (state) {
   return {
-    pageState: state.location.pageState
+    pageState: state.location.pageState,
+    vpDims: state.env.vpDims
   }
 }
 
 function mapDispatchToProps (dispatch) {
   return {
-    onSetLocPageState: pageState => dispatch(setLocPageState(pageState))
+    onSetLocPageState: pageState => dispatch(setLocPageState(pageState)),
+    onGetVPDims: () => dispatch(getVPDims())
   }
 }
 
@@ -65,5 +70,6 @@ export default connect(mapStateToProps, mapDispatchToProps)(App)
 App.propTypes = {
   pageState: PropTypes.string.isRequired,
   onSetLocPageState: PropTypes.func.isRequired,
-  title: PropTypes.string
+  title: PropTypes.string,
+  vpDims: PropTypes.object
 }

@@ -20,7 +20,30 @@
     [x] check out potential for styling (esp america border)
   [x] figure out multi-endpoint apollo thing (schema-stitching?)
     [x] deploy server
-  [] **figure out how to bind 'region' (or derive it from data) to each location**
+  [] **figure out how to bind 'region' (or derive it from data) to each location** -- think about finding >/< bounds
   [x] start working on binding functions to real data, graphcms
-  [] set map to load at different zooms based on screen size
+  [x] set map to load at different zooms based on screen size
   [] **reallllly clean up / wrap your hand around code for search portion**
+
+
+
+## tests
+[] locations
+  [x] if you search for an address it shows up in list view 
+    [] and map shows markers
+  [x] if you search for a carwash by name it shows up in list view
+    [] and map shows markers
+  [x] if you search for an address within 5 miles the nearby locations show up in list view
+    [] and map shows markers
+  [] **if you search for a city that contains a location it shows up in list view**
+  + parsed by bounds and region
+  [] if you search for a state that contains location it shows up in list view
+  + parsed by bounds and region
+  [] if you navigate directly to a 'search' link (SSR), its query string is parsed into a valid search
+    +
+  [] when a group of locations show up on a map, the map centers on marker cluster **(or search item?)** and zooms to bounds
+
+## problems with above
+1. [x] no search results rendering at all
+2. [] no map markers rendering at all
+3. [] map not centering correctly

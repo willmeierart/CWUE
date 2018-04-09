@@ -60,12 +60,7 @@ class GoogleMap extends Component {
 
           // this.map.data.addGeoJson(flippedGeoJson)
           this.map.data.loadGeoJson('/static/geoData/US_GEO.json')
-          this.map.data.setStyle({
-            fillColor: 'red',
-            fillOpacity: 1,
-            zIndex: 2,
-            strokeWeight: 1
-          })
+          this.map.data.setStyle(this.props.geoJSONstyles)
         }
       }
     }
@@ -182,12 +177,14 @@ class GoogleMap extends Component {
   }
 
   render () {
-    const { width, height } = this.props.dims
+    const { dims: { width, height  }, template } = this.props
     return (
       <div className='map-container'>
         <div id='map' style={{ width: '100%', height: '100%' }} ref={map => { this.mapDOM = map }} />
         <style jsx>{`
           .map-container {
+            pointer-events: ${template === 'initial' ? 'none' : 'all'};
+            cursor: default!important;
             width: ${width};
             height: ${height};
           }

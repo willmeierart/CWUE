@@ -10,6 +10,10 @@ export default class Results extends Component {
 
   componentDidMount () {
     // this.props.setActiveResults()
+    console.log(this.props)
+  }
+  componentDidUpdate (nextProps) {
+    console.log(this.props)
   }
   // componentWillUnmount () { this.props.setActiveResults() }
 

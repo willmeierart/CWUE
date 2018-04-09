@@ -23,6 +23,7 @@ class LocationsWrapper extends Component {
 
   shouldComponentUpdate (newProps) {
     if (this.props !== newProps) {
+      console.log(newProps)
       return true
     }
   }
@@ -32,23 +33,21 @@ class LocationsWrapper extends Component {
 
   setActiveResults (results) {
     const { onSetActiveResultsList, data: { _Carwash_USA_Express, _Cloned_CWUE } } = this.props
-    const data = {
-      CarwashUSAExpress: _Carwash_USA_Express,
-      Clone: _Cloned_CWUE
-    }
+    // const data = {
+    //   CarwashUSAExpress: _Carwash_USA_Express,
+    //   Clone: _Cloned_CWUE
+    // }
     if (this.fakeData) {
       onSetActiveResultsList(locData)
     } else if (results) {
       onSetActiveResultsList(results)
-    } else {
-      onSetActiveResultsList(data)
     }
   }
 
   goToRegion () { ImperativeRouter.push('locations', { state: 'region' }, false) }
 
   render () {
-    const { mapCenter, mapZoom, mapMarkers, onGetUserLocation, userLocation, onSetActiveLocation, activeResults, activeLocation, pageState, activeSearchPhrase, onSetActiveSearchPhrase, url, data, staticLocationList } = this.props
+    const { mapCenter, mapZoom, mapMarkers, onGetUserLocation, userLocation, onSetActiveLocation, activeResults, activeLocation, pageState, activeSearchPhrase, onSetActiveSearchPhrase, url, data, staticLocationList, onSetMapZoom, vpDims, setTemplate } = this.props
     const getMapDims = template => {
       const large = { width: '96vw', height: '40vw' }
       const small = { width: '40vw', height: '40vw' }
@@ -64,7 +63,8 @@ class LocationsWrapper extends Component {
     return (
       <div>
         <div className='region-btn' onClick={this.goToRegion}>regions page</div>
-        <TemplateSwitcher template={pageState}
+        <TemplateSwitcher
+          template={pageState}
           onGetUserLocation={onGetUserLocation}
           onSetActiveLocation={onSetActiveLocation}
           setActiveResults={this.setActiveResults}
@@ -74,8 +74,25 @@ class LocationsWrapper extends Component {
           searchPhrase={activeSearchPhrase}
           url={url}>
           <h1>LOCATIONS</h1>
-          <SearchBar setCenter={this.setCenter} setMarkers={this.setMarkers} setTemplate={this.props.setTemplate} activeResults={activeResults} onSetActiveSearchPhrase={onSetActiveSearchPhrase} data={data} staticLocationList={staticLocationList} />
-          <GoogleMap template={pageState} center={mapCenter} zoom={mapZoom} markers={mapMarkers} dims={getMapDims(pageState)} setTemplate={this.props.setTemplate} />
+          <SearchBar
+            setCenter={this.setCenter}
+            setMarkers={this.setMarkers}
+            setTemplate={setTemplate}
+            activeResults={activeResults}
+            onSetActiveSearchPhrase={onSetActiveSearchPhrase}
+            data={data}
+            staticLocationList={staticLocationList}
+            setActiveResults={this.setActiveResults}
+            url={url} />
+          <GoogleMap
+            template={pageState}
+            center={mapCenter}
+            zoom={mapZoom}
+            markers={mapMarkers}
+            dims={getMapDims(pageState)}
+            onSetMapZoom={onSetMapZoom}
+            setTemplate={setTemplate}
+            vpDims={vpDims} />
         </TemplateSwitcher>
         <style jsx>{`
           .region-btn {

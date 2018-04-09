@@ -4,10 +4,9 @@
 import ImperativeRouter from '../../server/ImperativeRouter'
 
 const ResultModule = ({ location, pickLocation, detail }) => {
-  const address = location ? location.address : ''
-  const addrSplitta = address.indexOf(',')
-  const addr1 = address.substring(0, addrSplitta)
-  const addr2 = address.substring(addrSplitta + 2, address.length)
+  const { details, phone, addressStreet, addressCity, addressState, addressZip, openHours, name, brand } = location
+  console.log(location)
+  const addrLine2 = `${addressCity}, ${addressState}, ${addressZip}`
   const onPickLocation = location => {
     const query = { state: 'detail', spec: location.name }
     ImperativeRouter.push('locations', query, false)
@@ -17,19 +16,20 @@ const ResultModule = ({ location, pickLocation, detail }) => {
   return location !== null ? (
     <div className='result-outer'>
       <div className='result-inner'>
-        <h3>{ location.name }</h3>
+        <h3>{ name }</h3>
+        <h4>({ brand })</h4>
         <div className='details-container'>
           <div className='col col-left'>
-            <div className='small-grey-1 addr-1'>{ addr1 }</div>
-            <div className='small-grey-1 addr-2'>{ addr2 }</div>
-            <div className='phone'>{ location.phone }</div>
-            <div className='small-grey-2 details'>{ location.details } </div>
+            <div className='small-grey-1 addr-1'>{ addressStreet }</div>
+            <div className='small-grey-1 addr-2'>{ addrLine2 }</div>
+            <div className='phone'>{ phone }</div>
+            <div className='small-grey-2 details'>{ details } </div>
           </div>
           <div className='col col-right'>
             <div className='hours'>HOURS</div>
-            <div>{ location.hours.map((hrs, i) => (
+            <div>{ openHours.map((hrs, i) => (
               <div key={`hrs-${i}`} className='mapped-hrs'>
-                <div className='small-grey-2'>{ hrs.day }</div>
+                <div className='small-grey-2'>{ hrs.days }</div>
                 <div className='small-grey-2'>{ hrs.time }</div>
               </div>
             )) }</div>
