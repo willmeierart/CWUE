@@ -48,5 +48,5 @@
 2. [x] results not rendering on first search
 2. [] no map markers rendering at all
 3. [] map not centering correctly
-4. [] activeResult not being picked
+4. [x] activeResult not being picked
 5. [] handle all incomplete paths (no 404 on locations/detail etc)

@@ -17,6 +17,7 @@ import {
   setStaticLocList
 } from '../../../lib/redux/actions'
 import WithApolloLoader from '../../hoc/WithApolloLoader'
+import ImperativeRouter from '../../../server/ImperativeRouter'
 import { binder } from '../../../lib/_utils'
 
 export default function DataManager (ComposedComponent) {
@@ -52,7 +53,10 @@ export default function DataManager (ComposedComponent) {
 
       switch (true) {
         case (initial || (state === 'results' && isServer)):
-          this.setPageStateGeoLoc()
+          if (initial && url.asPath !== '/carwash/locations') {
+            ImperativeRouter.push('locations', { state: 'initial' }, true)
+          }
+          this.setPageStateGeoLoc(state)
           break
         case state === 'detail':
           this.props.onSetActiveLocation(spec)
@@ -68,17 +72,10 @@ export default function DataManager (ComposedComponent) {
       const { userLocation } = this.props
       if (userLocation !== null && userLocation !== 'denied') {
         // this.setTemplate('results') // need to have :spec of 'my-location'
-        NextRouter.push({
-          pathname: '/locations',
-          query: {
-            state: 'results',
-            spec: 'my-location'
-          },
-          asPath: '/carwash/locations/results?search=my-location',
-          shallow: true
-        })
+        ImperativeRouter.push('locations', { state: 'results', spec: 'my-location' }, false)
       } else {
-        this.setTemplate('initial')
+        // this.setTemplate('initial')
+        ImperativeRouter.push('locations', { state: 'initial' }, false)
       }
     }
 

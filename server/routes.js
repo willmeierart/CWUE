@@ -1,6 +1,5 @@
 const UrlPrettifier = require('next-url-prettifier').default
 const qs = require('qs')
-const NextRouter = require('next/router')
 
 // custom router a la next-url-prettifier
 
@@ -66,7 +65,7 @@ const routes = [
           if (spec && spec !== '') {
             return `/carwash/locations/results?search=${spec.toLowerCase().replace(/( )/g, '-')}`
           } else {
-            return '/carwash/locations'
+            return '/carwash/locations/results'
           }
         case 'region':
           if (spec && spec !== '') {
@@ -79,6 +78,7 @@ const routes = [
             return `/carwash/locations/region/state`
           }
         case 'detail':
+          console.log(state, spec)
           if (spec && spec !== '') {
             return `/carwash/locations/detail/${spec.toLowerCase().replace(/( )/g, '-')}`
           } else {
@@ -89,10 +89,18 @@ const routes = [
       }
     },
     prettyUrlPatterns: [
-      { pattern: '/carwash/locations', defaultParams: { state: 'initial' } },
-      { pattern: '/carwash/locations/results?search=:spec', defaultParams: { state: 'results' } },
-      { pattern: '/carwash/locations/region/:spec', defaultParams: { state: 'region' } },
-      { pattern: '/carwash/locations/detail/:spec', defaultParams: { state: 'detail' } }
+      { pattern: '/carwash/locations',
+        defaultParams: { state: 'initial' } },
+      { pattern: '/carwash/locations/results?search=:spec',
+        defaultParams: { state: 'results' } },
+      { pattern: '/carwash/locations/results',
+        defaultParams: { state: 'results' } },
+      { pattern: '/carwash/locations/region/:spec',
+        defaultParams: { state: 'region' } },
+      { pattern: '/carwash/locations/detail/:spec',
+        defaultParams: { state: 'detail' } },
+      { pattern: '/carwash/locations/detail',
+        defaultParams: { state: 'initial' } }
     ]
   },
   {

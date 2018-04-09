@@ -32,6 +32,7 @@ const TemplateSwitcher = ({
             setActiveResults={setActiveResults}
             onSetActiveLocation={onSetActiveLocation}
             searchPhrase={searchPhrase}
+            userLocation={userLocation}
             url={url}>
             { children }
           </Results>

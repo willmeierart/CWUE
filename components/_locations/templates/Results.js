@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import ResultsList from '../ResultsList'
+import ImperativeRouter from '../../../server/ImperativeRouter'
 import { binder } from '../../../lib/_utils'
 
 export default class Results extends Component {
@@ -10,6 +11,15 @@ export default class Results extends Component {
 
   componentDidMount () {
     // this.props.setActiveResults()
+    const { url: { query: { spec } }, userLocation, setActiveResults } = this.props
+    if (!spec || spec === 'my-location') {
+      if (typeof userLocation === 'object') {
+        // setActiveResults('my-location')
+      } else {
+        ImperativeRouter.push('locations', { state: 'initial' }, true)
+      }
+    }
+    console.log(this.props)
   }
   shouldComponentUpdate (nextProps) {
     // console.log(this.props)
