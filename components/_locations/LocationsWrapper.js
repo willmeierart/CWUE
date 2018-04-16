@@ -24,7 +24,7 @@ class LocationsWrapper extends Component {
 
   shouldComponentUpdate (newProps) {
     if (!equal(newProps, this.props)) {
-      console.log(newProps)
+      // console.log(newProps)
       return true
     }
     return true
@@ -88,6 +88,7 @@ class LocationsWrapper extends Component {
             setActiveResults={this.setActiveResults}
             url={url} />
           <GoogleMap
+            url={url}
             onIdle
             template={pageState}
             center={mapCenter}

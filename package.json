@@ -20,6 +20,7 @@
   "dependencies": {
     "apollo-client-preset": "^1.0.8",
     "apollo-link": "^1.2.1",
+    "array-equal": "^1.0.0",
     "autoprefixer": "^7.2.6",
     "axios": "^0.18.0",
     "babel-plugin-module-resolver": "^3.1.0",

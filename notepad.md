@@ -30,9 +30,9 @@
 ## tests
 [] locations
   [x] if you search for an address it shows up in list view 
-    [] and map shows markers
+    [x] and map shows markers
   [x] if you search for a carwash by name it shows up in list view
-    [] and map shows markers
+    [x] and map shows markers
   [x] if you search for an address within 5 miles the nearby locations show up in list view
     [] and map shows markers
   [x] if you search for a city that contains a location it shows up in list view
@@ -48,10 +48,11 @@
 2. [x] results not rendering on first search
 2. [x] no map markers rendering at all
 3. [] markers not rendering first load
-3. [] map not centering correctly
+3. [] map not zooming correctly
 4. [x] activeResult not being picked
 5. [] handle all incomplete paths (no 404 on locations/detail etc)
 6. [] breaking on SSR now (has to do with markers)
+7. if previous marker contained within search, bounds not reset
 
 ## mtg 04/10
 + bottom logos aren't links to other sites
