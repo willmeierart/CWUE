@@ -10,49 +10,15 @@
     [] seo indexing
 
 [] locations 
-  [x] work out routing completely
-    [] **make sure query strings parseable - DOESN'T NEED TO SSR**
+  [] every route needs to render SSR without errors
+    [] **make sure query strings parseable into valid search - DOESN'T NEED TO SSR**
     [] make sure everything actually being SSR'd...🤞
+    [] no 404 on any route or incomplete path
   [] maps
-    [x] restrict api key
-    [] deal with automatic bounds / markers / etc
-    [] get working with indirect search (markers)
-    [x] check out potential for styling (esp america border)
-  [x] figure out multi-endpoint apollo thing (schema-stitching?)
-    [x] deploy server
-  [] **figure out how to bind 'region' (or derive it from data) to each location** -- think about finding >/< bounds
-  [x] start working on binding functions to real data, graphcms
-  [x] set map to load at different zooms based on screen size
-  [] **reallllly clean up / wrap your hand around code for search portion**
+    [] markers not rendering first SSR load?
+    [] not zooming/centering properly
+      [] if previous marker contained within new markers...?
 
-
-
-## tests
-[] locations
-  [x] if you search for an address it shows up in list view 
-    [x] and map shows markers
-  [x] if you search for a carwash by name it shows up in list view
-    [x] and map shows markers
-  [x] if you search for an address within 5 miles the nearby locations show up in list view
-    [] and map shows markers
-  [x] if you search for a city that contains a location it shows up in list view
-  + parsed by bounds and region
-  [x] if you search for a state that contains location it shows up in list view
-  + parsed by bounds and region
-  [] if you navigate directly to a 'search' link (SSR), its query string is parsed into a valid search
-    +
-  [] when a group of locations show up on a map, the map centers on marker cluster **(or search item?)** and zooms to bounds
-
-## problems with above
-1. [x] no search results rendering at all
-2. [x] results not rendering on first search
-2. [x] no map markers rendering at all
-3. [] markers not rendering first load
-3. [] map not zooming correctly
-4. [x] activeResult not being picked
-5. [] handle all incomplete paths (no 404 on locations/detail etc)
-6. [] breaking on SSR now (has to do with markers)
-7. if previous marker contained within search, bounds not reset
 
 ## mtg 04/10
 + bottom logos aren't links to other sites
