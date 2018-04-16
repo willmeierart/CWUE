@@ -4,6 +4,7 @@ import MapManager from './data_managers/Map'
 import { binder } from '../../lib/_utils'
 import { getCoordsFromAddress } from '../../lib/_locationUtils'
 import locData from '../../lib/_data/locData'
+import equal from 'deep-equal'
 // import { flip } from 'geojson-flip'
 // const geoJSON = require('/static/geoData/US_GEO.js')
 // const flippedGeoJson = flip(geoJSON)
@@ -11,19 +12,22 @@ import locData from '../../lib/_data/locData'
 class GoogleMap extends Component {
   constructor (props) {
     super(props)
-    this.allMarkers = []
+    // this.allMarkers = []
+    const { zoom } = this.props
     this.state = {
       center: {lat: 39.8283459, lng: -98.5794797},
-      markers: this.props.markers || [],
-      zoom: this.props.zoom || 4,
+      activeMarkers: [],
+      markerSet: [],
+      markerTitles: [],
+      zoom: zoom || 4,
       bounds: null
     }
-    binder(this, ['setCenter', 'setMarker', 'setMarkers', 'setCenterViaMarkers', 'setBounds'])
+    binder(this, ['setCenter', 'setMarker', 'setMarkers', 'setCenterViaMarkers', 'setBounds', 'toggleActiveMarkers'])
   }
 
   componentDidMount () {
     const init = () => {
-      const { template, onIdle, InitialMapStyles, markers } = this.props
+      const { template, onIdle, InitialMapStyles, geoJSONstyles } = this.props
       if (!window.google) {
         console.log('no google')
         setTimeout(init, 500)
@@ -35,32 +39,25 @@ class GoogleMap extends Component {
           center: this.state.center,
           mapTypeId: google.maps.MapTypeId.ROADMAP,
           disableDefaultUI: true,
-          zoomControl: false,
-          mapTypeControl: false,
-          scaleControl: false,
-          streetViewControl: false,
-          rotateControl: false,
-          fullscreenControl: false,
-          styles: template === 'initial' ? InitialMapStyles : null,
-          gestureHandling: 'none'
+          // zoomControl: false,
+          // mapTypeControl: false,
+          // scaleControl: false,
+          // streetViewControl: false,
+          // rotateControl: false,
+          // fullscreenControl: false,
+          styles: template === 'initial' ? InitialMapStyles : null
+          // gestureHandling: 'none'
         })
-        if (onIdle) {
-          google.maps.event.addListener(this.map, 'idle', () =>
-            onIdle(this.map, markers)
-            // onIdle(this.map, this.allMarkers)
-          )
-        }
-
-        this.setMarkers()
-        // this.setState({ markers: markers })
         if (template === 'results') {
-          this.setCenterViaMarkers(locData)
+          if (onIdle) {
+            google.maps.event.addListener(this.map, 'idle', () => {
+              this.setMarkers()
+            })
+          }
+          this.setCenterViaMarkers(this.state.activeMarkers)
         } else if (template === 'initial') {
-          // this.setCenter('geographic center of the united states')
-
-          // this.map.data.addGeoJson(flippedGeoJson)
           this.map.data.loadGeoJson('/static/geoData/US_GEO.json')
-          this.map.data.setStyle(this.props.geoJSONstyles)
+          this.map.data.setStyle(geoJSONstyles)
         }
       }
     }
@@ -68,23 +65,24 @@ class GoogleMap extends Component {
   }
 
   componentDidUpdate (prevProps, prevState) {
-    if (JSON.stringify(this.props) !== JSON.stringify(prevProps)) {
-      this.setState({
-        markers: this.props.markers || [],
-        zoom: this.props.zoom || 8
-        // center: this.props.center
-      })
+    if (!equal(this.props, prevProps)) {
+      console.log('props different')
+      this.setMarkers()
+      this.setCenterViaMarkers(this.state.activeMarkers)
     }
-    if (JSON.stringify(this.state) !== JSON.stringify(prevState)) {
+    if (!equal(this.state, prevState)) {
       if (this.map.getZoom() !== this.state.zoom) {
+        console.log('zoom different')
         this.map.setZoom(this.state.zoom)
       }
-      if (JSON.stringify(prevState.center) !== JSON.stringify(this.state.center)) {
+      if (!equal(prevState.center, this.state.center)) {
+        console.log('center different')
         this.map.panTo(this.state.center)
       }
-      if (JSON.stringify(this.state.markers) !== JSON.stringify(prevState.markers)) {
-        // this.setMarkers()
-        // console.log(this.state.markers);
+      if (!equal(prevState.activeMarkers, this.state.activeMarkers)) {
+        console.log('markers different')
+        this.toggleActiveMarkers()
+        this.setCenterViaMarkers(this.state.activeMarkers)
       }
     }
   }
@@ -93,7 +91,6 @@ class GoogleMap extends Component {
     const mainAction = () => {
       if (marker) this.setState({ bounds: this.state.bounds.extend(marker) })
       this.map.fitBounds(this.state.bounds)
-      // console.log(this.state.bounds)
     }
     if (!this.state.bounds) {
       this.setState({ bounds: new window.google.maps.LatLngBounds() }, mainAction)
@@ -109,25 +106,21 @@ class GoogleMap extends Component {
     let minLng = null
 
     const markerCenter = markers.reduce((obj, marker) => {
-      if (maxLat === null || marker.coords.lat > maxLat) maxLat = marker.coords.lat
-      if (minLat === null || marker.coords.lat < minLat) minLat = marker.coords.lat
-      if (maxLng === null || marker.coords.lng > maxLng) maxLng = marker.coords.lng
-      if (minLng === null || marker.coords.lng < minLng) minLng = marker.coords.lng
+      if (maxLat === null || marker.position.lat > maxLat) maxLat = marker.position.lat
+      if (minLat === null || marker.position.lat < minLat) minLat = marker.position.lat
+      if (maxLng === null || marker.position.lng > maxLng) maxLng = marker.position.lng
+      if (minLng === null || marker.position.lng < minLng) minLng = marker.position.lng
       obj.coords.lat = parseFloat(((maxLat + minLat) / 2).toFixed(5))
       obj.coords.lng = parseFloat(((maxLng + minLng) / 2).toFixed(5))
-      // console.log(maxLat, maxLng)
-      // console.log(coords);
-      this.setBounds(marker.coords)
+      this.setBounds(marker.position)
       return obj
     }, { coords: { lat: 0, lng: 0 } })
-    // console.log(markerCenter)
     this.setCenter(markerCenter.coords)
   }
 
   setCenter (center) {
     const setCenterType = center => {
       if (typeof center === 'string') {
-        // console.log(this.props.center)
         getCoordsFromAddress(center)
           .then(coords => {
             this.setState({ center: coords })
@@ -138,18 +131,20 @@ class GoogleMap extends Component {
     }
     if (center) {
       setCenterType(center)
+    } else if (this.props.center) {
+      setCenterType(this.props.center)
     } else {
-      if (this.props.center) {
-        setCenterType(this.props.center)
-      } else {
-        this.setState({ center: {lat: 39.740287, lng: -104.971806} })
-      }
+      this.setState({ center: {lat: 39.740287, lng: -104.971806} })
     }
   }
 
   setMarkers () {
-    // if (this.props.markers !== undefined) {
+    const newMarkerTitles = [...this.state.markerTitles]
     this.props.markers.forEach((marker, i) => {
+      const title = marker.title
+      if (newMarkerTitles.indexOf(title) === -1) {
+        newMarkerTitles.push(title)
+      }
       if (typeof marker.position === 'string') {
         getCoordsFromAddress(marker.position)
           .then(coords => {
@@ -160,27 +155,44 @@ class GoogleMap extends Component {
         this.setMarker(marker)
       }
     })
-    // }
+    this.setState({ markerTitles: newMarkerTitles })
+    this.toggleActiveMarkers()
   }
 
   setMarker (marker) {
-    const m = new window.google.maps.Marker({
-      position: marker.position,
-      animation: marker.animation,
-      title: marker.title,
-      label: marker.label,
-      map: this.map,
-      icon: marker.icon
+    const copiedMarkers = [...this.state.markerSet]
+    const i = this.state.markerTitles.indexOf(marker.title)
+    if (i === -1) {
+      const m = new window.google.maps.Marker({
+        position: marker.position,
+        animation: marker.animation,
+        title: marker.title,
+        label: marker.label,
+        map: this.map,
+        icon: marker.icon
+      })
+      window.google.maps.event.addListener(m, 'click', marker.onClick) // this is an important action
+      copiedMarkers.push(m)
+    }
+    this.setState({ markerSet: copiedMarkers })
+  }
+
+  toggleActiveMarkers () {
+    const activeMarkerTitles = this.props.markers.map(marker => marker.title)
+    this.state.markerSet.forEach(marker => {
+      if (activeMarkerTitles.indexOf(marker.title) !== -1) {
+        marker.setMap(this.map)
+      } else {
+        marker.setMap(null)
+      }
     })
-    window.google.maps.event.addListener(m, 'click', marker.onClick) // this is an important action
-    // this.allMarkers.push(m) // needs to somehow clear here
   }
 
   render () {
-    const { dims: { width, height  }, template } = this.props
+    const { dims: { width, height }, template } = this.props
     return (
       <div className='map-container'>
-        <div id='map' style={{ width: '100%', height: '100%' }} ref={map => { this.mapDOM = map }} />
+        <div onChange={this.updateAllMapProps} id='map' style={{ width: '100%', height: '100%' }} ref={map => { this.mapDOM = map }} />
         <style jsx>{`
           .map-container {
             pointer-events: ${template === 'initial' ? 'none' : 'all'};

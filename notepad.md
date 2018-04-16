@@ -12,7 +12,7 @@
 [] locations 
   [x] work out routing completely
     [] **make sure query strings parseable - DOESN'T NEED TO SSR**
-    [] make sure everything actually being SSR'd
+    [] make sure everything actually being SSR'd...🤞
   [] maps
     [x] restrict api key
     [] deal with automatic bounds / markers / etc
@@ -46,7 +46,19 @@
 ## problems with above
 1. [x] no search results rendering at all
 2. [x] results not rendering on first search
-2. [] no map markers rendering at all
+2. [x] no map markers rendering at all
+3. [] markers not rendering first load
 3. [] map not centering correctly
 4. [x] activeResult not being picked
 5. [] handle all incomplete paths (no 404 on locations/detail etc)
+6. [] breaking on SSR now (has to do with markers)
+
+## mtg 04/10
++ bottom logos aren't links to other sites
++ services:
+  + (ask monte for list)
++ special: text/img ONLY 
++ location detail bottom blurb is maybe a testimonial / some statement
++ locations now need to have an individual prices thing (maybe that goes under washes in gcms)
+  + also individual fast-passes?
++ there are multiple fastpasses? >> maybe not now

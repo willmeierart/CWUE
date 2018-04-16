@@ -68,14 +68,14 @@ export default function DataManager (ComposedComponent) {
       }
     }
 
-    setPageStateGeoLoc () {
+    setPageStateGeoLoc (state) {
       const { userLocation } = this.props
-      if (userLocation !== null && userLocation !== 'denied') {
+      if (userLocation !== null && userLocation !== 'denied' && state === 'results') {
         // this.setTemplate('results') // need to have :spec of 'my-location'
         ImperativeRouter.push('locations', { state: 'results', spec: 'my-location' }, false)
       } else {
         // this.setTemplate('initial')
-        ImperativeRouter.push('locations', { state: 'initial' }, false)
+        // ImperativeRouter.push('locations', { state: 'initial' }, false)
       }
     }
 

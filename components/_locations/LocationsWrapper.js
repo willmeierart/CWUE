@@ -43,6 +43,7 @@ class LocationsWrapper extends Component {
       onSetActiveResultsList(locData)
     } else if (results) {
       onSetActiveResultsList(results)
+      // console.log(results)
     }
   }
 
@@ -87,6 +88,7 @@ class LocationsWrapper extends Component {
             setActiveResults={this.setActiveResults}
             url={url} />
           <GoogleMap
+            onIdle
             template={pageState}
             center={mapCenter}
             zoom={mapZoom}
