@@ -1,7 +1,10 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import { graphql, compose } from 'react-apollo'
+import { homePage } from '../../lib/apollo/queries'
 import { getUserLocation } from '../../lib/redux/actions'
 import { binder } from '../../lib/_utils'
+import WithApolloLoader from '../hoc/WithApolloLoader'
 import Logo from '../layout/Logo'
 import FastPassCallout from './FastPassCallout'
 
@@ -68,4 +71,10 @@ function mapDispatchToProps (dispatch) {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(HomeWrapper)
+export default compose(
+  graphql(homePage)
+)(
+  connect(mapStateToProps, mapDispatchToProps)(
+    WithApolloLoader(HomeWrapper)
+  )
+)

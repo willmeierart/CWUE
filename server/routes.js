@@ -19,7 +19,18 @@ const routes = [
         : `/carwash/washes/${title.toLowerCase().replace(' ', '-')}`
     },
     prettyUrlPatterns: [ // server
-      { pattern: '/carwash/washes/:title', defaultParams: {} }
+      {
+        pattern: '/carwash/washes/:title',
+        defaultParams: {
+          title: 'exterior-washes'
+        }
+      },
+      {
+        pattern: '/carwash/washes',
+        defaultParams: {
+          title: 'exterior-washes'
+        }
+      }
     ],
     children: [
       { title: 'Exterior Washes' },
@@ -43,7 +54,10 @@ const routes = [
         : `/carwash/about/${title.toLowerCase()}`
     },
     prettyUrlPatterns: [
-      { pattern: '/carwash/about/:title', defaultParams: {} }
+      {
+        pattern: '/carwash/about/:title',
+        defaultParams: {}
+      }
     ],
     children: [
       { title: 'Company' },
@@ -65,7 +79,7 @@ const routes = [
           if (spec && spec !== '') {
             return `/carwash/locations/results?search=${spec.toLowerCase().replace(/( )/g, '-')}`
           } else {
-            return '/carwash/locations/results'
+            return '/carwash/locations'
           }
         case 'region':
           if (spec && spec !== '') {
@@ -89,18 +103,48 @@ const routes = [
       }
     },
     prettyUrlPatterns: [
-      { pattern: '/carwash/locations',
-        defaultParams: { state: 'initial' } },
-      { pattern: '/carwash/locations/results?search=:spec',
-        defaultParams: { state: 'results' } },
-      { pattern: '/carwash/locations/results',
-        defaultParams: { state: 'results' } },
-      { pattern: '/carwash/locations/region/:spec',
-        defaultParams: { state: 'region' } },
-      { pattern: '/carwash/locations/detail/:spec',
-        defaultParams: { state: 'detail' } },
-      { pattern: '/carwash/locations/detail',
-        defaultParams: { state: 'initial' } }
+      {
+        pattern: '/carwash/locations',
+        defaultParams: {
+          state: 'initial'
+        }
+      },
+      {
+        pattern: '/carwash/locations/results?search=:spec',
+        defaultParams: {
+          state: 'results'
+        }
+      },
+      {
+        pattern: '/carwash/locations/results',
+        defaultParams: {
+          state: 'results'
+        }
+      },
+      {
+        pattern: '/carwash/locations/region/:spec',
+        defaultParams: {
+          state: 'region'
+        }
+      },
+      {
+        pattern: '/carwash/locations/region',
+        defaultParams: {
+          state: 'initial'
+        }
+      },
+      {
+        pattern: '/carwash/locations/detail/:spec',
+        defaultParams: {
+          state: 'detail'
+        }
+      },
+      {
+        pattern: '/carwash/locations/detail',
+        defaultParams: {
+          state: 'initial'
+        }
+      }
     ]
   },
   {

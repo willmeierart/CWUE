@@ -1,14 +1,16 @@
 import React, { Component } from 'react'
 import debounce from 'lodash.debounce'
-import NextRouter from 'next/router'
+import ExecutionEnvironment from 'exenv'
+import ImperativeRouter from '../../server/ImperativeRouter'
 import { geocodeByAddress, getLatLng } from '../../lib/_locationUtils'
 import { binder } from '../../lib/_utils'
 import SearchManager from './data_managers/Search'
+import { Z_DEFAULT_STRATEGY } from 'zlib';
 
 class SearchBar extends Component {
   constructor (props) {
     super(props)
-    this.state = { autocompleteItems: [], value: '', markers: [] }
+    this.state = { autocompleteItems: [], value: '', markers: [], isServer: !ExecutionEnvironment.canUseDOM, freshLoad: true }
     binder(this, ['autocompleteCallback',
       'clearSuggestions',
       'fetchPredictions',
@@ -27,11 +29,42 @@ class SearchBar extends Component {
       'renderSuggestion',
       'renderFooter',
       'handleInput',
-      'getInputProps'
+      'getInputProps',
+      'handleSearchOnSSR'
     ])
     this.debouncedFetchPredictions = debounce(this.fetchPredictions, 800)
     this.highlightFirstSuggestion = false
     this.shouldFetchSuggestions = (thing) => { if (thing) return true }
+  }
+
+  componentDidMount () {
+    console.log(this.props)
+    this.handleSearchOnSSR()
+    const isClient = ExecutionEnvironment.canUseDOM
+    // if (isClient) {
+    //   this.setState({ freshLoad: false })
+    // }
+  }
+
+  handleSearchOnSSR () {
+    const { searchPhrase, activeResults, url: { asPath } } = this.props
+    const noActiveSearch = !searchPhrase && activeResults.length === 0
+    const hasQueryString = asPath.indexOf('?') !== -1
+    if (noActiveSearch) {
+      if (hasQueryString) {
+        const searchVal = asPath.split('?search=')[1].replace(/[-]/g, ' ')
+        console.log(searchVal)
+        this.setState({
+          value: searchVal,
+          freshLoad: true
+        }, async () => {
+          console.log(this.state.isServer);
+          await this.fetchPredictions()
+        })
+      } else {
+        ImperativeRouter.push('locations', { state: 'initial' }, false)
+      }
+    }
   }
 
   fetchPredictions () {
@@ -57,7 +90,7 @@ class SearchBar extends Component {
     this.props.handleSelection(address, placeId, handleInput)
   }
 
-  handleInput (val) { this.setState({ value: val }) } // val = address (active selection)
+  handleInput (val) { this.setState({ value: val, freshLoad: this.state.freshLoad && false }) } // val = address (active selection)
 
   clearSuggestions () { this.setState({ autocompleteItems: [] }) }
 
@@ -84,6 +117,7 @@ class SearchBar extends Component {
 
   handleEnterKey (val) {
     const activeItem = this.getActiveItem()
+    console.log(activeItem)
     if (activeItem === undefined) {
       this.handleEnterKeyWithoutActiveItem()
     } else {
@@ -181,6 +215,7 @@ class SearchBar extends Component {
   }
 
   autocompleteCallback (predictions, status) {
+    console.log(predictions)
     // called by this.fetchPredictions, used as callback to native google autocomplete func
     // predictions are each full object returned from autocompleteservice
     if (status !== this.props.autocompleteOK) {
@@ -200,6 +235,9 @@ class SearchBar extends Component {
         formattedSuggestion: formattedSuggestion(p.structured_formatting)
       }))
     })
+    if (this.state.freshLoad && this.props.url.query.state === 'results') {
+      this.handleEnterKeyWithoutActiveItem()
+    }
   }
 
   renderSuggestion ({ suggestion }) { return <div>{ suggestion }</div> }
@@ -231,7 +269,6 @@ class SearchBar extends Component {
           </div>
         </div>
         <style jsx>{`
-
           .searchbar-wrapper {
             margin-bottom: 2vh;
             width: 100%;

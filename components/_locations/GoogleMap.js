@@ -6,21 +6,17 @@ import { getCoordsFromAddress } from '../../lib/_locationUtils'
 import locData from '../../lib/_data/locData'
 import equal from 'deep-equal'
 import arrayEqual from 'array-equal'
-// import { flip } from 'geojson-flip'
-// const geoJSON = require('/static/geoData/US_GEO.js')
-// const flippedGeoJson = flip(geoJSON)
 
 class GoogleMap extends Component {
   constructor (props) {
     super(props)
-    // this.allMarkers = []
     const { zoom } = this.props
     this.state = {
       center: {lat: 39.8283459, lng: -98.5794797},
       activeMarkers: [],
       markerSet: [],
       markerTitles: [],
-      zoom: zoom || 4,
+      zoom: zoom || 3,
       bounds: null
     }
     binder(this, ['setCenter', 'setMarker', 'setMarkers', 'setCenterViaMarkers', 'setBounds', 'toggleActiveMarkers'])
@@ -53,13 +49,10 @@ class GoogleMap extends Component {
           if (onIdle) {
             google.maps.event.addListener(this.map, 'idle', () => {
               this.setMarkers()
-              // this.map.setZoom(this.state.zoom)
-              // this.map.panTo(this.state.center)
             })
           }
-          // this.setCenterViaMarkers(this.state.activeMarkers)
         } else if (template === 'initial') {
-          this.map.data.loadGeoJson('/static/geoData/US_GEO.json') 
+          this.map.data.loadGeoJson('/static/geoData/US_GEO.json')
           this.map.data.setStyle(geoJSONstyles)
         }
       }
@@ -71,13 +64,12 @@ class GoogleMap extends Component {
     if (!equal(this.props, prevProps)) {
       console.log('props different')
       this.setMarkers()
-      // this.setCenterViaMarkers(this.state.activeMarkers)
       this.map.panTo(this.state.center)
+      this.map.setZoom(this.props.zoom)
     }
-    // if (!equal(this.props.markers))
     if (prevState.zoom !== this.state.zoom) {
       console.log('zoom different:', prevState.zoom, this.state.zoom)
-      // this.props.onSetMapZoom(this.state.zoom)
+      this.map.setZoom(this.state.zoom)
     }
     if (!equal(prevState.center, this.state.center)) {
       console.log('center different:', prevState.center, this.state.center)

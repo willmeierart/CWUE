@@ -1,6 +1,9 @@
 import React, { Component } from 'react'
 import ExecutionEnvironment from 'exenv'
+import { compose, graphql } from 'react-apollo'
+import { aboutPage } from '../../lib/apollo/queries'
 import PropTypes from 'prop-types'
+import WithApolloLoader from '../hoc/WithApolloLoader'
 import TopSubMenu from '../layout/TopSubMenu'
 import TemplateSwitcher from './TemplateSwitcher'
 import { binder } from '../../lib/_utils'
@@ -46,4 +49,8 @@ AboutWrapper.propTypes = {
 
 }
 
-export default AboutWrapper
+export default compose(
+  graphql(aboutPage)
+)(
+  WithApolloLoader(AboutWrapper)
+)

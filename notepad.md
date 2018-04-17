@@ -8,16 +8,18 @@
   [] start using google tools to be checking:
     [] pagespeed
     [] seo indexing
+  [] go thru wireframes and gcms and make sure model is correct
 
-[] locations 
-  [] every route needs to render SSR without errors
-    [] **make sure query strings parseable into valid search - DOESN'T NEED TO SSR**
-    [] make sure everything actually being SSR'd...🤞
-    [] no 404 on any route or incomplete path
+[] locations
+  [x] every route needs to render SSR without errors - no 404 on any route or incomplete route (all route back to init flow)
+    [x] make sure query strings parseable into valid search - DOESN'T NEED TO SSR
+    [x] make sure everything actually being SSR'd...🤞
   [] maps
-    [] markers not rendering first SSR load?
+    [] markers not rendering first SSR load? (or even the map now...)
     [] not zooming/centering properly
       [] if previous marker contained within new markers...?
+
+[] washes
 
 
 ## mtg 04/10
