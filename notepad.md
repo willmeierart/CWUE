@@ -8,7 +8,8 @@
   [] start using google tools to be checking:
     [] pagespeed
     [] seo indexing
-  [] go thru wireframes and gcms and make sure model is correct
+  [x] go thru wireframes and gcms and make sure model is correct
+  [] set up error boundaries for apollo (and maps, anything else that causes hard crash)
 
 [] locations
   [x] every route needs to render SSR without errors - no 404 on any route or incomplete route (all route back to init flow)
@@ -31,3 +32,4 @@
 + locations now need to have an individual prices thing (maybe that goes under washes in gcms)
   + also individual fast-passes?
 + there are multiple fastpasses? >> maybe not now
++ testimonial feedback needs to send email directly to email address

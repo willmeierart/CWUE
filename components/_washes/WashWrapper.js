@@ -19,6 +19,7 @@ class AboutWrapper extends Component {
   }
   componentDidMount () {
     this.updateAll()
+    console.log(this.props)
   }
 
   componentDidUpdate (prevProps) {
@@ -34,7 +35,8 @@ class AboutWrapper extends Component {
     console.log(title)
     const splitPath = asPath.split(`${pathname}/`)
     const backupTitle = splitPath[splitPath.length - 1]
-    this.setState({ type: title || backupTitle })
+    const thisTitle = title || 'exterior-washes'
+    this.setState({ type: thisTitle })
   }
 
   async updateAll () {
@@ -54,7 +56,8 @@ class AboutWrapper extends Component {
 
   render () {
     const { type } = this.state
-    const typeKey = type.split('-')[0]
+    console.log(type);
+    const typeKey = type.split('-')[0] || 'exterior'
     return (
       <div className='outer-wrapper'>
         <div className='inner-wrapper'>

@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { graphql, compose } from 'react-apollo'
 import { homePage } from '../../lib/apollo/queries'
 import { getUserLocation } from '../../lib/redux/actions'
-import { binder } from '../../lib/_utils'
+import { binder, checkAllQueriesError } from '../../lib/_utils'
 import WithApolloLoader from '../hoc/WithApolloLoader'
 import Logo from '../layout/Logo'
 import FastPassCallout from './FastPassCallout'
@@ -20,6 +20,7 @@ class HomeWrapper extends Component {
     if (userLocation !== 'denied') {
       onGetUserLocation(window.location.pathname)
     }
+    // checkAllQueriesError(['homePage'])
   }
 
   render () {

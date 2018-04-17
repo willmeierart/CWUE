@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import ExecutionEnvironment from 'exenv'
 import { compose, graphql } from 'react-apollo'
-import { aboutPage } from '../../lib/apollo/queries'
+import { aboutPage, pageCopy } from '../../lib/apollo/queries'
 import PropTypes from 'prop-types'
 import WithApolloLoader from '../hoc/WithApolloLoader'
 import TopSubMenu from '../layout/TopSubMenu'

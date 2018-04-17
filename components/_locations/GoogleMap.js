@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import ReactDOM from 'react-dom'
 import MapManager from './data_managers/Map'
+import NextRouter from 'next/router'
 import { binder } from '../../lib/_utils'
 import { getCoordsFromAddress } from '../../lib/_locationUtils'
 import locData from '../../lib/_data/locData'
@@ -59,6 +60,14 @@ class GoogleMap extends Component {
     }
     init()
   }
+  
+  // componentWillUnmount () {
+  //   NextRouter.onRouteChangeComplete(url => {
+  //     if (url.query.state !== 'results') {
+  //       this.toggleActiveMarkers()
+  //     }
+  //   })
+  // }
 
   async componentDidUpdate (prevProps, prevState) {
     if (!equal(this.props, prevProps)) {
@@ -66,6 +75,9 @@ class GoogleMap extends Component {
       this.setMarkers()
       this.map.panTo(this.state.center)
       this.map.setZoom(this.props.zoom)
+      if (this.props.url.query.state !== 'results') {
+        this.toggleActiveMarkers()
+      }
     }
     if (prevState.zoom !== this.state.zoom) {
       console.log('zoom different:', prevState.zoom, this.state.zoom)
@@ -183,7 +195,7 @@ class GoogleMap extends Component {
     const activeMarkerTitles = this.props.markers.map(marker => marker.title)
     const newActiveMarkers = []
     this.state.markerSet.forEach(marker => {
-      if (activeMarkerTitles.indexOf(marker.title) !== -1) {
+      if (activeMarkerTitles.indexOf(marker.title) !== -1 && this.props.template === 'results') {
         newActiveMarkers.push(marker)
         marker.setMap(this.map)
       } else {

@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { graphql, compose } from 'react-apollo'
 import NextRouter from 'next/router'
 import ExecutionEnvironment from 'exenv'
-import { allLocations } from '../../../lib/apollo/queries'
+import { allLocations, pageCopy } from '../../../lib/apollo/queries'
 import {
   getUserLocation,
   setMapZoom,

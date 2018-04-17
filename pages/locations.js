@@ -10,4 +10,4 @@ const Locations = props => {
   )
 }
 
-export default withData(Locations)
+export default withData(Locations, 'locations')

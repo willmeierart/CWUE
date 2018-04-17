@@ -4,6 +4,16 @@ import Loader from 'react-loaders'
 export default function WithApolloLoader (ComposedComponent) {
   class WrappedComponent extends Component {
     render () {
+      console.log(this.props)
+      // const { queries, data } = this.props
+      // const conditions = queries
+      //   ? queries.reduce((bool, query) => {
+      //     Object.keys(this.props).forEach(prop => console.log(JSON.stringify(this.props[prop])))
+      //     console.log(query)
+      //     if (this.props[query].loading &&
+      //       !this.props[query].error) { bool = true }
+      //   }, false)
+      //   : this.props.data.loading && !this.props.data.error
       return (
         <div className='with-apollo-loader' style={{ height: '100%' }}>
           { this.props.data.loading && !this.props.data.error

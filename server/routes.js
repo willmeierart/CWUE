@@ -57,6 +57,10 @@ const routes = [
       {
         pattern: '/carwash/about/:title',
         defaultParams: {}
+      },
+      {
+        pattern: '/carwash/about',
+        defaultParams: {}
       }
     ],
     children: [
