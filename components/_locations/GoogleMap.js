@@ -5,7 +5,6 @@ import MapManager from './data_managers/Map'
 import NextRouter from 'next/router'
 import { binder } from '../../lib/_utils'
 import { getCoordsFromAddress } from '../../lib/_locationUtils'
-import locData from '../../lib/_data/locData'
 import equal from 'deep-equal'
 import arrayEqual from 'array-equal'
 
@@ -28,7 +27,7 @@ class GoogleMap extends Component {
     const init = () => {
       const { template, onIdle, initialMapStyles, geoJSONstyles, url } = this.props
       if (!window.google) {
-        console.log('no google')
+        console.warn('no google')
         setTimeout(init, 500)
       } else {
         const { google } = window
@@ -61,7 +60,7 @@ class GoogleMap extends Component {
     }
     init()
   }
-  
+
   // componentWillUnmount () {
   //   NextRouter.onRouteChangeComplete(url => {
   //     if (url.query.state !== 'results') {

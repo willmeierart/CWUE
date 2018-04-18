@@ -11,7 +11,6 @@ import Footer from '../components/layout/Footer'
 class App extends Component {
   componentDidMount () {
     window.addEventListener('resize', this.props.onGetVPDims)
-    console.log(this.props)
   }
   render () {
     const { title, children, pageState, onSetLocPageState, url } = this.props

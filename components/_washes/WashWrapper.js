@@ -23,15 +23,12 @@ class AboutWrapper extends Component {
 
   componentDidUpdate (prevProps) {
     if (!equal(this.props.url, prevProps.url)) {
-      console.log('updating')
       this.updateAll()
-      console.log(this.state)
     }
   }
 
   setPageStateViaUrl () {
     const { query: { title }, asPath, pathname } = this.props.url
-    console.log(title)
     const splitPath = asPath.split(`${pathname}/`)
     const backupTitle = splitPath[splitPath.length - 1]
     const thisTitle = title || 'exterior-washes'
@@ -55,7 +52,6 @@ class AboutWrapper extends Component {
 
   render () {
     const { type } = this.state
-    console.log(type);
     const typeKey = type.split('-')[0] || 'exterior'
     return (
       <div className='outer-wrapper'>

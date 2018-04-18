@@ -1,26 +1,32 @@
 ## active
 - general
-  [x] find out about which menu items have dropdowns - ALL
-    [x] and set that up
-  [x] FINISH UDEMY GRAPHQL
-  [] implement proptypes
-  [] clean up && comment code
-  [] start using google tools to be checking:
+  [] comment code
+  [] (once deployed to staging) start using google tools to be checking:
     [] pagespeed
     [] seo indexing
   [x] go thru wireframes and gcms and make sure model is correct
-  [] set up error boundaries for apollo (and maps, anything else that causes hard crash)
+  [] **set up error boundaries for apollo (and maps, anything else that causes hard crash)...**
+  [] once we enter design phase
+    [] start mocking up according to spec
+    [] work out top nav
+  [] *implement custom < Head /> for every page for SEO*
 
 - locations
-  [x] every route needs to render SSR without errors - no 404 on any route or incomplete route (all route back to init flow)
-    [x] make sure query strings parseable into valid search - DOESN'T NEED TO SSR
-    [x] make sure everything actually being SSR'd...🤞
   [] maps
-    [] markers not rendering first SSR load? (or even the map now...)
+    [] markers
+      [] not rendering first SSR load? (or even the map now...)
+      [] should never appear on initial map view
     [] not zooming/centering properly
-      [] if previous marker contained within new markers...?
+      [] ...if previous marker contained within new markers...?
+  [] regions page...?
+  [] make sure imperative routing actually working how you want with redirects (should never show blank results page)
+  [] make sure flow working with valid user location
 
 - washes
+  [] is every view really all that different?
+
+- fastpass
+  [] any guidance at all...
 
 
 ## mtg 04/10
