@@ -1,6 +1,4 @@
-// import { Link } from 'next-url-prettifier'
-// import { Router } from '../../server/routes'
-// const NextRouter = require('next/router')
+import PropTypes from 'prop-types'
 import ImperativeRouter from '../../server/ImperativeRouter'
 
 const ResultModule = ({ location, pickLocation, detail }) => {
@@ -98,6 +96,12 @@ const ResultModule = ({ location, pickLocation, detail }) => {
       `}</style>
     </div>
   ) : null
+}
+
+ResultModule.propTypes = {
+  location: PropTypes.object.isRequired,
+  pickLocation: PropTypes.func,
+  detail: PropTypes.bool
 }
 
 export default ResultModule

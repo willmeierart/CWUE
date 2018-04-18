@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { graphql, compose } from 'react-apollo'
 import { homePage } from '../../lib/apollo/queries'
@@ -15,7 +16,6 @@ class HomeWrapper extends Component {
   }
 
   componentDidMount () {
-    console.log(this.props)
     const { userLocation, onGetUserLocation } = this.props
     if (userLocation !== 'denied') {
       onGetUserLocation(window.location.pathname)
@@ -79,3 +79,9 @@ export default compose(
     WithApolloLoader(HomeWrapper)
   )
 )
+
+HomeWrapper.propTypes = {
+  data: PropTypes.object.isRequired,
+  onGetUserLocation: PropTypes.func.isRequired,
+  userLocation: PropTypes.oneOfType([PropTypes.object, PropTypes.string])
+}

@@ -30,4 +30,8 @@ const WashesTable = ({ data }) => {
   )
 }
 
+WashesTable.propTypes = {
+  data: PropTypes.array.isRequired
+}
+
 export default WashesTable

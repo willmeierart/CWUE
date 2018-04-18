@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 
 export default class Initial extends Component {
   componentDidMount () {
@@ -40,4 +41,9 @@ export default class Initial extends Component {
       </div>
     )
   }
+}
+
+Initial.propTypes = {
+  onGetUserLocation: PropTypes.func.isRequired,
+  userLocation: PropTypes.oneOfType([PropTypes.object, PropTypes.string])
 }

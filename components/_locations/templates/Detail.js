@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 // import Router from 'next/router'
 import Images from '../Images'
 import ResultModule from '../ResultModule'
@@ -8,6 +9,10 @@ class Detail extends Component {
   constructor (props) {
     super(props)
     binder(this, ['renderSpecials'])
+  }
+
+  componentDidMount () {
+    console.log(this.props)
   }
 
   renderSpecials (specials) {
@@ -137,6 +142,10 @@ class Detail extends Component {
       </div>
     )
   }
+}
+
+Detail.propTypes = {
+  activeLocation: PropTypes.object.isRequired
 }
 
 export default Detail

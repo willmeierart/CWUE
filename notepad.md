@@ -1,5 +1,5 @@
 ## active
-[] general
+- general
   [x] find out about which menu items have dropdowns - ALL
     [x] and set that up
   [x] FINISH UDEMY GRAPHQL
@@ -11,7 +11,7 @@
   [x] go thru wireframes and gcms and make sure model is correct
   [] set up error boundaries for apollo (and maps, anything else that causes hard crash)
 
-[] locations
+- locations
   [x] every route needs to render SSR without errors - no 404 on any route or incomplete route (all route back to init flow)
     [x] make sure query strings parseable into valid search - DOESN'T NEED TO SSR
     [x] make sure everything actually being SSR'd...🤞
@@ -20,7 +20,7 @@
     [] not zooming/centering properly
       [] if previous marker contained within new markers...?
 
-[] washes
+- washes
 
 
 ## mtg 04/10

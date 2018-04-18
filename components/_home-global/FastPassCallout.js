@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import { Link } from 'next-url-prettifier'
 import { Router, routes } from '../../server/routes'
 

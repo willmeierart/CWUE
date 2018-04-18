@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 import { binder } from '../../lib/_utils'
 
 class Images extends Component {
@@ -90,6 +91,10 @@ class Images extends Component {
       </div>
     )
   }
+}
+
+Images.propTypes = {
+  images: PropTypes.array.isRequired
 }
 
 export default Images

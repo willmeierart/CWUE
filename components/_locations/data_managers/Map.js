@@ -31,7 +31,7 @@ export default function MapManager (ComposedComponent) {
       }
     }
     render () {
-      const InitialMapStyles = [
+      const initialMapStyles = [
         {
           'stylers': [
             { 'color': '#ffffff' }
@@ -77,7 +77,7 @@ export default function MapManager (ComposedComponent) {
         strokeWeight: 1
       }
       return (
-        <ComposedComponent geoJSONstyles={geoJSONstyles} InitialMapStyles={InitialMapStyles} {...this.props} />
+        <ComposedComponent geoJSONstyles={geoJSONstyles} initialMapStyles={initialMapStyles} {...this.props} />
       )
     }
   }

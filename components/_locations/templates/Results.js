@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 import ResultsList from '../ResultsList'
 import ImperativeRouter from '../../../server/ImperativeRouter'
 import { binder } from '../../../lib/_utils'
@@ -19,7 +20,6 @@ export default class Results extends Component {
         ImperativeRouter.push('locations', { state: 'initial' }, true)
       }
     }
-    console.log(this.props)
   }
   shouldComponentUpdate (nextProps) {
     // console.log(this.props)
@@ -121,4 +121,13 @@ export default class Results extends Component {
       </section>
     )
   }
+}
+
+Results.propTypes = {
+  userLocation: PropTypes.oneOfType([PropTypes.object, PropTypes.string]),
+  onSetActiveLocation: PropTypes.func.isRequired,
+  activeResults: PropTypes.array.isRequired,
+  setActiveResults: PropTypes.func.isRequired,
+  searchPhrase: PropTypes.string.isRequired,
+  url: PropTypes.object.isRequired
 }

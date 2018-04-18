@@ -4,7 +4,6 @@ import Loader from 'react-loaders'
 export default function WithApolloLoader (ComposedComponent) {
   class WrappedComponent extends Component {
     render () {
-      console.log(this.props)
       // const { queries, data } = this.props
       // const conditions = queries
       //   ? queries.reduce((bool, query) => {

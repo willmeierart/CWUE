@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 import MapManager from './data_managers/Map'
 import NextRouter from 'next/router'
@@ -25,7 +26,7 @@ class GoogleMap extends Component {
 
   componentDidMount () {
     const init = () => {
-      const { template, onIdle, InitialMapStyles, geoJSONstyles, url } = this.props
+      const { template, onIdle, initialMapStyles, geoJSONstyles, url } = this.props
       if (!window.google) {
         console.log('no google')
         setTimeout(init, 500)
@@ -43,7 +44,7 @@ class GoogleMap extends Component {
           // streetViewControl: false,
           // rotateControl: false,
           // fullscreenControl: false,
-          styles: template === 'initial' ? InitialMapStyles : null
+          styles: template === 'initial' ? initialMapStyles : null
           // gestureHandling: 'none'
         })
         if (template === 'results' || url.asPath.indexOf('results') !== -1) {
@@ -221,6 +222,21 @@ class GoogleMap extends Component {
       </div>
     )
   }
+}
+
+GoogleMap.propTypes = {
+  center: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+  dims: PropTypes.object.isRequired,
+  geoJSONstyles: PropTypes.object.isRequired,
+  initialMapStyles: PropTypes.array.isRequired,
+  markers: PropTypes.array.isRequired,
+  onIdle: PropTypes.bool,
+  onSetMapZoom: PropTypes.func.isRequired,
+  setTemplate: PropTypes.func.isRequired,
+  template: PropTypes.string.isRequired,
+  url: PropTypes.object.isRequired,
+  vpDims: PropTypes.object.isRequired,
+  zoom: PropTypes.number.isRequired
 }
 
 export default MapManager(GoogleMap)

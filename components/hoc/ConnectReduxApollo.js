@@ -8,6 +8,7 @@ const ConnectReduxApollo = (
   queries,
   ComposedComponent
 ) => {
+  console.log(this.props)
   const composedQueries = Object.keys(queries).map(query =>
     graphql(query, { name: `${query}` })
   )

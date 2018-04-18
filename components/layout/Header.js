@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import TopMenu from './TopMenu'
 import Logo from './Logo'
 
@@ -20,5 +21,11 @@ const Header = props => (
     `}</style>
   </header>
 )
+
+Header.propTypes = {
+  url: PropTypes.object.isRequired,
+  pageState: PropTypes.string.isRequired,
+  onSetLocPageState: PropTypes.func.isRequired
+}
 
 export default Header

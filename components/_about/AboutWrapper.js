@@ -6,10 +6,11 @@ import PropTypes from 'prop-types'
 import WithApolloLoader from '../hoc/WithApolloLoader'
 import TopSubMenu from '../layout/TopSubMenu'
 import TemplateSwitcher from './TemplateSwitcher'
+import aboutData from '../../lib/_data/aboutData'
 import { binder } from '../../lib/_utils'
 
 class AboutWrapper extends Component {
-  constructor(props) {
+  constructor (props) {
     super(props)
     this.state = {
       template: 'company' // company || testimonials || news || careers || faq || contact
@@ -34,19 +35,24 @@ class AboutWrapper extends Component {
   }
 
   render () {
-    const { url } = this.props
+    const { url, data } = this.props
     const { template } = this.state
     return (
       <div className='outer-wrapper'>
-        <TemplateSwitcher template={template} />
-        <style jsx>{``}</style>
+        <h2 className='template-title'>{ template.toUpperCase() }</h2>
+        <TemplateSwitcher aboutData={aboutData} data={data} template={template} />
+        <style jsx>{`
+          h2 {
+            margin-left: 2em;
+          }
+        `}</style>
       </div>
     )
   }
 }
 
 AboutWrapper.propTypes = {
-
+  data: PropTypes.object.isRequired
 }
 
 export default compose(

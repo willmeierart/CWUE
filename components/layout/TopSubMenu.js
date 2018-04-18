@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import { Link } from 'next-url-prettifier'
 import { Router, routes } from '../../server/routes'
 import ImperativeRouter from '../../server/ImperativeRouter'
@@ -35,6 +36,10 @@ const TopSubMenu = ({ url }) => {
       `}</style>
     </div>
   )
+}
+
+TopSubMenu.propTypes = {
+  url: PropTypes.object.isRequired
 }
 
 export default TopSubMenu

@@ -19,7 +19,6 @@ class AboutWrapper extends Component {
   }
   componentDidMount () {
     this.updateAll()
-    console.log(this.props)
   }
 
   componentDidUpdate (prevProps) {
@@ -111,7 +110,7 @@ class AboutWrapper extends Component {
 }
 
 AboutWrapper.propTypes = {
-
+  url: PropTypes.object.isRequired
 }
 
 export default AboutWrapper

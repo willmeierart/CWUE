@@ -122,6 +122,8 @@ const WashItem = ({ wash }) => {
   )
 }
 
-WashItem.propTypes = {}
+WashItem.propTypes = {
+  wash: PropTypes.object.isRequired
+}
 
 export default WashItem

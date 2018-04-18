@@ -52,7 +52,7 @@ export default function DataManager (ComposedComponent) {
       const initial = !state || state === '' || state === 'initial'
 
       switch (true) {
-        case (initial || (state === 'results' && isServer)):
+        case initial:
           if (initial && url.asPath !== '/carwash/locations') {
             ImperativeRouter.push('locations', { state: 'initial' }, true)
           }

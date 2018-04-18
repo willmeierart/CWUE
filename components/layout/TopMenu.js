@@ -149,5 +149,6 @@ export default class TopMenu extends Component {
 
 TopMenu.propTypes = {
   pageState: PropTypes.string.isRequired,
-  onSetLocPageState: PropTypes.func.isRequired
+  onSetLocPageState: PropTypes.func.isRequired,
+  url: PropTypes.object.isRequired
 }

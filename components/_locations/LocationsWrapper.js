@@ -116,4 +116,29 @@ class LocationsWrapper extends Component {
   }
 }
 
+LocationsWrapper.propTypes = {
+  activeLocation: PropTypes.object,
+  activeResults: PropTypes.array.isRequired,
+  activeSearchPhrase: PropTypes.string.isRequired,
+  data: PropTypes.object.isRequired,
+  mapCenter: PropTypes.oneOfType([PropTypes.object, PropTypes.string]),
+  mapMarkers: PropTypes.array.isRequired,
+  mapZoom: PropTypes.number.isRequired,
+  onGetUserLocation: PropTypes.func.isRequired,
+  onSetActiveLocation: PropTypes.func.isRequired,
+  onSetActiveResultsList: PropTypes.func.isRequired,
+  onSetLocPageState: PropTypes.func.isRequired,
+  onSetMapMarkers: PropTypes.func.isRequired,
+  onSetMapCenter: PropTypes.func.isRequired,
+  onSetMapZoom: PropTypes.func.isRequired,
+  onSetStaticLocList: PropTypes.func.isRequired,
+  pageState: PropTypes.string.isRequired,
+  serverState: PropTypes.object.isRequired,
+  setTemplate: PropTypes.func.isRequired,
+  staticLocationList: PropTypes.array.isRequired,
+  userLocation: PropTypes.oneOfType([PropTypes.object, PropTypes.string]),
+  vpDims: PropTypes.object.isRequired,
+  url: PropTypes.object.isRequired
+}
+
 export default DataManager(LocationsWrapper)

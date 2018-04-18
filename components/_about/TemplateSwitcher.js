@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import Company from './company'
 import Testimonials from './testimonials'
 import News from './news'
@@ -7,55 +8,64 @@ import Contact from './contact'
 
 const TemplateSwitcher = ({
   template,
-  children
+  children,
+  data,
+  aboutData
 }) => {
   const componentSwitcher = () => {
     switch (template) {
       case 'company':
         return (
-          <Company>
+          <Company data={data}>
             { children }
           </Company>
         )
       case 'testimonials':
         return (
-          <Testimonials>
+          <Testimonials data={data}>
             { children }
           </Testimonials>
         )
       case 'news':
         return (
-          <News>
+          <News data={data}>
             { children }
           </News>
         )
       case 'careers':
         return (
-          <Careers>
+          <Careers benefits={aboutData.benefits} data={data}>
             { children }
           </Careers>
         )
       case 'faq':
         return (
-          <FAQ>
+          <FAQ data={data}>
             { children }
           </FAQ>
         )
       case 'contact':
         return (
-          <Contact>
+          <Contact contactInfo={aboutData.contactInfo}
+            sections={aboutData.contactSections} data={data}>
             { children }
           </Contact>
         )
       default :
         return (
-          <Company>
+          <Company data={data}>
             { children }
           </Company>
         )
     }
   }
   return componentSwitcher()
+}
+
+TemplateSwitcher.propTypes = {
+  template: PropTypes.string.isRequired,
+  data: PropTypes.object.isRequired,
+  aboutData: PropTypes.object.isRequired
 }
 
 export default TemplateSwitcher

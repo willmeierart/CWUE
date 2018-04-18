@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import Initial from './Initial'
 import Results from './Results'
 import Region from './Region'
@@ -42,7 +43,6 @@ const TemplateSwitcher = ({
       case 'detail':
         return (
           <Detail
-            onSetActiveLocation={onSetActiveLocation}
             activeLocation={activeLocation}>
             { children }
           </Detail>
@@ -58,6 +58,18 @@ const TemplateSwitcher = ({
     }
   }
   return componentSwitcher()
+}
+
+TemplateSwitcher.propTypes = {
+  template: PropTypes.string.isRequired,
+  onGetUserLocation: PropTypes.func.isRequired,
+  userLocation: PropTypes.oneOfType([PropTypes.object, PropTypes.string]),
+  onSetActiveLocation: PropTypes.func.isRequired,
+  activeLocation: PropTypes.object.isRequired,
+  activeResults: PropTypes.array.isRequired,
+  setActiveResults: PropTypes.func.isRequired,
+  searchPhrase: PropTypes.string.isRequired,
+  url: PropTypes.object.isRequired
 }
 
 export default TemplateSwitcher

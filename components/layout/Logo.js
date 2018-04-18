@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import Link from 'next/link'
 
 const Logo = ({ isHomepage }) => (
@@ -26,5 +27,9 @@ const Logo = ({ isHomepage }) => (
     </div>
   </a></Link>
 )
+
+Logo.propTypes = {
+  isHomepage: PropTypes.bool
+}
 
 export default Logo

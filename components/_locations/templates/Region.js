@@ -1,11 +1,16 @@
 import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 import ResultsList from '../ResultsList'
 import { binder } from '../../../lib/_utils'
 
-export default class Results extends Component {
+export default class Region extends Component {
   constructor (props) {
     super(props)
     binder(this, ['pickLocation'])
+  }
+  
+  componentDidMount () {
+    console.log(this.props)
   }
 
   pickLocation (location) {
@@ -83,4 +88,8 @@ export default class Results extends Component {
       </section>
     )
   }
+}
+
+Region.propTypes = {
+
 }

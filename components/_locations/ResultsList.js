@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import ResultModule from './ResultModule'
 
 const ResultsList = ({ results, pickLocation }) => {
@@ -25,6 +26,11 @@ const ResultsList = ({ results, pickLocation }) => {
       `}</style>
     </div>
   )
+}
+
+ResultsList.propTypes = {
+  results: PropTypes.array.isRequired,
+  pickLocation: PropTypes.func.isRequired
 }
 
 export default ResultsList

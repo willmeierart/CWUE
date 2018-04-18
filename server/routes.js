@@ -81,7 +81,7 @@ const routes = [
           return '/carwash/locations'
         case 'results':
           if (spec && spec !== '') {
-            return `/carwash/locations/results?search=${spec.toLowerCase().replace(/( )/g, '-')}`
+            return `/carwash/locations/results/${spec.toLowerCase().replace(/( )/g, '-')}`
           } else {
             return '/carwash/locations'
           }
@@ -114,7 +114,7 @@ const routes = [
         }
       },
       {
-        pattern: '/carwash/locations/results?search=:spec',
+        pattern: '/carwash/locations/results/:spec',
         defaultParams: {
           state: 'results'
         }

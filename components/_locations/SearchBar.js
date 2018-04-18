@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 import debounce from 'lodash.debounce'
 import ExecutionEnvironment from 'exenv'
 import ImperativeRouter from '../../server/ImperativeRouter'
@@ -49,10 +50,11 @@ class SearchBar extends Component {
   handleSearchOnSSR () {
     const { searchPhrase, activeResults, url: { asPath } } = this.props
     const noActiveSearch = !searchPhrase && activeResults.length === 0
-    const hasQueryString = asPath.indexOf('?') !== -1
+    const pathSplitta = asPath.split('results/')[1]
+    const hasQueryString = pathSplitta && pathSplitta !== ''
     if (noActiveSearch) {
       if (hasQueryString) {
-        const searchVal = asPath.split('?search=')[1].replace(/[-]/g, ' ')
+        const searchVal = asPath.split('results/')[1].replace(/[-]/g, ' ')
         console.log(searchVal)
         this.setState({
           value: searchVal,
@@ -320,6 +322,21 @@ class SearchBar extends Component {
       </div>
     )
   }
+}
+
+SearchBar.propTypes = {
+  activeResults: PropTypes.array.isRequired,
+  autocompleteOK: PropTypes.string,
+  autocompleteService: PropTypes.object,
+  data: PropTypes.object.isRequired,
+  distanceService: PropTypes.object,
+  onSetActiveSearchPhrase: PropTypes.func.isRequired,
+  setActiveResults: PropTypes.func.isRequired,
+  setCenter: PropTypes.func.isRequired,
+  setMarkers: PropTypes.func.isRequired,
+  setTemplate: PropTypes.func.isRequired,
+  staticLocationList: PropTypes.array.isRequired,
+  url: PropTypes.object.isRequired
 }
 
 export default SearchManager(SearchBar)

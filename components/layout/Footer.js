@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import { Link } from 'next-url-prettifier'
 import { Router, routes } from '../../server/routes'
 import { AzLogo01 } from '../assets/ZeroLogos'
@@ -126,6 +127,10 @@ const Footer = () => {
       `}</style>
     </div>
   )
+}
+
+Footer.propTypes = {
+
 }
 
 export default Footer
