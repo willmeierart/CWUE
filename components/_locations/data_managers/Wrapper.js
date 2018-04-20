@@ -14,7 +14,8 @@ import {
   setLocPageState,
   setActiveResultsList,
   setActiveSearchPhrase,
-  setStaticLocList
+  setStaticLocList,
+  makeUserLocationPage
 } from '../../../lib/redux/actions'
 import WithApolloLoader from '../../hoc/WithApolloLoader'
 import ImperativeRouter from '../../../server/ImperativeRouter'
@@ -24,7 +25,14 @@ export default function DataManager (ComposedComponent) {
   class WrappedComponent extends Component {
     constructor (props) {
       super(props)
-      binder(this, ['setPageStateViaUrl', 'setPageStateGeoLoc', 'setTemplate'])
+      this.state = { mapZoomModifier: 0 }
+      binder(this, [
+        'setPageStateViaUrl',
+        'setPageStateGeoLoc',
+        'setTemplate',
+        'setMapZoomModifier',
+        'setUserLocationStatus'
+      ])
     }
     componentDidMount () {
       this.setPageStateViaUrl()
@@ -32,29 +40,41 @@ export default function DataManager (ComposedComponent) {
 
     componentDidUpdate (prevProps) {
       if (
-        (this.props.userLocation !== prevProps.userLocation &&
-        typeof this.props.userLocation === 'object') ||
         this.props.activeLocation !== prevProps.activeLocation ||
         this.props.url !== prevProps.url
       ) {
         this.setPageStateViaUrl()
       }
+      // if (this.props.userLocation !== prevProps.userLocation &&
+      //   typeof this.props.userLocation === 'object' && this.props.userLocation !== {}
+      // ) {
+      //   ImperativeRouter.push('locations', { state: 'results', spec: 'my-location' }, false)
+      // }
     }
 
     componentWillUnmount () {
       // NextRouter.onRouteChangeComplete =  url => { this.props.onSetActiveLocation(null) }
     }
 
+    setUserLocationStatus (userLocationStatus) {
+      this.setState({ userLocationStatus })
+    }
+
+    setMapZoomModifier (mapZoomModifier) {
+      console.log('mapZoomModifier changed to:', mapZoomModifier)
+      this.setState({ mapZoomModifier })
+    }
+
     setPageStateViaUrl () {
       const { url } = this.props
       const { query: { state, spec } } = url
-      const isServer = !ExecutionEnvironment.canUseDOM
+      // const isServer = !ExecutionEnvironment.canUseDOM
       const initial = !state || state === '' || state === 'initial'
 
       switch (true) {
         case initial:
           if (initial && url.asPath !== '/carwash/locations') {
-            ImperativeRouter.push('locations', { state: 'initial' }, true)
+            ImperativeRouter.push('locations', { state: 'initial' }, false) 
           }
           this.setPageStateGeoLoc(state)
           break
@@ -69,11 +89,24 @@ export default function DataManager (ComposedComponent) {
     }
 
     setPageStateGeoLoc (state) {
+      console.log('setpgstgeoloc')
       const { userLocation } = this.props
-      if (userLocation !== null && userLocation !== 'denied' && state === 'results') {
+      console.log(userLocation)
+      if (userLocation !== null && userLocation !== 'denied') {
         // this.setTemplate('results') // need to have :spec of 'my-location'
-        ImperativeRouter.push('locations', { state: 'results', spec: 'my-location' }, false)
+        if (userLocation === {}) {
+          this.props.onGetUserLocation(null, () => {
+            console.log('firing ongetuserlocation callback');
+            this.setState({ mapZoomModifier: -2 }, () => {
+              ImperativeRouter.push('locations', { state: 'results', spec: 'my-location' }, false)
+            })
+          })
+        }
+        // else {
+        //   ImperativeRouter.push('locations', { state: 'results', spec: 'my-location' }, false)
+        // }
       } else {
+        this.setState({ mapZoomModifier: 0 })
         // this.setTemplate('initial')
         // ImperativeRouter.push('locations', { state: 'initial' }, false)
       }
@@ -100,7 +133,13 @@ export default function DataManager (ComposedComponent) {
     }
 
     render () {
-      return <ComposedComponent {...this.props} setTemplate={this.setTemplate} />
+      const { mapZoomModifier } = this.state
+      return (
+        <ComposedComponent {...this.props}
+          setMapZoomModifier={this.setMapZoomModifier}
+          mapZoomModifier={mapZoomModifier}
+          setTemplate={this.setTemplate} />
+      )
     }
   }
   return compose(
@@ -116,11 +155,25 @@ export default function DataManager (ComposedComponent) {
 
 function mapStateToProps (state) {
   const {
-    location: { userLocation, mapCenter, mapZoom, mapMarkers, activeLocation, pageState, activeResults, activeSearchPhrase, staticLocationList },
+    location: {
+      userLocation,
+      userIsLocated,
+      mapCenter,
+      mapZoom,
+      mapMarkers,
+      activeLocation,
+      pageState,
+      activeResults,
+      activeSearchPhrase,
+      staticLocationList,
+      isUserLocationPage
+    },
     env: { vpDims }
   } = state
   return {
     userLocation,
+    userIsLocated,
+    isUserLocationPage,
     mapCenter,
     mapZoom,
     mapMarkers,
@@ -135,7 +188,7 @@ function mapStateToProps (state) {
 
 function mapDispatchToProps (dispatch) {
   return {
-    onGetUserLocation: path => dispatch(getUserLocation(path)),
+    onGetUserLocation: (ops, callback) => dispatch(getUserLocation(ops, callback)),
     onSetMapCenter: center => dispatch(setMapCenter(center)),
     onSetMapZoom: zoom => dispatch(setMapZoom(zoom)),
     onSetMapMarkers: markers => dispatch(setMapMarkers(markers)),
@@ -143,12 +196,16 @@ function mapDispatchToProps (dispatch) {
     onSetLocPageState: pageState => dispatch(setLocPageState(pageState)),
     onSetActiveResultsList: list => dispatch(setActiveResultsList(list)),
     onSetActiveSearchPhrase: phrase => dispatch(setActiveSearchPhrase(phrase)),
-    onSetStaticLocList: locObj => dispatch(setStaticLocList(locObj))
+    onSetStaticLocList: locObj => dispatch(setStaticLocList(locObj)),
+    onMakeUserLocationPage: bool => dispatch(makeUserLocationPage(bool))
   }
 }
 
 DataManager.propTypes = {
-  userLocation: PropTypes.object,
+  userLocation: PropTypes.oneOfType([PropTypes.object, PropTypes.string]).isRequired,
+  userIsLocated: PropTypes.bool.isRequired,
+  isUserLocationPage: PropTypes.bool.isRequired,
+  onMakeUserLocationPage: PropTypes.func.isRequired,
   mapCenter: PropTypes.object,
   mapZoom: PropTypes.number,
   mapMarkers: PropTypes.array,

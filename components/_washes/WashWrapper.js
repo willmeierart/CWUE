@@ -1,13 +1,16 @@
 import React, { Component } from 'react'
 // import ExecutionEnvironment from 'exenv'
 import PropTypes from 'prop-types'
+import { graphql, compose } from 'react-apollo'
 import equal from 'deep-equal'
+import WithApolloLoader from '../hoc/WithApolloLoader'
 import WashesTable from './WashesTable'
 import WashFastPassCallout from './WashFastPassCallout'
 import { binder } from '../../lib/_utils'
 import washData from '../../lib/_data/washData'
+import { allWashes } from '../../lib/apollo/queries'
 
-class AboutWrapper extends Component {
+class WashWrapper extends Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -15,10 +18,12 @@ class AboutWrapper extends Component {
       menuHeaderText: 'EXTERIOR CAR WASH MENU',
       pageHeaderText: 'EXTERIOR WASHES'
     }
-    binder(this, ['setPageStateViaUrl', 'updateText', 'updateAll'])
+    binder(this, ['setPageStateViaUrl', 'updateText', 'updateAll', 'filterData'])
+    this.fakeData = false
   }
   componentDidMount () {
     this.updateAll()
+    console.log(this.props);
   }
 
   componentDidUpdate (prevProps) {
@@ -50,6 +55,15 @@ class AboutWrapper extends Component {
     })
   }
 
+  filterData (type) {
+    const data = this.props.data.allWashes
+    return data.reduce((acc, d) => {
+      const formatted = d.washType.split('_')[0].toLowerCase()
+      formatted === type && acc.push(d)
+      return acc
+    }, [])
+  }
+
   render () {
     const { type } = this.state
     const typeKey = type.split('-')[0] || 'exterior'
@@ -71,7 +85,7 @@ class AboutWrapper extends Component {
             <span className='line' />
           </div>
           <div className='table-wrapper'>
-            <WashesTable data={washData[typeKey].washes} />
+            <WashesTable data={this.fakeData ? washData[typeKey].washes : this.filterData(typeKey)} />
           </div>
         </div>
         {/* <TemplateSwitcher template={template} /> */}
@@ -105,8 +119,15 @@ class AboutWrapper extends Component {
   }
 }
 
-AboutWrapper.propTypes = {
-  url: PropTypes.object.isRequired
+WashWrapper.propTypes = {
+  url: PropTypes.object.isRequired,
+  data: PropTypes.object.isRequired
 }
 
-export default AboutWrapper
+export default compose(
+    graphql(allWashes)
+  )(
+    WithApolloLoader(
+      WashWrapper
+    )
+  )

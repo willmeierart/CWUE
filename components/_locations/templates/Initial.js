@@ -1,25 +1,27 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
+import LocateMeBtn from '../LocateMeBtn'
 
 export default class Initial extends Component {
   componentDidMount () {
-    const { userLocation, onGetUserLocation } = this.props
-    if (userLocation !== 'denied') {
+    const { userLocation, onGetUserLocation, userIsLocated } = this.props
+    if (userLocation !== 'denied' && !userIsLocated) {
       onGetUserLocation(window.location.pathname)
     }
   }
   render () {
-    const { children } = this.props
+    const { children, userIsLocated, userLocation, onMakeUserLocationPage } = this.props
     const Title = children[0]
     const SearchBar = children[1]
     const Map = children[2]
+    const showBtn = typeof userLocation === 'object' && !userIsLocated
 
     return (
       <div className='template-wrapper'>
         <div className='title-wrapper'>{ Title }</div>
         <div className='search-wrapper'>{ SearchBar }</div>
+        { showBtn && <LocateMeBtn onMakeUserLocationPage={onMakeUserLocationPage} /> }
         <div className='map-wrapper'>
-          {/* <img alt='placeholder map' src='/static/images/placeholderMap.jpg' /> */}
           { Map }
         </div>
         <style jsx>{`
@@ -45,5 +47,7 @@ export default class Initial extends Component {
 
 Initial.propTypes = {
   onGetUserLocation: PropTypes.func.isRequired,
-  userLocation: PropTypes.oneOfType([PropTypes.object, PropTypes.string])
+  userLocation: PropTypes.oneOfType([PropTypes.object, PropTypes.string]),
+  userIsLocated: PropTypes.bool.isRequired,
+  onMakeUserLocationPage: PropTypes.func.isRequired
 }

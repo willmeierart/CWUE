@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 // import Router from 'next/router'
 import Images from '../Images'
-import ResultModule from '../ResultModule'
+import ResultModule from './Results/ResultModule'
 import { binder } from '../../../lib/_utils'
 
 class Detail extends Component {

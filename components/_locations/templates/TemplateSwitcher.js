@@ -6,14 +6,18 @@ import Detail from './Detail'
 
 const TemplateSwitcher = ({
   template,
+  setTemplate,
   children,
   onGetUserLocation,
   userLocation,
+  userIsLocated,
   onSetActiveLocation,
   activeLocation,
   activeResults,
   setActiveResults,
   searchPhrase,
+  onMakeUserLocationPage,
+  isUserLocationPage,
   url
 }) => {
   const componentSwitcher = () => {
@@ -22,6 +26,7 @@ const TemplateSwitcher = ({
         return (
           <Initial
             onGetUserLocation={onGetUserLocation}
+            onMakeUserLocationPage={onMakeUserLocationPage}
             userLocation={userLocation}>
             { children }
           </Initial>
@@ -29,11 +34,15 @@ const TemplateSwitcher = ({
       case 'results':
         return (
           <Results
+            setTemplate={setTemplate}
+            isUserLocationPage={isUserLocationPage}
             activeResults={activeResults}
             setActiveResults={setActiveResults}
+            onGetUserLocation={onGetUserLocation}
             onSetActiveLocation={onSetActiveLocation}
             searchPhrase={searchPhrase}
             userLocation={userLocation}
+            userIsLocated={userIsLocated}
             url={url}>
             { children }
           </Results>
@@ -51,6 +60,7 @@ const TemplateSwitcher = ({
         return (
           <Initial
             onGetUserLocation={onGetUserLocation}
+            userIsLocated={userIsLocated}
             userLocation={userLocation}>
             { children }
           </Initial>
@@ -64,6 +74,9 @@ TemplateSwitcher.propTypes = {
   template: PropTypes.string.isRequired,
   onGetUserLocation: PropTypes.func.isRequired,
   userLocation: PropTypes.oneOfType([PropTypes.object, PropTypes.string]),
+  userIsLocated: PropTypes.bool.isRequired,
+  isUserLocationPage: PropTypes.bool.isRequired,
+  onMakeUserLocationPage: PropTypes.func.isRequired,
   onSetActiveLocation: PropTypes.func.isRequired,
   activeLocation: PropTypes.object.isRequired,
   activeResults: PropTypes.array.isRequired,

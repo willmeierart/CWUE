@@ -3,15 +3,14 @@ import PropTypes from 'prop-types'
 import debounce from 'lodash.debounce'
 import ExecutionEnvironment from 'exenv'
 import ImperativeRouter from '../../server/ImperativeRouter'
-import { geocodeByAddress, getLatLng } from '../../lib/_locationUtils'
+import { reverseGeocode } from '../../lib/_locationUtils'
 import { binder } from '../../lib/_utils'
 import SearchManager from './data_managers/Search'
-import { Z_DEFAULT_STRATEGY } from 'zlib';
 
 class SearchBar extends Component {
   constructor (props) {
     super(props)
-    this.state = { autocompleteItems: [], value: '', markers: [], isServer: !ExecutionEnvironment.canUseDOM, freshLoad: true }
+    this.state = { autocompleteItems: [], value: '', markers: [], isServer: !ExecutionEnvironment.canUseDOM, freshLoad: true, specialVal: '' }
     binder(this, ['autocompleteCallback',
       'clearSuggestions',
       'fetchPredictions',
@@ -31,7 +30,8 @@ class SearchBar extends Component {
       'renderFooter',
       'handleInput',
       'getInputProps',
-      'handleSearchOnSSR'
+      'handleSearchOnSSR',
+      'generateState'
     ])
     this.debouncedFetchPredictions = debounce(this.fetchPredictions, 800)
     this.highlightFirstSuggestion = false
@@ -41,35 +41,75 @@ class SearchBar extends Component {
   componentDidMount () {
     console.log(this.props)
     this.handleSearchOnSSR()
-    const isClient = ExecutionEnvironment.canUseDOM
-    // if (isClient) {
-    //   this.setState({ freshLoad: false })
-    // }
+  }
+
+  componentDidUpdate (prevProps, prevState) {
+    if (this.props.userLocation !== prevProps.userLocation && this.state.specialVal !== '') {
+      console.log(this.props.userLocation)
+      // this.generateState(this.state.specialVal)
+    }
+    if (this.state.specialVal !== prevState.specialVal) {
+      console.log(this.state, prevState)
+      this.props.setMapZoomModifier(-2)
+      this.generateState(this.state.specialVal)
+    }
   }
 
   handleSearchOnSSR () {
-    const { searchPhrase, activeResults, url: { asPath } } = this.props
+    const {
+      searchPhrase,
+      activeResults,
+      url: { asPath },
+      userLocation,
+      setMapZoomModifier
+    } = this.props
     const noActiveSearch = !searchPhrase && activeResults.length === 0
     const pathSplitta = asPath.split('results/')[1]
     const hasQueryString = pathSplitta && pathSplitta !== ''
+    const isUserLocation = pathSplitta === 'my-location'
+
     if (noActiveSearch) {
       if (hasQueryString) {
-        const searchVal = asPath.split('results/')[1].replace(/[-]/g, ' ')
-        console.log(searchVal)
-        this.setState({
-          value: searchVal,
-          freshLoad: true
-        }, async () => {
-          console.log(this.state.isServer);
-          await this.fetchPredictions()
-        })
+        if (isUserLocation) {
+          if (typeof userLocation === 'object') {
+            if (!userLocation.lat || !userLocation.lng) {
+              console.log('awaiting userlocation', userLocation)
+              this.props.onGetUserLocation(null, () => {
+                reverseGeocode(userLocation, val =>
+                  this.setState({ specialVal: val })
+                )
+              })
+            } else {
+              reverseGeocode(userLocation, (val) => this.setState({specialVal: val}))
+            }
+            setMapZoomModifier(-2)
+            console.log('geocode was fired')
+          } else {
+            ImperativeRouter.push('locations', { state: 'initial' }, false)
+          }
+        } else {
+          const searchVal = asPath.split('results/')[1].replace(/[-]/g, ' ')
+          this.generateState(searchVal)
+        }
       } else {
         ImperativeRouter.push('locations', { state: 'initial' }, false)
       }
     }
   }
 
+  generateState (searchVal) {
+    console.log(searchVal)
+    this.setState({
+      value: searchVal,
+      freshLoad: true
+    }, async () => {
+      console.log(this.state)
+      await this.fetchPredictions()
+    })
+  }
+
   fetchPredictions () {
+    // console.log(value)
     // magical google autocomplete connector function
     const { value } = this.state
     if (value.length) {
@@ -135,7 +175,6 @@ class SearchBar extends Component {
     } else {
       console.warn('no active item')
     }
-    // this.props.setMarkers([])
   }
 
   handleDownKey () {
@@ -331,12 +370,15 @@ SearchBar.propTypes = {
   data: PropTypes.object.isRequired,
   distanceService: PropTypes.object,
   onSetActiveSearchPhrase: PropTypes.func.isRequired,
+  onGetUserLocation: PropTypes.func.isRequired,
   setActiveResults: PropTypes.func.isRequired,
   setCenter: PropTypes.func.isRequired,
   setMarkers: PropTypes.func.isRequired,
   setTemplate: PropTypes.func.isRequired,
   staticLocationList: PropTypes.array.isRequired,
-  url: PropTypes.object.isRequired
+  url: PropTypes.object.isRequired,
+  userLocation: PropTypes.oneOfType([PropTypes.object, PropTypes.string]).isRequired,
+  setMapZoomModifier: PropTypes.func.isRequired
 }
 
 export default SearchManager(SearchBar)

@@ -4,6 +4,7 @@ import WashItem from './WashItem'
 
 const WashesTable = ({ data }) => {
   const renderTable = () => {
+    console.log(data)
     return data.map((wash, i) => (
       <div key={i} className='item-wrapper'>
         <WashItem wash={wash} />

@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import ImperativeRouter from '../../server/ImperativeRouter'
+import ImperativeRouter from '../../../../server/ImperativeRouter'
 
 const ResultModule = ({ location, pickLocation, detail }) => {
   const { details, phone, addressStreet, addressCity, addressState, addressZip, openHours, name, brand } = location

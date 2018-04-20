@@ -10,7 +10,16 @@ export default function SearchManager (ComposedComponent) {
     constructor (props) {
       super(props)
       this.state = { searchIsRegion: false, nearbyResults: [], placeBounds: null }
-      binder(this, ['handleSelection', 'findResultsInRadius', 'getRelevantCoords', 'distanceServiceCallback', 'setTheResults', 'isInBounds', 'searchIsRegion', 'setAllMarkers'])
+      binder(this, [
+        'handleSelection',
+        'findResultsInRadius',
+        'getRelevantCoords',
+        'distanceServiceCallback',
+        'setTheResults',
+        'isInBounds',
+        'searchIsRegion',
+        'setAllMarkers'
+      ])
       const mile = 1610
       this.radius = 5 * mile
     }

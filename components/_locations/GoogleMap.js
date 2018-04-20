@@ -11,13 +11,13 @@ import arrayEqual from 'array-equal'
 class GoogleMap extends Component {
   constructor (props) {
     super(props)
-    const { zoom } = this.props
+    const { zoom, mapZoomModifier } = this.props
     this.state = {
       center: {lat: 39.8283459, lng: -98.5794797},
       activeMarkers: [],
       markerSet: [],
       markerTitles: [],
-      zoom: zoom || 3,
+      zoom: zoom + mapZoomModifier || 3 + mapZoomModifier,
       bounds: null
     }
     binder(this, ['setCenter', 'setMarker', 'setMarkers', 'setCenterViaMarkers', 'setBounds', 'toggleActiveMarkers'])
@@ -30,6 +30,7 @@ class GoogleMap extends Component {
         console.warn('no google')
         setTimeout(init, 500)
       } else {
+        console.log(this.state.zoom, this.props.mapZoomModifier)
         const { google } = window
         const mapNode = ReactDOM.findDOMNode(this.mapDOM)
         this.map = new google.maps.Map(mapNode, {
@@ -69,26 +70,33 @@ class GoogleMap extends Component {
   //   })
   // }
 
-  async componentDidUpdate (prevProps, prevState) {
+  componentDidUpdate (prevProps, prevState) {
     if (!equal(this.props, prevProps)) {
-      console.log('props different')
+      // console.log('props different', this.props)
       this.setMarkers()
       this.map.panTo(this.state.center)
-      this.map.setZoom(this.props.zoom)
       if (this.props.url.query.state !== 'results') {
         this.toggleActiveMarkers()
       }
+      if (this.props.mapZoomModifier !== prevProps.mapZoomModifier || this.props.zoom !== prevProps.zoom) {
+        console.log(this.props.mapZoomModifier)
+        if (this.props.mapZoomModifier === 0) {
+          this.map.setZoom(this.props.zoom)
+        } else {
+          this.map.setZoom(this.props.zoom + this.props.mapZoomModifier)
+        }
+      }
     }
     if (prevState.zoom !== this.state.zoom) {
-      console.log('zoom different:', prevState.zoom, this.state.zoom)
+      // console.log('zoom different:', prevState.zoom, this.state.zoom)
       this.map.setZoom(this.state.zoom)
     }
     if (!equal(prevState.center, this.state.center)) {
-      console.log('center different:', prevState.center, this.state.center)
+      // console.log('center different:', prevState.center, this.state.center)
       this.map.panTo(this.state.center)
     }
     if (!arrayEqual(prevState.activeMarkers, this.state.activeMarkers)) {
-      console.log('markers different:', prevState.activeMarkers, this.state.activeMarkers)
+      // console.log('markers different:', prevState.activeMarkers, this.state.activeMarkers)
       this.setMarkers()
       this.setCenterViaMarkers(this.state.activeMarkers)
     }
@@ -181,7 +189,7 @@ class GoogleMap extends Component {
         position: marker.position,
         animation: marker.animation,
         title: marker.title,
-        label: marker.label, 
+        label: marker.label,
         map: this.map,
         icon: marker.icon
       })
@@ -192,6 +200,7 @@ class GoogleMap extends Component {
   }
 
   toggleActiveMarkers () {
+    // console.log('toggling', this.props.template, this.state.markerSet)
     const activeMarkerTitles = this.props.markers.map(marker => marker.title)
     const newActiveMarkers = []
     this.state.markerSet.forEach(marker => {
@@ -228,6 +237,7 @@ GoogleMap.propTypes = {
   dims: PropTypes.object.isRequired,
   geoJSONstyles: PropTypes.object.isRequired,
   initialMapStyles: PropTypes.array.isRequired,
+  setMarkers: PropTypes.func.isRequired,
   markers: PropTypes.array.isRequired,
   onIdle: PropTypes.bool,
   onSetMapZoom: PropTypes.func.isRequired,
@@ -235,6 +245,7 @@ GoogleMap.propTypes = {
   template: PropTypes.string.isRequired,
   url: PropTypes.object.isRequired,
   vpDims: PropTypes.object.isRequired,
+  mapZoomModifier: PropTypes.number.isRequired,
   zoom: PropTypes.number.isRequired
 }
 

@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import ResultsList from '../ResultsList'
+import ResultsList from './Results/ResultsList'
 import { binder } from '../../../lib/_utils'
 
 export default class Region extends Component {

@@ -1,10 +1,12 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import ResultsList from '../ResultsList'
-import ImperativeRouter from '../../../server/ImperativeRouter'
-import { binder } from '../../../lib/_utils'
+import UserLocationManager from './UserLocationManager'
+import ResultsList from './ResultsList'
+import ResultsErrorView from './ResultsErrorView'
+import ImperativeRouter from '../../../../server/ImperativeRouter'
+import { binder } from '../../../../lib/_utils'
 
-export default class Results extends Component {
+class Results extends Component {
   constructor (props) {
     super(props)
     binder(this, ['pickLocation'])
@@ -12,14 +14,13 @@ export default class Results extends Component {
 
   componentDidMount () {
     // this.props.setActiveResults()
-    const { url: { query: { spec } }, userLocation, setActiveResults } = this.props
+    const { url: { query: { spec } }, userLocation, activeResults } = this.props
     if (!spec || spec === 'my-location') {
-      if (typeof userLocation === 'object') {
-        // setActiveResults('my-location')
-      } else {
-        ImperativeRouter.push('locations', { state: 'initial' }, true)
-      }
+      // if (typeof userLocation !== 'object') {
+      //   ImperativeRouter.push('locations', { state: 'initial' }, true)
+      // }
     }
+    console.log(this.props)
   }
   shouldComponentUpdate (nextProps) {
     // console.log(this.props)
@@ -31,7 +32,6 @@ export default class Results extends Component {
   // componentWillUnmount () { this.props.setActiveResults() }
 
   pickLocation (location) {
-    console.log(location)
     if (typeof location === 'string') {
       this.props.onSetActiveLocation(location)
     } else if (typeof location === 'object' && location.name) {
@@ -42,32 +42,49 @@ export default class Results extends Component {
   }
 
   render () {
-    const { children, activeResults, searchPhrase, url: { query: { spec } } } = this.props
+    const { children, activeResults, searchPhrase, url: { query: { spec } }, isUserLocationPage, userIsLocated, setTemplate, onGetUserLocation} = this.props
+    const hasResults = activeResults.length > 0
     const Title = children[0]
     const SearchBar = children[1]
     const Map = children[2]
     const formatQS = qs => {
       const splitta = qs.split('-')
-      // splitta.reduce((a, b) => {}, [])
-      return splitta.map(wd => {
-        // const firstCap = wd[0].toUpperCase()
-        // const rest = wd.substring(1, wd.length)
-        // return [firstCap, rest].join('')
-        return wd.toUpperCase()
-      }).join(', ')
+      return splitta.map(wd => wd.toUpperCase()).join(' ')
     }
-    const locationsNear = searchPhrase
-      ? `Locations Near ${searchPhrase}`
-      : spec
-        ? `Locations Near ${formatQS(spec)}`
-        : 'Locations'
+    const locationsNearPhrase = () => {
+      const defaultErr = 'Please browse this list of all our locations:'
+      if (isUserLocationPage) {
+        if (hasResults) {
+          return 'Locations near me'
+        } else {
+          return `There are no nearby locations. ${defaultErr}`
+        }
+      } else {
+        if (searchPhrase) {
+          if (hasResults) {
+            return `Locations near ${searchPhrase}`
+          } else {
+            return `There are no locations near ${searchPhrase}. ${defaultErr}`
+          }
+        } else {
+          if (spec) {
+            if (hasResults) {
+              return `Locations near ${formatQS(spec)}`
+            } else {
+              return `There are no locations near ${formatQS(spec)}. ${defaultErr}`
+            }
+          }
+        }
+      }
+    }
+    const renderView = userIsLocated || hasResults
     return (
       <section className='template-wrapper'>
         <div className='title-wrapper'>{ Title }</div>
         <section className='content-wrapper'>
           <div className='col col-left'>
             <h2 className='locations-near content'>
-              { locationsNear }
+              { locationsNearPhrase() }
               <hr />
             </h2>
             <div className='results-container content'>
@@ -84,6 +101,8 @@ export default class Results extends Component {
             width: 100%;
             box-sizing: border-box;
             position: relative;
+            display: flex;
+            justify-content: center;
           }
           .template-wrapper {
             display: flex;
@@ -125,9 +144,14 @@ export default class Results extends Component {
 
 Results.propTypes = {
   userLocation: PropTypes.oneOfType([PropTypes.object, PropTypes.string]),
+  userIsLocated: PropTypes.bool.isRequired,
+  isUserLocationPage: PropTypes.bool,
   onSetActiveLocation: PropTypes.func.isRequired,
+  onGetUserLocation: PropTypes.func.isRequired,
   activeResults: PropTypes.array.isRequired,
   setActiveResults: PropTypes.func.isRequired,
   searchPhrase: PropTypes.string.isRequired,
   url: PropTypes.object.isRequired
 }
+
+export default UserLocationManager(Results)
