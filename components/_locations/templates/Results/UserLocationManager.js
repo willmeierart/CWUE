@@ -7,30 +7,29 @@ export default function UserLocationManager (ComposedComponent) {
     constructor (props) {
       super(props)
       this.state = { isUserLocationPage: false }
-      binder(this, ['determineComponentState', 'makeUserLocationPage'])
+      binder(this, ['determineComponentState'])
     }
 
     componentDidMount () {
       console.log(this.props)
       if (this.props.userIsLocated && this.props.searchPhrase === '') {
-        this.makeUserLocationPage(true)
+        this.props.onMakeUserLocationPage(true)
       }
     }
 
-    makeUserLocationPage (isUserLocationPage) {
-      this.setState({ isUserLocationPage })
-    }
-
     determineComponentState () {
+      const { isUserLocationPage, userIsLocated, onMakeUserLocationPage } = this.props
+      console.log(userIsLocated)
       switch (true) {
-        case !this.state.isUserLocationPage :
-          return <ComposedComponent makeUserLocationPage={this.makeUserLocationPage} {...this.props} />
-        case this.state.isUserLocationPage && this.props.userIsLocated :
-          return <ComposedComponent isUserLocationPage {...this.props} />
-        case this.state.isUserLocationPage && !this.props.userIsLocated :
+        case !isUserLocationPage :
+          return <ComposedComponent makeUserLocationPage={onMakeUserLocationPage} {...this.props} />
+        case isUserLocationPage :
+          if (userIsLocated) {
+            return <ComposedComponent isUserLocationPage {...this.props} />
+          }
           return <UserLocationLoader {...this.props} />
         default :
-          return <ComposedComponent makeUserLocationPage={this.makeUserLocationPage} {...this.props} />
+          return <ComposedComponent makeUserLocationPage={onMakeUserLocationPage} {...this.props} />
       }
     }
 

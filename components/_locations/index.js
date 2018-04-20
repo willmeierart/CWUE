@@ -14,7 +14,7 @@ import ImperativeRouter from '../../server/ImperativeRouter'
 class LocationsWrapper extends Component {
   constructor (props) {
     super(props)
-    binder(this, ['setCenter', 'setMarkers', 'setActiveResults'])
+    binder(this, ['setCenter', 'setMarkers', 'setActiveResults', 'showAllLocationsOnErr'])
     this.fakeData = false
   }
   componentDidMount () {
@@ -33,6 +33,10 @@ class LocationsWrapper extends Component {
 
   setCenter (center) { this.props.onSetMapCenter(center) }
   setMarkers (markers) { this.props.onSetMapMarkers(markers) } // leave in case middleware logic needed
+
+  showAllLocationsOnErr () {
+    this.props.onSetActiveResultsList(this.props.staticLocationList)
+  }
 
   setActiveResults (results) {
     const { onSetActiveResultsList } = this.props
@@ -88,6 +92,8 @@ class LocationsWrapper extends Component {
       <div>
         <div className='region-btn' onClick={this.goToRegion}>regions page</div>
         <TemplateSwitcher
+          staticLocationList={staticLocationList}
+          showAllLocationsOnErr={this.showAllLocationsOnErr}
           setTemplate={setTemplate}
           template={pageState}
           onGetUserLocation={onGetUserLocation}
@@ -114,6 +120,9 @@ class LocationsWrapper extends Component {
             userLocation={userLocation}
             onGetUserLocation={onGetUserLocation}
             setMapZoomModifier={setMapZoomModifier}
+            onMakeUserLocationPage={onMakeUserLocationPage}
+            isUserLocationPage={isUserLocationPage}
+            userIsLocated={userIsLocated}
             url={url} />
           <GoogleMap
             url={url}

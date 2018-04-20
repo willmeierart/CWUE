@@ -45,15 +45,6 @@ export default function DataManager (ComposedComponent) {
       ) {
         this.setPageStateViaUrl()
       }
-      // if (this.props.userLocation !== prevProps.userLocation &&
-      //   typeof this.props.userLocation === 'object' && this.props.userLocation !== {}
-      // ) {
-      //   ImperativeRouter.push('locations', { state: 'results', spec: 'my-location' }, false)
-      // }
-    }
-
-    componentWillUnmount () {
-      // NextRouter.onRouteChangeComplete =  url => { this.props.onSetActiveLocation(null) }
     }
 
     setUserLocationStatus (userLocationStatus) {
@@ -89,26 +80,20 @@ export default function DataManager (ComposedComponent) {
     }
 
     setPageStateGeoLoc (state) {
-      console.log('setpgstgeoloc')
-      const { userLocation } = this.props
+      const { userLocation, userIsLocated, mapZoom, onSetMapZoom } = this.props
       console.log(userLocation)
       if (userLocation !== null && userLocation !== 'denied') {
-        // this.setTemplate('results') // need to have :spec of 'my-location'
-        if (userLocation === {}) {
-          this.props.onGetUserLocation(null, () => {
-            console.log('firing ongetuserlocation callback');
-            this.setState({ mapZoomModifier: -2 }, () => {
-              ImperativeRouter.push('locations', { state: 'results', spec: 'my-location' }, false)
-            })
+        if (!userIsLocated) {
+          this.props.onGetUserLocation(null, async () => {
+            console.log('firing ongetuserlocation callback')
+            await onSetMapZoom(mapZoom - 2)
+            ImperativeRouter.push('locations', { state: 'results', spec: 'my-location' }, false)
           })
+        } else {
+          ImperativeRouter.push('locations', { state: 'results', spec: 'my-location' }, false)
         }
-        // else {
-        //   ImperativeRouter.push('locations', { state: 'results', spec: 'my-location' }, false)
-        // }
       } else {
-        this.setState({ mapZoomModifier: 0 })
-        // this.setTemplate('initial')
-        // ImperativeRouter.push('locations', { state: 'initial' }, false)
+        onSetMapZoom(mapZoom)
       }
     }
 

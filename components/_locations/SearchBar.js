@@ -61,35 +61,44 @@ class SearchBar extends Component {
       activeResults,
       url: { asPath },
       userLocation,
-      setMapZoomModifier
+      setMapZoomModifier,
+      isUserLocationPage,
+      userIsLocated
     } = this.props
     const noActiveSearch = !searchPhrase && activeResults.length === 0
     const pathSplitta = asPath.split('results/')[1]
     const hasQueryString = pathSplitta && pathSplitta !== ''
-    const isUserLocation = pathSplitta === 'my-location'
+    // const isUserLocation = pathSplitta === 'my-location'
 
     if (noActiveSearch) {
       if (hasQueryString) {
-        if (isUserLocation) {
-          if (typeof userLocation === 'object') {
-            if (!userLocation.lat || !userLocation.lng) {
-              console.log('awaiting userlocation', userLocation)
-              this.props.onGetUserLocation(null, () => {
-                reverseGeocode(userLocation, val =>
-                  this.setState({ specialVal: val })
-                )
-              })
-            } else {
-              reverseGeocode(userLocation, (val) => this.setState({specialVal: val}))
-            }
-            setMapZoomModifier(-2)
-            console.log('geocode was fired')
+        if (isUserLocationPage) {
+          // if (typeof userLocation === 'object') {
+          if (userIsLocated) {
+            console.log('awaiting userlocation', userLocation)
+            this.props.onGetUserLocation(null, () => {
+              reverseGeocode(userLocation, val =>
+                this.setState({ specialVal: val })
+              )
+            })
           } else {
-            ImperativeRouter.push('locations', { state: 'initial' }, false)
+            reverseGeocode(userLocation, (val) =>
+              this.setState({specialVal: val})
+            )
           }
+          setMapZoomModifier(-2)
+          console.log('geocode was fired')
+          // } else {
+          //   ImperativeRouter.push('locations', { state: 'initial' }, false)
+          // }
         } else {
           const searchVal = asPath.split('results/')[1].replace(/[-]/g, ' ')
-          this.generateState(searchVal)
+          if (searchVal !== 'my location') {
+            this.generateState(searchVal)
+          }
+          // else {
+          //   ImperativeRouter.push('locations', { state: 'initial' }, false)
+          // }
         }
       } else {
         ImperativeRouter.push('locations', { state: 'initial' }, false)
@@ -129,7 +138,11 @@ class SearchBar extends Component {
   }
 
   handleSelect (address, placeId, handleInput) {
-    this.props.handleSelection(address, placeId, handleInput)
+    const {isUserLocationPage, onMakeUserLocationPage, handleSelection} = this.props
+    if (isUserLocationPage) {
+      onMakeUserLocationPage(false)
+    }
+    handleSelection(address, placeId, handleInput)
   }
 
   handleInput (val) { this.setState({ value: val, freshLoad: this.state.freshLoad && false }) } // val = address (active selection)

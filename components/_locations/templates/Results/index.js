@@ -2,8 +2,6 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import UserLocationManager from './UserLocationManager'
 import ResultsList from './ResultsList'
-import ResultsErrorView from './ResultsErrorView'
-import ImperativeRouter from '../../../../server/ImperativeRouter'
 import { binder } from '../../../../lib/_utils'
 
 class Results extends Component {
@@ -20,6 +18,7 @@ class Results extends Component {
       //   ImperativeRouter.push('locations', { state: 'initial' }, true)
       // }
     }
+    // this.props.setActiveResults([])
     console.log(this.props)
   }
   shouldComponentUpdate (nextProps) {
@@ -42,7 +41,17 @@ class Results extends Component {
   }
 
   render () {
-    const { children, activeResults, searchPhrase, url: { query: { spec } }, isUserLocationPage, userIsLocated, setTemplate, onGetUserLocation} = this.props
+    const { children,
+      activeResults,
+      searchPhrase,
+      url: { query: { spec } },
+      isUserLocationPage,
+      userIsLocated,
+      setTemplate,
+      onGetUserLocation,
+      showAllLocationsOnErr,
+      staticLocationList
+    } = this.props
     const hasResults = activeResults.length > 0
     const Title = children[0]
     const SearchBar = children[1]
@@ -57,6 +66,7 @@ class Results extends Component {
         if (hasResults) {
           return 'Locations near me'
         } else {
+          // showAllLocationsOnErr()
           return `There are no nearby locations. ${defaultErr}`
         }
       } else {
@@ -64,6 +74,7 @@ class Results extends Component {
           if (hasResults) {
             return `Locations near ${searchPhrase}`
           } else {
+            // showAllLocationsOnErr()
             return `There are no locations near ${searchPhrase}. ${defaultErr}`
           }
         } else {
@@ -71,13 +82,13 @@ class Results extends Component {
             if (hasResults) {
               return `Locations near ${formatQS(spec)}`
             } else {
+              // showAllLocationsOnErr()
               return `There are no locations near ${formatQS(spec)}. ${defaultErr}`
             }
           }
         }
       }
     }
-    const renderView = userIsLocated || hasResults
     return (
       <section className='template-wrapper'>
         <div className='title-wrapper'>{ Title }</div>
@@ -88,7 +99,7 @@ class Results extends Component {
               <hr />
             </h2>
             <div className='results-container content'>
-              <ResultsList results={activeResults} pickLocation={this.pickLocation} />
+              <ResultsList results={hasResults ? activeResults : staticLocationList} pickLocation={this.pickLocation} />
             </div>
           </div>
           <div className='col col-right'>
@@ -145,12 +156,14 @@ class Results extends Component {
 Results.propTypes = {
   userLocation: PropTypes.oneOfType([PropTypes.object, PropTypes.string]),
   userIsLocated: PropTypes.bool.isRequired,
+  onMakeUserLocationPage: PropTypes.func.isRequired,
   isUserLocationPage: PropTypes.bool,
   onSetActiveLocation: PropTypes.func.isRequired,
   onGetUserLocation: PropTypes.func.isRequired,
   activeResults: PropTypes.array.isRequired,
   setActiveResults: PropTypes.func.isRequired,
   searchPhrase: PropTypes.string.isRequired,
+  showAllLocationsOnErr: PropTypes.func.isRequired,
   url: PropTypes.object.isRequired
 }
 
