@@ -62,14 +62,6 @@ class GoogleMap extends Component {
     init()
   }
 
-  // componentWillUnmount () {
-  //   NextRouter.onRouteChangeComplete(url => {
-  //     if (url.query.state !== 'results') {
-  //       this.toggleActiveMarkers()
-  //     }
-  //   })
-  // }
-
   componentDidUpdate (prevProps, prevState) {
     if (!equal(this.props, prevProps)) {
       // console.log('props different', this.props)

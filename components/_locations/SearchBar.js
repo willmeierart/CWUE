@@ -10,7 +10,7 @@ import SearchManager from './data_managers/Search'
 class SearchBar extends Component {
   constructor (props) {
     super(props)
-    this.state = { autocompleteItems: [], value: '', markers: [], isServer: !ExecutionEnvironment.canUseDOM, freshLoad: true, specialVal: '' }
+    this.state = { autocompleteItems: [], value: '', isServer: !ExecutionEnvironment.canUseDOM, freshLoad: true, specialVal: '' }
     binder(this, ['autocompleteCallback',
       'clearSuggestions',
       'fetchPredictions',
@@ -88,17 +88,11 @@ class SearchBar extends Component {
           }
           setMapZoomModifier(-2)
           console.log('geocode was fired')
-          // } else {
-          //   ImperativeRouter.push('locations', { state: 'initial' }, false)
-          // }
         } else {
           const searchVal = asPath.split('results/')[1].replace(/[-]/g, ' ')
           if (searchVal !== 'my location') {
             this.generateState(searchVal)
           }
-          // else {
-          //   ImperativeRouter.push('locations', { state: 'initial' }, false)
-          // }
         }
       } else {
         ImperativeRouter.push('locations', { state: 'initial' }, false)
@@ -118,7 +112,6 @@ class SearchBar extends Component {
   }
 
   fetchPredictions () {
-    // console.log(value)
     // magical google autocomplete connector function
     const { value } = this.state
     if (value.length) {
@@ -154,8 +147,8 @@ class SearchBar extends Component {
   selectActiveItemAtIndex (index) {
     // this is what points at a certain item and selects that one specifically
     const activeName = this.state.autocompleteItems.find(item => item.index === index).suggestion
-    this.setActiveItemAtIndex(index) // below
-    this.handleInput(activeName) // above
+    this.setActiveItemAtIndex(index)
+    this.handleInput(activeName)
   }
 
   setActiveItemAtIndex (index) {
