@@ -102,16 +102,22 @@ class GoogleMap extends Component {
       if (this.props.activeResults !== prevProps.activeResults) {
         this.toggleActiveMarkers()
       }
+      if (this.props.allMarkers !== prevProps.allMarkers) {
+        const filteredMarkers = this.props.allMarkers.filter(marker => marker.map === this.map)
+        // this.setState({ bounds: null }, () => { this.setCenterViaMarkers(filteredMarkers) })
+      }
       if (this.props.center !== prevProps.center) {
         console.log(this.props.center)
         // console.log(this.map.getCenter())
-        if (this.props.center instanceof window.google.maps.LatLng) {
-          this.map.panTo(this.props.center)
-        } else {
-          const validLatLng = new window.google.maps.LatLng(this.props.center)
-          const { lat, lng } = validLatLng
-          this.map.panTo({ lat: lat(), lng: lng() })
-        }
+        // if (this.props.center instanceof window.google.maps.LatLng) {
+        //   this.map.panTo(this.props.center)
+        // } else {
+        //   const validLatLng = new window.google.maps.LatLng(this.props.center)
+        //   const { lat, lng } = validLatLng
+        //   this.map.panTo({ lat: lat(), lng: lng() })
+        // }
+        const filteredMarkers = this.props.allMarkers.filter(marker => marker.map === this.map)
+        this.setCenterViaMarkers(filteredMarkers)
       }
     }
     // if (prevState.zoom !== this.state.zoom) {
@@ -134,8 +140,10 @@ class GoogleMap extends Component {
       }
     }
     if (!this.state.bounds) {
+      console.log('no bounds');
       this.setState({ bounds: new window.google.maps.LatLngBounds() }, mainAction)
     } else {
+      console.log('has bounds already');
       mainAction()
     }
   }
@@ -146,21 +154,22 @@ class GoogleMap extends Component {
     let maxLng = null
     let minLng = null
 
-    this.setState({ bounds: new window.google.maps.LatLngBounds() })
+    this.setState({ bounds: null }, () => {
+      console.log(this.state.bounds)
 
-    const markerCenter = markers.reduce((obj, marker) => {
-      if (maxLat === null || marker.position.lat > maxLat) maxLat = marker.position.lat()
-      if (minLat === null || marker.position.lat < minLat) minLat = marker.position.lat()
-      if (maxLng === null || marker.position.lng > maxLng) maxLng = marker.position.lng()
-      if (minLng === null || marker.position.lng < minLng) minLng = marker.position.lng()
-      obj.coords.lat = parseFloat(((maxLat + minLat) / 2).toFixed(5))
-      obj.coords.lng = parseFloat(((maxLng + minLng) / 2).toFixed(5))
-      const invokedPos = { lat: marker.position.lat(), lng: marker.position.lng() }
-      this.setBounds(invokedPos)
-      return obj
-    }, { coords: { lat: 0, lng: 0 } })
-    console.log(markerCenter.coords)
-    this.setCenter(markerCenter.coords)
+      const markerCenter = markers.reduce((obj, marker) => {
+        if (maxLat === null || marker.position.lat > maxLat) maxLat = marker.position.lat()
+        if (minLat === null || marker.position.lat < minLat) minLat = marker.position.lat()
+        if (maxLng === null || marker.position.lng > maxLng) maxLng = marker.position.lng()
+        if (minLng === null || marker.position.lng < minLng) minLng = marker.position.lng()
+        obj.coords.lat = parseFloat(((maxLat + minLat) / 2).toFixed(5))
+        obj.coords.lng = parseFloat(((maxLng + minLng) / 2).toFixed(5))
+        const invokedPos = { lat: marker.position.lat(), lng: marker.position.lng() }
+        this.setBounds(invokedPos)
+        return obj
+      }, { coords: { lat: 0, lng: 0 } })
+      this.setCenter(markerCenter.coords)
+    })
   }
 
   setCenter (center) {
