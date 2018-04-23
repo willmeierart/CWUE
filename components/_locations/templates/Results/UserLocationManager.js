@@ -11,7 +11,6 @@ export default function UserLocationManager (ComposedComponent) {
     }
 
     componentDidMount () {
-      console.log(this.props)
       if (this.props.userIsLocated && this.props.searchPhrase === '') {
         this.props.onMakeUserLocationPage(true)
       }
@@ -19,7 +18,6 @@ export default function UserLocationManager (ComposedComponent) {
 
     determineComponentState () {
       const { isUserLocationPage, userIsLocated, onMakeUserLocationPage } = this.props
-      console.log(userIsLocated)
       switch (true) {
         case !isUserLocationPage :
           return <ComposedComponent makeUserLocationPage={onMakeUserLocationPage} {...this.props} />

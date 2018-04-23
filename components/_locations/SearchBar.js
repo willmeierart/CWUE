@@ -109,7 +109,6 @@ class SearchBar extends Component {
       value: searchVal,
       freshLoad: true
     }, async () => {
-      console.log(this.state)
       await this.fetchPredictions()
     })
   }
@@ -168,7 +167,6 @@ class SearchBar extends Component {
 
   handleEnterKey (val) {
     const activeItem = this.getActiveItem()
-    console.log(activeItem)
     if (activeItem === undefined) {
       this.handleEnterKeyWithoutActiveItem()
     } else {
@@ -265,7 +263,6 @@ class SearchBar extends Component {
   }
 
   autocompleteCallback (predictions, status) {
-    console.log(predictions)
     // called by this.fetchPredictions, used as callback to native google autocomplete func
     // predictions are each full object returned from autocompleteservice
     if (status !== this.props.autocompleteOK) {
@@ -382,7 +379,6 @@ SearchBar.propTypes = {
   onGetUserLocation: PropTypes.func.isRequired,
   setActiveResults: PropTypes.func.isRequired,
   setCenter: PropTypes.func.isRequired,
-  setMarkers: PropTypes.func.isRequired,
   setTemplate: PropTypes.func.isRequired,
   staticLocationList: PropTypes.array.isRequired,
   url: PropTypes.object.isRequired,

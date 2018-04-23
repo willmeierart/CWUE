@@ -17,8 +17,7 @@ export default function SearchManager (ComposedComponent) {
         'distanceServiceCallback',
         'setTheResults',
         'isInBounds',
-        'searchIsRegion',
-        'setAllMarkers'
+        'searchIsRegion'
       ])
       const mile = 1610
       this.radius = 5 * mile
@@ -199,7 +198,7 @@ export default function SearchManager (ComposedComponent) {
           })
         })
       }
-      this.setAllMarkers(this.state.nearbyResults)
+      // this.setAllMarkers(this.state.nearbyResults)
       this.props.setActiveResults(this.state.nearbyResults)
     }
 
@@ -213,21 +212,6 @@ export default function SearchManager (ComposedComponent) {
         newResults.push(loc)
         this.setState({ nearbyResults: newResults })
       }
-    }
-
-    setAllMarkers (results) {
-      const nearbyResults = results || this.state.nearbyResults
-      const markers = []
-      if (nearbyResults.length > 0) {
-        nearbyResults.forEach(place => {
-          const { coordinates } = place
-          const marker = makeMarker(coordinates, place)
-          if (markers.indexOf(marker === -1)) {
-            markers.push(marker)
-          }
-        })
-      }
-      this.props.setMarkers(markers)
     }
 
     render () {

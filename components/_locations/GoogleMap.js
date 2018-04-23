@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom'
 import MapManager from './data_managers/Map'
 import NextRouter from 'next/router'
 import { binder } from '../../lib/_utils'
-import { getCoordsFromAddress } from '../../lib/_locationUtils'
+import { getCoordsFromAddress, makeMarker } from '../../lib/_locationUtils'
 import equal from 'deep-equal'
 import arrayEqual from 'array-equal'
 
@@ -20,7 +20,7 @@ class GoogleMap extends Component {
       zoom: zoom + mapZoomModifier || 3 + mapZoomModifier,
       bounds: null
     }
-    binder(this, ['setCenter', 'setMarker', 'setMarkers', 'setCenterViaMarkers', 'setBounds', 'toggleActiveMarkers'])
+    binder(this, ['setCenter', /* 'setMarker', 'setMarkers', */ 'setCenterViaMarkers', 'setBounds', 'toggleActiveMarkers', 'setAllMarkers'])
   }
 
   componentDidMount () {
@@ -50,13 +50,19 @@ class GoogleMap extends Component {
         if (template === 'results' || url.asPath.indexOf('results') !== -1) {
           if (onIdle) {
             google.maps.event.addListener(this.map, 'idle', () => {
-              this.setMarkers()
+              // this.setMarkers()
+              // this.setAllMarkers()
+              // this.toggleActiveMarkers()
             })
           }
         } else if (template === 'initial') {
           this.map.data.loadGeoJson('/static/geoData/US_GEO.json')
           this.map.data.setStyle(geoJSONstyles)
         }
+        if (this.props.activeResults.length !== this.props.allMarkers.length || this.props.allMarkers.indexOf(undefined) !== -1) {
+          this.setAllMarkers()
+        }
+        console.log('componentDidMount')
       }
     }
     init()
@@ -65,7 +71,7 @@ class GoogleMap extends Component {
   componentDidUpdate (prevProps, prevState) {
     if (!equal(this.props, prevProps)) {
       // console.log('props different', this.props)
-      this.setMarkers()
+      // this.setMarkers()
       this.map.panTo(this.state.center)
       if (this.props.url.query.state !== 'results') {
         this.toggleActiveMarkers()
@@ -78,6 +84,9 @@ class GoogleMap extends Component {
           this.map.setZoom(this.props.zoom + this.props.mapZoomModifier)
         }
       }
+      if (this.props.activeResults !== prevProps.activeResults) {
+        this.toggleActiveMarkers()
+      }
     }
     if (prevState.zoom !== this.state.zoom) {
       // console.log('zoom different:', prevState.zoom, this.state.zoom)
@@ -86,11 +95,6 @@ class GoogleMap extends Component {
     if (!equal(prevState.center, this.state.center)) {
       // console.log('center different:', prevState.center, this.state.center)
       this.map.panTo(this.state.center)
-    }
-    if (!arrayEqual(prevState.activeMarkers, this.state.activeMarkers)) {
-      // console.log('markers different:', prevState.activeMarkers, this.state.activeMarkers)
-      this.setMarkers()
-      this.setCenterViaMarkers(this.state.activeMarkers)
     }
   }
 
@@ -152,61 +156,39 @@ class GoogleMap extends Component {
     }
   }
 
-  setMarkers () {
-    const newMarkerTitles = [...this.state.markerTitles]
-    this.props.markers.forEach((marker, i) => {
-      const title = marker.title
-      if (newMarkerTitles.indexOf(title) === -1) {
-        newMarkerTitles.push(title)
-      }
-      if (typeof marker.position === 'string') {
-        getCoordsFromAddress(marker.position)
-          .then(coords => {
-            marker.position = coords
-            this.setMarker(marker)
-          })
-      } else if (typeof marker.position === 'object') {
-        this.setMarker(marker)
-      }
-    })
-    this.setState({ markerTitles: newMarkerTitles })
-    this.toggleActiveMarkers()
-  }
-
-  setMarker (marker) {
-    const copiedMarkers = [...this.state.markerSet]
-    const i = this.state.markerTitles.indexOf(marker.title)
-    if (i === -1) {
-      const m = new window.google.maps.Marker({
+  setAllMarkers () {
+    const { staticLocationList, activeResults, setMarkers } = this.props
+    const activeMarkerTitles = activeResults.map(result => result.name)
+    const mappedAsMarkers = staticLocationList.map(loc => {
+      const marker = makeMarker(loc)
+      const newMarker = new window.google.maps.Marker({
         position: marker.position,
         animation: marker.animation,
         title: marker.title,
-        label: marker.label,
-        map: this.map,
-        icon: marker.icon
+        label: marker.label || '',
+        map: activeMarkerTitles.indexOf(marker.title) !== -1 ? this.map : null,
+        icon: marker.icon || null
       })
-      window.google.maps.event.addListener(m, 'click', marker.onClick) // this is an important action
-      copiedMarkers.push(m)
-    }
-    this.setState({ markerSet: copiedMarkers })
-    this.props.onSetOfficialMapMarkers(copiedMarkers)
+      return newMarker
+    })
+    setMarkers(mappedAsMarkers)
   }
 
   toggleActiveMarkers () {
-    const activeMarkerTitles = this.props.markers.map(marker => marker.title)
-    const newActiveMarkers = []
-    this.props.officialMapMarkers.forEach(marker => {
-      if (activeMarkerTitles.indexOf(marker.title) !== -1 && this.props.template === 'results') {
-        newActiveMarkers.push(marker)
+    const { activeResults, allMarkers, setMarkers } = this.props
+    console.log(allMarkers)
+    const activeMarkerTitles = activeResults.map(result => result.name)
+    const newMarkers = allMarkers.map(marker => {
+      if (activeMarkerTitles.indexOf(marker.title) !== -1) {
+        marker.map = this.map
         marker.setMap(this.map)
-        console.log('binding marker to map')
       } else {
+        marker.map = null
         marker.setMap(null)
-        console.log('setting marker\'s map to null')
       }
+      return marker
     })
-    this.setState({ activeMarkers: newActiveMarkers })
-    this.props.onSetOfficialMapMarkers(newActiveMarkers)
+    setMarkers(newMarkers)
   }
 
   render () {
@@ -232,10 +214,7 @@ GoogleMap.propTypes = {
   dims: PropTypes.object.isRequired,
   geoJSONstyles: PropTypes.object.isRequired,
   initialMapStyles: PropTypes.array.isRequired,
-  setMarkers: PropTypes.func.isRequired,
-  markers: PropTypes.array.isRequired,
-  onSetOfficialMapMarkers: PropTypes.func.isRequired,
-  officialMapMarkers: PropTypes.array.isRequired,
+  allMarkers: PropTypes.array.isRequired,
   onIdle: PropTypes.bool,
   onSetMapZoom: PropTypes.func.isRequired,
   setTemplate: PropTypes.func.isRequired,
@@ -243,7 +222,8 @@ GoogleMap.propTypes = {
   url: PropTypes.object.isRequired,
   vpDims: PropTypes.object.isRequired,
   mapZoomModifier: PropTypes.number.isRequired,
-  zoom: PropTypes.number.isRequired
+  zoom: PropTypes.number.isRequired,
+  activeResults: PropTypes.array.isRequired
 }
 
 export default MapManager(GoogleMap)

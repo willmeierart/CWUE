@@ -32,7 +32,7 @@ class LocationsWrapper extends Component {
   }
 
   setCenter (center) { this.props.onSetMapCenter(center) }
-  setMarkers (markers) { this.props.onSetMapMarkers(markers) } // leave in case middleware logic needed
+  setMarkers (markers) { this.props.onSetAllMarkers(markers) } // leave in case middleware logic needed
 
   showAllLocationsOnErr () {
     this.props.onSetActiveResultsList(this.props.staticLocationList)
@@ -54,7 +54,7 @@ class LocationsWrapper extends Component {
     const {
       mapCenter,
       mapZoom,
-      mapMarkers,
+      allMarkers,
       officialMapMarkers,
       onSetOfficialMapMarkers,
       onGetUserLocation,
@@ -116,7 +116,6 @@ class LocationsWrapper extends Component {
             setCenter={this.setCenter}
             setTemplate={setTemplate}
             activeResults={activeResults}
-            setMarkers={this.setMarkers}
             onSetActiveSearchPhrase={onSetActiveSearchPhrase}
             data={data}
             staticLocationList={staticLocationList}
@@ -129,15 +128,14 @@ class LocationsWrapper extends Component {
             userIsLocated={userIsLocated}
             url={url} />
           <GoogleMap
+            staticLocationList={staticLocationList}
             url={url}
-            onIdle
             template={pageState}
             center={mapCenter}
-            setMarkers={this.setMarkers}
             zoom={mapZoom}
-            onSetOfficialMapMarkers={onSetOfficialMapMarkers}
-            officialMapMarkers={officialMapMarkers}
-            markers={mapMarkers}
+            setMarkers={this.setMarkers}
+            activeResults={activeResults}
+            allMarkers={allMarkers}
             dims={getMapDims(pageState)}
             onSetMapZoom={onSetMapZoom}
             setTemplate={setTemplate}
@@ -167,15 +165,13 @@ LocationsWrapper.propTypes = {
   activeSearchPhrase: PropTypes.string.isRequired,
   data: PropTypes.object.isRequired,
   mapCenter: PropTypes.oneOfType([PropTypes.object, PropTypes.string]),
-  mapMarkers: PropTypes.array.isRequired,
-  officialMapMarkers: PropTypes.array.isRequired,
+  allMarkers: PropTypes.array.isRequired,
   mapZoom: PropTypes.number.isRequired,
   onGetUserLocation: PropTypes.func.isRequired,
   onSetActiveLocation: PropTypes.func.isRequired,
   onSetActiveResultsList: PropTypes.func.isRequired,
   onSetLocPageState: PropTypes.func.isRequired,
-  onSetMapMarkers: PropTypes.func.isRequired,
-  onSetOfficialMapMarkers: PropTypes.func.isRequired,
+  onSetAllMarkers: PropTypes.func.isRequired,
   onSetMapCenter: PropTypes.func.isRequired,
   onSetMapZoom: PropTypes.func.isRequired,
   onSetStaticLocList: PropTypes.func.isRequired,
