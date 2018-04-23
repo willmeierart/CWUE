@@ -9,8 +9,6 @@ const Header = props => (
     <TopMenu {...props} />
     <style jsx>{`
       .header {
-        position: absolute;
-        top: 0;
         width: 100%;
         height: 120px;
         display: flex;

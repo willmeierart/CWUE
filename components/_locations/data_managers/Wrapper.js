@@ -9,13 +9,15 @@ import {
   getUserLocation,
   setMapZoom,
   setMapMarkers,
+  setOfficialMapMarkers,
   setMapCenter,
   setActiveLocation,
   setLocPageState,
   setActiveResultsList,
   setActiveSearchPhrase,
   setStaticLocList,
-  makeUserLocationPage
+  makeUserLocationPage,
+  setUserNotification
 } from '../../../lib/redux/actions'
 import WithApolloLoader from '../../hoc/WithApolloLoader'
 import ImperativeRouter from '../../../server/ImperativeRouter'
@@ -43,6 +45,7 @@ export default function DataManager (ComposedComponent) {
         this.props.activeLocation !== prevProps.activeLocation ||
         this.props.url !== prevProps.url
       ) {
+        this.props.onSetActiveSearchPhrase('')
         this.setPageStateViaUrl()
       }
     }
@@ -82,14 +85,15 @@ export default function DataManager (ComposedComponent) {
     setPageStateGeoLoc (state) {
       const { userLocation, userIsLocated, mapZoom, onSetMapZoom } = this.props
       console.log(userLocation)
-      if (userLocation !== null && userLocation !== 'denied') {
+      if (userLocation !== null && userLocation !== 'denied' && userLocation !== {}) {
         if (!userIsLocated) {
           this.props.onGetUserLocation(null, async () => {
             console.log('firing ongetuserlocation callback')
-            await onSetMapZoom(mapZoom - 2)
-            ImperativeRouter.push('locations', { state: 'results', spec: 'my-location' }, false)
+            // await onSetMapZoom(mapZoom - 2)
+            // ImperativeRouter.push('locations', { state: 'results', spec: 'my-location' }, false)
           })
         } else {
+          // onSetMapZoom(mapZoom - 2)
           ImperativeRouter.push('locations', { state: 'results', spec: 'my-location' }, false)
         }
       } else {
@@ -146,6 +150,7 @@ function mapStateToProps (state) {
       mapCenter,
       mapZoom,
       mapMarkers,
+      officialMapMarkers,
       activeLocation,
       pageState,
       activeResults,
@@ -161,6 +166,7 @@ function mapStateToProps (state) {
     isUserLocationPage,
     mapCenter,
     mapZoom,
+    officialMapMarkers,
     mapMarkers,
     activeLocation,
     pageState,
@@ -177,12 +183,14 @@ function mapDispatchToProps (dispatch) {
     onSetMapCenter: center => dispatch(setMapCenter(center)),
     onSetMapZoom: zoom => dispatch(setMapZoom(zoom)),
     onSetMapMarkers: markers => dispatch(setMapMarkers(markers)),
+    onSetOfficialMapMarkers: markers => dispatch(setOfficialMapMarkers(markers)),
     onSetActiveLocation: location => dispatch(setActiveLocation(location)),
     onSetLocPageState: pageState => dispatch(setLocPageState(pageState)),
     onSetActiveResultsList: list => dispatch(setActiveResultsList(list)),
     onSetActiveSearchPhrase: phrase => dispatch(setActiveSearchPhrase(phrase)),
     onSetStaticLocList: locObj => dispatch(setStaticLocList(locObj)),
-    onMakeUserLocationPage: bool => dispatch(makeUserLocationPage(bool))
+    onMakeUserLocationPage: bool => dispatch(makeUserLocationPage(bool)),
+    onSetUserNotification: alertObj => dispatch(setUserNotification(alertObj))
   }
 }
 
@@ -194,6 +202,7 @@ DataManager.propTypes = {
   mapCenter: PropTypes.object,
   mapZoom: PropTypes.number,
   mapMarkers: PropTypes.array,
+  officialMapMarkers: PropTypes.array,
   activeLocation: PropTypes.object,
   pageState: PropTypes.string.isRequired,
   activeResults: PropTypes.array,
@@ -202,5 +211,6 @@ DataManager.propTypes = {
   onSetActiveSearchPhrase: PropTypes.func,
   onSetStaticLocList: PropTypes.func,
   staticLocationList: PropTypes.array,
-  vpDims: PropTypes.object
+  vpDims: PropTypes.object,
+  onSetUserNotification: PropTypes.func.isRequired
 }

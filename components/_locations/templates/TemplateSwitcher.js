@@ -20,6 +20,7 @@ const TemplateSwitcher = ({
   isUserLocationPage,
   showAllLocationsOnErr,
   staticLocationList,
+  onSetUserNotification,
   url
 }) => {
   const componentSwitcher = () => {
@@ -37,6 +38,7 @@ const TemplateSwitcher = ({
       case 'results':
         return (
           <Results
+            onSetUserNotification={onSetUserNotification}
             staticLocationList={staticLocationList}
             showAllLocationsOnErr={showAllLocationsOnErr}
             setTemplate={setTemplate}
@@ -89,7 +91,8 @@ TemplateSwitcher.propTypes = {
   setActiveResults: PropTypes.func.isRequired,
   searchPhrase: PropTypes.string.isRequired,
   url: PropTypes.object.isRequired,
-  showAllLocationsOnErr: PropTypes.func.isRequired
+  showAllLocationsOnErr: PropTypes.func.isRequired,
+  onSetUserNotification: PropTypes.func.isRequired
 }
 
 export default TemplateSwitcher

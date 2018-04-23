@@ -189,21 +189,24 @@ class GoogleMap extends Component {
       copiedMarkers.push(m)
     }
     this.setState({ markerSet: copiedMarkers })
+    this.props.onSetOfficialMapMarkers(copiedMarkers)
   }
 
   toggleActiveMarkers () {
-    // console.log('toggling', this.props.template, this.state.markerSet)
     const activeMarkerTitles = this.props.markers.map(marker => marker.title)
     const newActiveMarkers = []
-    this.state.markerSet.forEach(marker => {
+    this.props.officialMapMarkers.forEach(marker => {
       if (activeMarkerTitles.indexOf(marker.title) !== -1 && this.props.template === 'results') {
         newActiveMarkers.push(marker)
         marker.setMap(this.map)
+        console.log('binding marker to map')
       } else {
         marker.setMap(null)
+        console.log('setting marker\'s map to null')
       }
     })
     this.setState({ activeMarkers: newActiveMarkers })
+    this.props.onSetOfficialMapMarkers(newActiveMarkers)
   }
 
   render () {
@@ -231,6 +234,8 @@ GoogleMap.propTypes = {
   initialMapStyles: PropTypes.array.isRequired,
   setMarkers: PropTypes.func.isRequired,
   markers: PropTypes.array.isRequired,
+  onSetOfficialMapMarkers: PropTypes.func.isRequired,
+  officialMapMarkers: PropTypes.array.isRequired,
   onIdle: PropTypes.bool,
   onSetMapZoom: PropTypes.func.isRequired,
   setTemplate: PropTypes.func.isRequired,

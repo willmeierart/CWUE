@@ -55,6 +55,8 @@ class LocationsWrapper extends Component {
       mapCenter,
       mapZoom,
       mapMarkers,
+      officialMapMarkers,
+      onSetOfficialMapMarkers,
       onGetUserLocation,
       userLocation,
       userIsLocated,
@@ -73,7 +75,8 @@ class LocationsWrapper extends Component {
       mapZoomModifier,
       setMapZoomModifier,
       onMakeUserLocationPage,
-      isUserLocationPage
+      isUserLocationPage,
+      onSetUserNotification
     } = this.props
 
     const getMapDims = template => {
@@ -106,6 +109,7 @@ class LocationsWrapper extends Component {
           searchPhrase={activeSearchPhrase}
           onMakeUserLocationPage={onMakeUserLocationPage}
           isUserLocationPage={isUserLocationPage}
+          onSetUserNotification={onSetUserNotification}
           url={url}>
           <h1>LOCATIONS</h1>
           <SearchBar
@@ -131,6 +135,8 @@ class LocationsWrapper extends Component {
             center={mapCenter}
             setMarkers={this.setMarkers}
             zoom={mapZoom}
+            onSetOfficialMapMarkers={onSetOfficialMapMarkers}
+            officialMapMarkers={officialMapMarkers}
             markers={mapMarkers}
             dims={getMapDims(pageState)}
             onSetMapZoom={onSetMapZoom}
@@ -162,12 +168,14 @@ LocationsWrapper.propTypes = {
   data: PropTypes.object.isRequired,
   mapCenter: PropTypes.oneOfType([PropTypes.object, PropTypes.string]),
   mapMarkers: PropTypes.array.isRequired,
+  officialMapMarkers: PropTypes.array.isRequired,
   mapZoom: PropTypes.number.isRequired,
   onGetUserLocation: PropTypes.func.isRequired,
   onSetActiveLocation: PropTypes.func.isRequired,
   onSetActiveResultsList: PropTypes.func.isRequired,
   onSetLocPageState: PropTypes.func.isRequired,
   onSetMapMarkers: PropTypes.func.isRequired,
+  onSetOfficialMapMarkers: PropTypes.func.isRequired,
   onSetMapCenter: PropTypes.func.isRequired,
   onSetMapZoom: PropTypes.func.isRequired,
   onSetStaticLocList: PropTypes.func.isRequired,
@@ -181,7 +189,8 @@ LocationsWrapper.propTypes = {
   vpDims: PropTypes.object.isRequired,
   mapZoomModifier: PropTypes.number.isRequired,
   setMapZoomModifier: PropTypes.func.isRequired,
-  url: PropTypes.object.isRequired
+  url: PropTypes.object.isRequired,
+  onSetUserNotification: PropTypes.func.isRequired
 }
 
 export default DataManager(LocationsWrapper)

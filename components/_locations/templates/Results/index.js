@@ -12,11 +12,12 @@ class Results extends Component {
 
   componentDidMount () {
     // this.props.setActiveResults()
-    const { url: { query: { spec } }, userLocation, activeResults } = this.props
-    if (!spec || spec === 'my-location') {
+    const { url: { query: { spec } } } = this.props
+    if (spec === 'my-location') {
       // if (typeof userLocation !== 'object') {
       //   ImperativeRouter.push('locations', { state: 'initial' }, true)
       // }
+      this.props.onMakeUserLocationPage(true)
     }
     // this.props.setActiveResults([])
     console.log(this.props)
@@ -46,27 +47,30 @@ class Results extends Component {
       searchPhrase,
       url: { query: { spec } },
       isUserLocationPage,
-      userIsLocated,
-      setTemplate,
-      onGetUserLocation,
-      showAllLocationsOnErr,
-      staticLocationList
+      staticLocationList,
+      onSetUserNotification
     } = this.props
     const hasResults = activeResults.length > 0
     const Title = children[0]
     const SearchBar = children[1]
     const Map = children[2]
+
     const formatQS = qs => {
       const splitta = qs.split('-')
       return splitta.map(wd => wd.toUpperCase()).join(' ')
     }
+
     const locationsNearPhrase = () => {
       const defaultErr = 'Please browse this list of all our locations:'
-      if (isUserLocationPage) {
+      if (isUserLocationPage || spec === 'my-location') {
         if (hasResults) {
           return 'Locations near me'
         } else {
           // showAllLocationsOnErr()
+          onSetUserNotification({
+            alert: 'Sorry, looks like there are no nearby locations',
+            color: 'red'
+          })
           return `There are no nearby locations. ${defaultErr}`
         }
       } else {
@@ -75,6 +79,10 @@ class Results extends Component {
             return `Locations near ${searchPhrase}`
           } else {
             // showAllLocationsOnErr()
+            onSetUserNotification({
+              alert: `Sorry, looks like there are no locations near ${searchPhrase}`,
+              color: 'red'
+            })
             return `There are no locations near ${searchPhrase}. ${defaultErr}`
           }
         } else {
@@ -83,6 +91,10 @@ class Results extends Component {
               return `Locations near ${formatQS(spec)}`
             } else {
               // showAllLocationsOnErr()
+              onSetUserNotification({
+                alert: `Sorry, looks like there are no locations near ${formatQS(spec)}`,
+                color: 'red'
+              })
               return `There are no locations near ${formatQS(spec)}. ${defaultErr}`
             }
           }
@@ -164,7 +176,8 @@ Results.propTypes = {
   setActiveResults: PropTypes.func.isRequired,
   searchPhrase: PropTypes.string.isRequired,
   showAllLocationsOnErr: PropTypes.func.isRequired,
-  url: PropTypes.object.isRequired
+  url: PropTypes.object.isRequired,
+  onSetUserNotification: PropTypes.func.isRequired
 }
 
 export default UserLocationManager(Results)

@@ -2,9 +2,10 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { setLocPageState, getVPDims } from '../lib/redux/actions'
-import Header from '../components/layout/Header'
-import Footer from '../components/layout/Footer'
+import { setLocPageState, getVPDims, setUserNotification } from '../lib/redux/actions'
+import Header from './layout/Header'
+import Footer from './layout/Footer'
+import NotificationBar from './ui/NotificationBar'
 
 // import globalStyles from '../../styles/index.scss'
 
@@ -13,12 +14,13 @@ class App extends Component {
     window.addEventListener('resize', this.props.onGetVPDims)
   }
   render () {
-    const { title, children, pageState, onSetLocPageState, url } = this.props
+    const { title, children, pageState, onSetLocPageState, url, userNotification: { alert, color }, onSetUserNotification } = this.props
     return (
       <div className='App'>
         {/* <Head title={title} /> */}
         <div>
           <Header url={url} pageState={pageState} onSetLocPageState={onSetLocPageState} />
+          { (alert !== '' && color !== '') && <NotificationBar onSetUserNotification={onSetUserNotification} alert={alert} color={color} /> }
           <main>{ children }</main>
           <Footer pageState={pageState} />
         </div>
@@ -54,14 +56,16 @@ class App extends Component {
 function mapStateToProps (state) {
   return {
     pageState: state.location.pageState,
-    vpDims: state.env.vpDims
+    vpDims: state.env.vpDims,
+    userNotification: state.env.userNotification
   }
 }
 
 function mapDispatchToProps (dispatch) {
   return {
     onSetLocPageState: pageState => dispatch(setLocPageState(pageState)),
-    onGetVPDims: () => dispatch(getVPDims())
+    onGetVPDims: () => dispatch(getVPDims()),
+    onSetUserNotification: alertObj => dispatch(setUserNotification(alertObj))
   }
 }
 
@@ -71,5 +75,7 @@ App.propTypes = {
   pageState: PropTypes.string.isRequired,
   onSetLocPageState: PropTypes.func.isRequired,
   title: PropTypes.string.isRequired,
-  vpDims: PropTypes.object.isRequired
+  vpDims: PropTypes.object.isRequired,
+  userNotification: PropTypes.object.isRequired,
+  onSetUserNotification: PropTypes.func.isRequired
 }

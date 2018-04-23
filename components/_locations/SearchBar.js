@@ -63,7 +63,8 @@ class SearchBar extends Component {
       userLocation,
       setMapZoomModifier,
       isUserLocationPage,
-      userIsLocated
+      userIsLocated,
+      onMakeUserLocationPage
     } = this.props
     const noActiveSearch = !searchPhrase && activeResults.length === 0
     const pathSplitta = asPath.split('results/')[1]
@@ -92,6 +93,8 @@ class SearchBar extends Component {
           const searchVal = asPath.split('results/')[1].replace(/[-]/g, ' ')
           if (searchVal !== 'my location') {
             this.generateState(searchVal)
+          } else {
+            onMakeUserLocationPage(true)
           }
         }
       } else {

@@ -40,13 +40,13 @@ class HomeWrapper extends Component {
           .header-content {
             position: absolute;
             top: 0;
-            width: 100vw;
+            width: calc(100vw - 4em);
             background: red;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            z-index: 0;
+            z-index: -1;
             padding: 2em;
             padding-top: 100px;
           }

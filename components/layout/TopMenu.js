@@ -97,7 +97,7 @@ export default class TopMenu extends Component {
             {/* margin-left: 3em; */}
             justify-content: center;
             flex-grow: 0;
-            position: fixed;
+            {/* position: fixed; */}
             width: 100%;
             left: 0;
           }
