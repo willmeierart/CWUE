@@ -4,23 +4,17 @@ import ReactDOM from 'react-dom'
 import MapManager from './data_managers/Map'
 import NextRouter from 'next/router'
 import { binder } from '../../lib/_utils'
-import { getCoordsFromAddress, makeMarker } from '../../lib/_locationUtils'
+import { getCoordsFromAddress, makeMarker, getLatLng, reverseGeocode } from '../../lib/_locationUtils'
 import equal from 'deep-equal'
 import arrayEqual from 'array-equal'
 
 class GoogleMap extends Component {
   constructor (props) {
     super(props)
-    const { zoom, mapZoomModifier } = this.props
     this.state = {
-      center: {lat: 39.8283459, lng: -98.5794797},
-      activeMarkers: [],
-      markerSet: [],
-      markerTitles: [],
-      zoom: zoom + mapZoomModifier || 3 + mapZoomModifier,
       bounds: null
     }
-    binder(this, ['setCenter', /* 'setMarker', 'setMarkers', */ 'setCenterViaMarkers', 'setBounds', 'toggleActiveMarkers', 'setAllMarkers'])
+    binder(this, ['setCenter', 'setCenterViaMarkers', 'setBounds', 'toggleActiveMarkers', 'setAllMarkers'])
   }
 
   componentDidMount () {
@@ -33,9 +27,32 @@ class GoogleMap extends Component {
         console.log(this.state.zoom, this.props.mapZoomModifier)
         const { google } = window
         const mapNode = ReactDOM.findDOMNode(this.mapDOM)
+        const { center } = this.props
+        console.log(center)
+        let mapCenter
+        if (typeof center === 'object') {
+          if (center instanceof google.maps.LatLng) {
+            console.log('init: center is valid')
+            mapCenter = center
+          } else {
+            console.log('init: center invalid, being converted to latlng')
+            const centerify = new google.maps.LatLng(center.lat, center.lng)
+            const { lat, lng } = centerify
+            mapCenter = { lat: lat(), lng: lng() }
+            // mapCenter = centerify
+          }
+        } else {
+          console.log('init: center is a string, reverse geocoding')
+          const reverseGeocoded = reverseGeocode(center)
+          console.log(reverseGeocoded)
+          const { lat } = reverseGeocoded.geometry.location
+          const { lng } = reverseGeocoded.geometry.location
+          mapCenter = { lat: lat(), lng: lng() }
+        }
+        
         this.map = new google.maps.Map(mapNode, {
-          zoom: this.state.zoom,
-          center: this.state.center,
+          zoom: this.props.zoom,
+          center: mapCenter,
           mapTypeId: google.maps.MapTypeId.ROADMAP,
           disableDefaultUI: true,
           // zoomControl: false,
@@ -70,8 +87,7 @@ class GoogleMap extends Component {
   componentDidUpdate (prevProps, prevState) {
     if (!equal(this.props, prevProps)) {
       // console.log('props different', this.props)
-      // this.setMarkers()
-      this.map.panTo(this.state.center)
+      // this.map.panTo(this.state.center)
       if (this.props.url.query.state !== 'results') {
         this.toggleActiveMarkers()
       }
@@ -80,21 +96,32 @@ class GoogleMap extends Component {
         if (this.props.mapZoomModifier === 0) {
           this.map.setZoom(this.props.zoom)
         } else {
-          this.map.setZoom(this.props.zoom + this.props.mapZoomModifier)
+          this.map.setZoom(this.props.zoom)
         }
       }
       if (this.props.activeResults !== prevProps.activeResults) {
         this.toggleActiveMarkers()
       }
+      if (this.props.center !== prevProps.center) {
+        console.log(this.props.center)
+        // console.log(this.map.getCenter())
+        if (this.props.center instanceof window.google.maps.LatLng) {
+          this.map.panTo(this.props.center)
+        } else {
+          const validLatLng = new window.google.maps.LatLng(this.props.center)
+          const { lat, lng } = validLatLng
+          this.map.panTo({ lat: lat(), lng: lng() })
+        }
+      }
     }
-    if (prevState.zoom !== this.state.zoom) {
-      // console.log('zoom different:', prevState.zoom, this.state.zoom)
-      this.map.setZoom(this.state.zoom)
-    }
-    if (!equal(prevState.center, this.state.center)) {
-      // console.log('center different:', prevState.center, this.state.center)
-      this.map.panTo(this.state.center)
-    }
+    // if (prevState.zoom !== this.state.zoom) {
+    //   // console.log('zoom different:', prevState.zoom, this.state.zoom)
+    //   this.map.setZoom(this.state.zoom)
+    // }
+    // if (!equal(prevState.center, this.state.center)) {
+    //   // console.log('center different:', prevState.center, this.state.center)
+    //   this.map.panTo(this.state.center)
+    // }
   }
 
   setBounds (marker) {
@@ -132,6 +159,7 @@ class GoogleMap extends Component {
       this.setBounds(invokedPos)
       return obj
     }, { coords: { lat: 0, lng: 0 } })
+    console.log(markerCenter.coords)
     this.setCenter(markerCenter.coords)
   }
 
@@ -140,18 +168,22 @@ class GoogleMap extends Component {
       if (typeof center === 'string') {
         getCoordsFromAddress(center)
           .then(coords => {
-            this.setState({ center: coords }, () => this.map.panTo(this.state.center))
+            console.log('center was a string, now coords are:', coords)
+            this.props.setCenter(coords)
+            // this.setState({ center: coords }, () => this.map.panTo(this.state.center))
           })
       } else {
-        this.setState({ center }, () => this.map.panTo(this.state.center))
+        console.log('firing normally, center is:', center)
+        // this.setState({ center }, () => this.map.panTo(this.state.center))
+        this.props.setCenter(center)
+        // this.setState({ center: coords }, () => this.map.panTo(this.state.center))
       }
     }
     if (center) {
       setCenterType(center)
-    } else if (this.props.center) {
-      setCenterType(this.props.center)
     } else {
-      this.setState({ center: {lat: 39.740287, lng: -104.971806} })
+      console.log('was no center, using props')
+      setCenterType(this.props.center)
     }
   }
 
@@ -221,7 +253,9 @@ GoogleMap.propTypes = {
   vpDims: PropTypes.object.isRequired,
   mapZoomModifier: PropTypes.number.isRequired,
   zoom: PropTypes.number.isRequired,
-  activeResults: PropTypes.array.isRequired
+  activeResults: PropTypes.array.isRequired,
+  setCenter: PropTypes.func.isRequired,
+  setMarkers: PropTypes.func.isRequired
 }
 
 export default MapManager(GoogleMap)

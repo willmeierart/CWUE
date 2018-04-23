@@ -84,7 +84,6 @@ export default function DataManager (ComposedComponent) {
 
     setPageStateGeoLoc (state) {
       const { userLocation, userIsLocated, mapZoom, onSetMapZoom } = this.props
-      console.log(userLocation)
       if (userLocation !== null && userLocation !== 'denied' && userLocation !== {}) {
         if (!userIsLocated) {
           this.props.onGetUserLocation(null, async () => {
@@ -94,7 +93,7 @@ export default function DataManager (ComposedComponent) {
           })
         } else {
           // onSetMapZoom(mapZoom - 2)
-          ImperativeRouter.push('locations', { state: 'results', spec: 'my-location' }, false)
+          // ImperativeRouter.push('locations', { state: 'results', spec: 'my-location' }, false)
         }
       } else {
         onSetMapZoom(mapZoom)

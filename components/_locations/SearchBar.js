@@ -39,13 +39,11 @@ class SearchBar extends Component {
   }
 
   componentDidMount () {
-    console.log(this.props)
     this.handleSearchOnSSR()
   }
 
   componentDidUpdate (prevProps, prevState) {
     if (this.props.userLocation !== prevProps.userLocation && this.state.specialVal !== '') {
-      console.log(this.props.userLocation)
       // this.generateState(this.state.specialVal)
     }
     if (this.state.specialVal !== prevState.specialVal) {

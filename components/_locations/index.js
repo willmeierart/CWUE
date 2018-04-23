@@ -6,6 +6,7 @@ import GoogleMap from './GoogleMap'
 import SearchBar from './SearchBar'
 import LocateMeBtn from './LocateMeBtn'
 import DataManager from './data_managers/Wrapper'
+import { getLatLng } from '../../lib/_locationUtils'
 import { binder } from '../../lib/_utils'
 
 import locData from '../../lib/_data/locData'
@@ -23,7 +24,19 @@ class LocationsWrapper extends Component {
     this.setActiveResults()
   }
 
-  setCenter (center) { this.props.onSetMapCenter(center) }
+  setCenter (center) {
+    console.log(center)
+    if (center instanceof window.google.maps.LatLng) {
+      console.log('setcenter correct format')
+      this.props.onSetMapCenter(center)
+    } else {
+      console.log('attempting to convert setcenter to correct format')
+      const validLatLng = new window.google.maps.LatLng(center.lat, center.lng)
+      const { lat, lng } = validLatLng
+      this.props.onSetMapCenter({ lat: lat(), lng: lng() })
+      // this.props.onSetMapCenter(validLatLng)
+    }
+  }
   setMarkers (markers) { this.props.onSetAllMarkers(markers) } // leave in case middleware logic needed
 
   showAllLocationsOnErr () {
@@ -125,6 +138,7 @@ class LocationsWrapper extends Component {
             template={pageState}
             center={mapCenter}
             zoom={mapZoom}
+            setCenter={this.setCenter}
             setMarkers={this.setMarkers}
             activeResults={activeResults}
             allMarkers={allMarkers}
