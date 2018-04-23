@@ -62,7 +62,6 @@ class GoogleMap extends Component {
         if (this.props.activeResults.length !== this.props.allMarkers.length || this.props.allMarkers.indexOf(undefined) !== -1) {
           this.setAllMarkers()
         }
-        console.log('componentDidMount')
       }
     }
     init()
@@ -176,7 +175,6 @@ class GoogleMap extends Component {
 
   toggleActiveMarkers () {
     const { activeResults, allMarkers, setMarkers } = this.props
-    console.log(allMarkers)
     const activeMarkerTitles = activeResults.map(result => result.name)
     const newMarkers = allMarkers.map(marker => {
       if (activeMarkerTitles.indexOf(marker.title) !== -1) {

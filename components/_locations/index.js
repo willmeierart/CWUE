@@ -23,14 +23,6 @@ class LocationsWrapper extends Component {
     this.setActiveResults()
   }
 
-  shouldComponentUpdate (newProps) {
-    if (!equal(newProps, this.props)) {
-      console.log(newProps)
-      return true
-    }
-    return true
-  }
-
   setCenter (center) { this.props.onSetMapCenter(center) }
   setMarkers (markers) { this.props.onSetAllMarkers(markers) } // leave in case middleware logic needed
 

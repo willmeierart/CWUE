@@ -11,25 +11,17 @@ class Results extends Component {
   }
 
   componentDidMount () {
-    // this.props.setActiveResults()
     const { url: { query: { spec } } } = this.props
     if (spec === 'my-location') {
-      // if (typeof userLocation !== 'object') {
-      //   ImperativeRouter.push('locations', { state: 'initial' }, true)
-      // }
       this.props.onMakeUserLocationPage(true)
     }
-    // this.props.setActiveResults([])
-    console.log(this.props)
   }
   shouldComponentUpdate (nextProps) {
-    // console.log(this.props)
     if (this.props.activeResults !== nextProps.activeResults) {
       return true
     }
     return false
   }
-  // componentWillUnmount () { this.props.setActiveResults() }
 
   pickLocation (location) {
     if (typeof location === 'string') {
@@ -78,7 +70,6 @@ class Results extends Component {
           if (hasResults) {
             return `Locations near ${searchPhrase}`
           } else {
-            // showAllLocationsOnErr()
             onSetUserNotification({
               alert: `Sorry, looks like there are no locations near ${searchPhrase}`,
               color: 'red'

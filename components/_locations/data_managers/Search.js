@@ -149,15 +149,11 @@ export default function SearchManager (ComposedComponent) {
               if (this.state.nearbyResults.indexOf(location) === -1) {
                 const makeMarkers = true
                 this.geocode(origin, makeMarkers)
-                // const newResults = [...this.state.nearbyResults]
-                // newResults.push(location)
-                // this.setState({ nearbyResults: newResults })
                 this.pushNewNearbyResult(location)
               }
             }
           })
         })
-        // this.setTheResults()
       }
     }
 
@@ -198,7 +194,6 @@ export default function SearchManager (ComposedComponent) {
           })
         })
       }
-      // this.setAllMarkers(this.state.nearbyResults)
       this.props.setActiveResults(this.state.nearbyResults)
     }
 
