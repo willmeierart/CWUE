@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
-// import NextRouter from 'next/router'
-// import { geocodeByAddress, getLatLng } from '../_locationUtils'
 import { binder } from '../../../lib/_utils'
+
+// wish more could be abstracted up to this, but so many of the map methods are stateful
+// for now, it just holds some styling controllers
 
 export default function MapManager (ComposedComponent) {
   class WrappedComponent extends Component {

@@ -2,11 +2,11 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 import MapManager from './data_managers/Map'
-import NextRouter from 'next/router'
 import { binder } from '../../lib/_utils'
-import { getCoordsFromAddress, makeMarker, getLatLng, reverseGeocode } from '../../lib/_locationUtils'
+import { getCoordsFromAddress, makeMarker, reverseGeocode } from '../../lib/_locationUtils'
 import equal from 'deep-equal'
-import arrayEqual from 'array-equal'
+
+// all mechanics relating to map, markers, etc
 
 class GoogleMap extends Component {
   constructor (props) {
@@ -14,11 +14,12 @@ class GoogleMap extends Component {
     this.state = {
       bounds: null
     }
-    binder(this, ['setCenter', 'setCenterViaMarkers', 'setBounds', 'toggleActiveMarkers', 'setAllMarkers'])
+    binder(this, ['setCenter', 'setCenterViaMarkers', 'setBounds', 'toggleActiveMarkers', 'setAllMarkers', 'clearAllMarkers'])
   }
 
   componentDidMount () {
-    const init = () => {
+    console.log('componentDidMount')
+    const init = async () => {
       const { template, onIdle, initialMapStyles, geoJSONstyles, url } = this.props
       if (!window.google) {
         console.warn('no google')
@@ -30,7 +31,7 @@ class GoogleMap extends Component {
         const { center } = this.props
         console.log(center)
         let mapCenter
-        if (typeof center === 'object') {
+        if (typeof center === 'object') { // handle initial centering of map
           if (center instanceof google.maps.LatLng) {
             console.log('init: center is valid')
             mapCenter = center
@@ -39,7 +40,6 @@ class GoogleMap extends Component {
             const centerify = new google.maps.LatLng(center.lat, center.lng)
             const { lat, lng } = centerify
             mapCenter = { lat: lat(), lng: lng() }
-            // mapCenter = centerify
           }
         } else {
           console.log('init: center is a string, reverse geocoding')
@@ -50,7 +50,7 @@ class GoogleMap extends Component {
           mapCenter = { lat: lat(), lng: lng() }
         }
         
-        this.map = new google.maps.Map(mapNode, {
+        this.map = new google.maps.Map(mapNode, { // init the map
           zoom: this.props.zoom,
           center: mapCenter,
           mapTypeId: google.maps.MapTypeId.ROADMAP,
@@ -64,7 +64,7 @@ class GoogleMap extends Component {
           styles: template === 'initial' ? initialMapStyles : null
           // gestureHandling: 'none'
         })
-        if (template === 'results' || url.asPath.indexOf('results') !== -1) {
+        if (template === 'results' || url.asPath.indexOf('results') !== -1) { // behavior different for results view than initial
           if (onIdle) {
             google.maps.event.addListener(this.map, 'idle', () => {
               // this.setMarkers()
@@ -72,24 +72,44 @@ class GoogleMap extends Component {
               // this.toggleActiveMarkers()
             })
           }
-        } else if (template === 'initial') {
+          if (this.props.activeResults.length !== this.props.allMarkers.length || this.props.allMarkers.indexOf(undefined) !== -1) {
+            await this.setAllMarkers() // set markers if they don't exist
+            console.log('first op')
+            
+            this.toggleActiveMarkers()
+          } else if (this.props.allMarkers.indexOf(undefined) === -1) {
+            console.log('second op');
+            this.toggleActiveMarkers() // otherwise just pick from all markers which should be displayed
+          }
+          // const filteredMarkers = this.props.allMarkers.filter(marker => marker.map === this.map)
+          // console.log('attempting set center via markers')
+          // console.log(filteredMarkers, this.props.allMarkers)
+          // this.setCenterViaMarkers(filteredMarkers)
+        } else if (template === 'initial') { // load geojson mask into map if initial view
           this.map.data.loadGeoJson('/static/geoData/US_GEO.json')
           this.map.data.setStyle(geoJSONstyles)
-        }
-        if (this.props.activeResults.length !== this.props.allMarkers.length || this.props.allMarkers.indexOf(undefined) !== -1) {
-          this.setAllMarkers()
         }
       }
     }
     init()
   }
 
+  componentWillUnmount () {
+    this.clearAllMarkers()
+  }
+
   componentDidUpdate (prevProps, prevState) {
+    const filteredMarkers = this.props.allMarkers.filter(marker => marker.map === this.map)
     if (!equal(this.props, prevProps)) {
       // console.log('props different', this.props)
       // this.map.panTo(this.state.center)
       if (this.props.url.query.state !== 'results') {
         this.toggleActiveMarkers()
+        if (this.props.template === 'initial') { // make sure geojson data loaded back in on clientside nav to initial view
+          this.map.data.loadGeoJson('/static/geoData/US_GEO.json')
+          this.map.data.setStyle(this.props.geoJSONstyles)
+          this.props.setCenter({ lat: 39.8283459, lng: -98.57947969999998 }) // hard-coded latlng for geographic center of US
+        }
       }
       if (this.props.mapZoomModifier !== prevProps.mapZoomModifier || this.props.zoom !== prevProps.zoom) {
         console.log(this.props.mapZoomModifier)
@@ -100,14 +120,16 @@ class GoogleMap extends Component {
         }
       }
       if (this.props.activeResults !== prevProps.activeResults) {
-        this.toggleActiveMarkers()
+        this.clearAllMarkers()
+        this.toggleActiveMarkers() // if results change, change the markers
       }
       if (this.props.allMarkers !== prevProps.allMarkers) {
-        const filteredMarkers = this.props.allMarkers.filter(marker => marker.map === this.map)
-        // this.setState({ bounds: null }, () => { this.setCenterViaMarkers(filteredMarkers) })
+        if (this.props.template === 'results') {
+          this.setCenterViaMarkers(filteredMarkers)
+        }
       }
       if (this.props.center !== prevProps.center) {
-        console.log(this.props.center)
+        // console.log(this.props.center)
         // console.log(this.map.getCenter())
         // if (this.props.center instanceof window.google.maps.LatLng) {
         //   this.map.panTo(this.props.center)
@@ -116,8 +138,12 @@ class GoogleMap extends Component {
         //   const { lat, lng } = validLatLng
         //   this.map.panTo({ lat: lat(), lng: lng() })
         // }
-        const filteredMarkers = this.props.allMarkers.filter(marker => marker.map === this.map)
-        this.setCenterViaMarkers(filteredMarkers)
+        // this.setCenterViaMarkers(filteredMarkers)
+      }
+      if (this.state.bounds !== prevState.bounds) {
+        if (this.props.template === 'results') {
+          this.setCenterViaMarkers(filteredMarkers)
+        }
       }
     }
     // if (prevState.zoom !== this.state.zoom) {
@@ -134,16 +160,13 @@ class GoogleMap extends Component {
     const mainAction = () => {
       if (marker) {
         this.setState({ bounds: this.state.bounds.extend(marker) }, () => {
-          console.log(this.state.bounds)
-          this.map.fitBounds(this.state.bounds)
+          this.map.fitBounds(this.state.bounds) // center map around markers
         })
       }
     }
-    if (!this.state.bounds) {
-      console.log('no bounds');
+    if (!this.state.bounds) { // init bounds
       this.setState({ bounds: new window.google.maps.LatLngBounds() }, mainAction)
     } else {
-      console.log('has bounds already');
       mainAction()
     }
   }
@@ -155,8 +178,6 @@ class GoogleMap extends Component {
     let minLng = null
 
     this.setState({ bounds: null }, () => {
-      console.log(this.state.bounds)
-
       const markerCenter = markers.reduce((obj, marker) => {
         if (maxLat === null || marker.position.lat > maxLat) maxLat = marker.position.lat()
         if (minLat === null || marker.position.lat < minLat) minLat = marker.position.lat()
@@ -165,10 +186,15 @@ class GoogleMap extends Component {
         obj.coords.lat = parseFloat(((maxLat + minLat) / 2).toFixed(5))
         obj.coords.lng = parseFloat(((maxLng + minLng) / 2).toFixed(5))
         const invokedPos = { lat: marker.position.lat(), lng: marker.position.lng() }
-        this.setBounds(invokedPos)
+        this.setBounds(invokedPos) // expand map bounds to the largest needed to show all markers
         return obj
       }, { coords: { lat: 0, lng: 0 } })
-      this.setCenter(markerCenter.coords)
+      if (markerCenter.coords.lat === 0 && markerCenter.coords.lng === 0 ) {
+        console.log('markercenter.Coords are 0,0 - defaulting to props.center');
+        this.setCenter(this.props.center)
+      } else {
+        this.setCenter(markerCenter.coords)
+      }
     })
   }
 
@@ -196,7 +222,7 @@ class GoogleMap extends Component {
     }
   }
 
-  setAllMarkers () {
+  setAllMarkers () { // weirdly, this is the way you do it -- not by adding and removing markers but by adding all markers and toggling their 'map' property between null and this.map
     const { staticLocationList, activeResults, setMarkers } = this.props
     const activeMarkerTitles = activeResults.map(result => result.name)
     const mappedAsMarkers = staticLocationList.map(loc => {
@@ -214,11 +240,21 @@ class GoogleMap extends Component {
     setMarkers(mappedAsMarkers)
   }
 
-  toggleActiveMarkers () {
-    const { activeResults, allMarkers, setMarkers } = this.props
+  clearAllMarkers () {
+    const { allMarkers, setMarkers } = this.props
+    const newMarkers = allMarkers.map(marker => {
+      marker.map = null
+      marker.setMap(null)
+      return marker
+    })
+    setMarkers(newMarkers)
+  }
+
+  toggleActiveMarkers () { 
+    const { activeResults, allMarkers, setMarkers, template } = this.props
     const activeMarkerTitles = activeResults.map(result => result.name)
     const newMarkers = allMarkers.map(marker => {
-      if (activeMarkerTitles.indexOf(marker.title) !== -1) {
+      if (activeMarkerTitles.indexOf(marker.title) !== -1 && template === 'results') {
         marker.map = this.map
         marker.setMap(this.map)
       } else {

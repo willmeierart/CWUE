@@ -16,7 +16,7 @@ export default function UserLocationManager (ComposedComponent) {
       }
     }
 
-    determineComponentState () {
+    determineComponentState () { // manages whether view is of a specific search's results or user location results
       const { isUserLocationPage, userIsLocated, onMakeUserLocationPage } = this.props
       switch (true) {
         case !isUserLocationPage :

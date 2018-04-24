@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
 import Loader from 'react-loaders'
 
+// render loader if apollo taking forever to load
+
 export default function WithApolloLoader (ComposedComponent) {
   class WrappedComponent extends Component {
     render () {

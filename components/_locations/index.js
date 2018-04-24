@@ -12,6 +12,8 @@ import { binder } from '../../lib/_utils'
 import locData from '../../lib/_data/locData'
 import ImperativeRouter from '../../server/ImperativeRouter'
 
+// this is the sort of second-tier manager for the locations section of the site, mostly structural
+
 class LocationsWrapper extends Component {
   constructor (props) {
     super(props)
@@ -26,16 +28,17 @@ class LocationsWrapper extends Component {
 
   setCenter (center) {
     console.log(center)
-    if (center instanceof window.google.maps.LatLng) {
-      console.log('setcenter correct format')
-      this.props.onSetMapCenter(center)
-    } else {
-      console.log('attempting to convert setcenter to correct format')
-      const validLatLng = new window.google.maps.LatLng(center.lat, center.lng)
-      const { lat, lng } = validLatLng
-      this.props.onSetMapCenter({ lat: lat(), lng: lng() })
-      // this.props.onSetMapCenter(validLatLng)
-    }
+    // if (center instanceof window.google.maps.LatLng) {
+    //   console.log('setcenter correct format')
+    //   this.props.onSetMapCenter(center)
+    // } else {
+    //   console.log('attempting to convert setcenter to correct format')
+    //   const validLatLng = new window.google.maps.LatLng(center.lat, center.lng)
+    //   const { lat, lng } = validLatLng
+    //   this.props.onSetMapCenter({ lat: lat(), lng: lng() })
+    //   // this.props.onSetMapCenter(validLatLng)
+    // }
+    this.props.onSetMapCenter(center)
   }
   setMarkers (markers) { this.props.onSetAllMarkers(markers) } // leave in case middleware logic needed
 

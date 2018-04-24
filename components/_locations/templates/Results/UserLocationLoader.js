@@ -1,3 +1,5 @@
+// shown if someone wants to find locations near them but their browser isn't geolocating quick enough
+
 const UserLocationLoader = () => (
   <div className='outer-wrapper'>
     <div className='inner-wrapper'> attempting to geolocate you! </div>

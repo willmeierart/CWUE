@@ -2,9 +2,7 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { graphql, compose } from 'react-apollo'
-import NextRouter from 'next/router'
-import ExecutionEnvironment from 'exenv'
-import { allLocations, pageCopy } from '../../../lib/apollo/queries'
+import { allLocations } from '../../../lib/apollo/queries'
 import {
   getUserLocation,
   setMapZoom,
@@ -22,6 +20,8 @@ import {
 import WithApolloLoader from '../../hoc/WithApolloLoader'
 import ImperativeRouter from '../../../server/ImperativeRouter'
 import { binder } from '../../../lib/_utils'
+
+// this is the datamanager for the entire locations section, handles the route-based-page-view logic, etc
 
 export default function DataManager (ComposedComponent) {
   class WrappedComponent extends Component {
@@ -44,17 +44,17 @@ export default function DataManager (ComposedComponent) {
       if (
         this.props.activeLocation !== prevProps.activeLocation ||
         this.props.url !== prevProps.url
-      ) {
+      ) { // if you change routes, re-evaluate page-view-state
         this.props.onSetActiveSearchPhrase('')
         this.setPageStateViaUrl()
       }
     }
 
-    setUserLocationStatus (userLocationStatus) {
+    setUserLocationStatus (userLocationStatus) { // do we have the user's location yet?
       this.setState({ userLocationStatus })
     }
 
-    setMapZoomModifier (mapZoomModifier) {
+    setMapZoomModifier (mapZoomModifier) { // to more precisely handle zooming when only one result present
       console.log('mapZoomModifier changed to:', mapZoomModifier)
       this.setState({ mapZoomModifier })
     }
@@ -62,18 +62,18 @@ export default function DataManager (ComposedComponent) {
     setPageStateViaUrl () {
       const { url } = this.props
       const { query: { state, spec } } = url
-      // const isServer = !ExecutionEnvironment.canUseDOM
-      const initial = !state || state === '' || state === 'initial'
+
+      const initial = !state || state === '' || state === 'initial' // if there is an incomplete route then still render initial view
 
       switch (true) {
         case initial:
-          if (initial && url.asPath !== '/carwash/locations') {
+          if (initial && url.asPath !== '/carwash/locations') { // if it's supposed to be the initial view but it isn't, make it so
             ImperativeRouter.push('locations', { state: 'initial' }, false) 
           }
           this.setPageStateGeoLoc(state)
           break
         case state === 'detail':
-          this.props.onSetActiveLocation(spec)
+          this.props.onSetActiveLocation(spec) // make sure if the detail view is rendered that there is a location to render data from
           this.setTemplate(state)
           break
         default:
@@ -82,21 +82,21 @@ export default function DataManager (ComposedComponent) {
       }
     }
 
-    setPageStateGeoLoc (state) {
+    setPageStateGeoLoc (state) { // determines whether initial view should be 'initial' or results near user's location, if that's available
       const { userLocation, userIsLocated, mapZoom, onSetMapZoom } = this.props
       if (userLocation !== null && userLocation !== 'denied' && userLocation !== {}) {
-        if (!userIsLocated) {
-          this.props.onGetUserLocation(null, async () => {
+        if (!userIsLocated) { // if the user hasn't been located, then try again to locate them
+          this.props.onGetUserLocation(null, async () => { 
             console.log('firing ongetuserlocation callback')
             // await onSetMapZoom(mapZoom - 2)
             // ImperativeRouter.push('locations', { state: 'results', spec: 'my-location' }, false)
           })
         } else {
           // onSetMapZoom(mapZoom - 2)
-          // ImperativeRouter.push('locations', { state: 'results', spec: 'my-location' }, false)
+          ImperativeRouter.push('locations', { state: 'results', spec: 'my-location' }, false)
         }
       } else {
-        onSetMapZoom(mapZoom)
+        // onSetMapZoom(mapZoom)
       }
     }
 
@@ -110,7 +110,7 @@ export default function DataManager (ComposedComponent) {
         } else if (pathname.indexOf('detail') !== -1) {
           onSetLocPageState('detail')
         } else {
-          if (pageState === 'initial') {
+          if (pageState === 'detail') {
             onSetLocPageState('detail')
           } else {
             console.warn('not a valid template state... \n ...attempting default switch')

@@ -3,6 +3,8 @@ import PropTypes from 'prop-types'
 import { Transition } from 'react-transition-group'
 import { binder } from '../../lib/_utils'
 
+// popup bar at top of page for user notifications
+
 class NotificationBar extends Component {
   constructor (props) {
     super(props)

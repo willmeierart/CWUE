@@ -5,6 +5,8 @@ import ImperativeRouter from '../../../server/ImperativeRouter'
 import { geocodeByAddress, getLatLng, makeMarker, normalizeRegionInputs } from '../../../lib/_locationUtils'
 import { binder } from '../../../lib/_utils'
 
+// most places-autocomplete api data held here
+
 export default function SearchManager (ComposedComponent) {
   class WrappedComponent extends Component {
     constructor (props) {
@@ -24,7 +26,7 @@ export default function SearchManager (ComposedComponent) {
     }
 
     componentDidMount () {
-      const init = () => {
+      const init = () => { // only work with google obj if it exists, else wait
         if (typeof window !== 'undefined' || !window.google.maps.places) {
           if (!window.google) {
             console.log('no google')
@@ -42,7 +44,7 @@ export default function SearchManager (ComposedComponent) {
       this.setState({ nearbyResults: [], isRegion: false })
     }
 
-    routeToResults (place) {
+    routeToResults (place) { // control programmatic url
       const spec = place.formatted_address
         .toLowerCase()
         .replace(/(,)/g, '')
@@ -59,8 +61,8 @@ export default function SearchManager (ComposedComponent) {
       this.props.onSetActiveSearchPhrase(address)
     }
 
-    geocode (address, makeMarkers) {
-      geocodeByAddress(address).then(res => {
+    geocode (address, makeMarkers) { // makeMarkers = [bool]
+      geocodeByAddress(address).then(res => { // these helper functions all in locationUtils file
         if (res.length > 0 && typeof res !== 'string') {
           const markers = []
           res.forEach(place =>
@@ -85,7 +87,7 @@ export default function SearchManager (ComposedComponent) {
       }).catch(err => { console.log(err) })
     }
 
-    searchIsRegion (types) {
+    searchIsRegion (types) { // determine if someone's search is a city, state, etc
       return types.reduce((bool, type) => {
         if ((type === 'locality' ||
           type === 'administrative_area_level_1') &&
@@ -102,7 +104,7 @@ export default function SearchManager (ComposedComponent) {
       this.getRelevantCoords(place, locationCoords)
     }
 
-    getRelevantCoords (place, locationCoords) {
+    getRelevantCoords (place, locationCoords) { // find which places from static list should be returned as valid result (all chained methods below)
       if (place.geometry.bounds) {
         const { b, f } = place.geometry.bounds
         const bounds = [
@@ -167,7 +169,7 @@ export default function SearchManager (ComposedComponent) {
           }
         })
       }
-      if (isRegion) {
+      if (isRegion) { // don't just check against coords of search, use bounds and name of region, too
         const splitSearch = activeSearchPhrase.toLowerCase().split(/[^a-z]/g)
         splitSearch.forEach(wd => {
           staticLocationList.forEach(loc => {
@@ -175,7 +177,7 @@ export default function SearchManager (ComposedComponent) {
               loc.addressCity.toLowerCase(),
               loc.addressState.toLowerCase()
             ]
-            if (loc.sEOLocationCategories.length > 0) {
+            if (loc.sEOLocationCategories.length > 0) { // also check against backend-associated locales
               loc.sEOLocationCategories.forEach(seo => {
                 const lowName = seo.name.toLowerCase()
                 if (usableProps.indexOf(lowName) === -1) {

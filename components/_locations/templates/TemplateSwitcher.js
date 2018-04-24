@@ -4,6 +4,8 @@ import Results from './Results'
 import Region from './Region'
 import Detail from './Detail'
 
+// handles the actual switching between template views
+
 const TemplateSwitcher = ({
   template,
   setTemplate,

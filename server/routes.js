@@ -80,7 +80,7 @@ const routes = [
         case 'initial':
           return '/carwash/locations'
         case 'results':
-          if (spec && spec !== '') {
+          if (spec && spec !== '') { // trying to handle a variety of error cases here
             return `/carwash/locations/results/${spec.toLowerCase().replace(/( )/g, '-')}`
           } else {
             return '/carwash/locations'

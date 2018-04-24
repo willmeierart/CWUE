@@ -4,6 +4,8 @@ import UserLocationManager from './UserLocationManager'
 import ResultsList from './ResultsList'
 import { binder } from '../../../../lib/_utils'
 
+// this view particularly has a lot going on, so it gets its own folder
+
 class Results extends Component {
   constructor (props) {
     super(props)
@@ -13,15 +15,15 @@ class Results extends Component {
   componentDidMount () {
     const { url: { query: { spec } } } = this.props
     if (spec === 'my-location') {
-      this.props.onMakeUserLocationPage(true)
+      this.props.onMakeUserLocationPage(true) // for SSR nav to my-location route
     }
   }
-  shouldComponentUpdate (nextProps) {
-    if (this.props.activeResults !== nextProps.activeResults) {
-      return true
-    }
-    return false
-  }
+  // shouldComponentUpdate (nextProps) {
+  //   if (this.props.activeResults !== nextProps.activeResults) {
+  //     return true
+  //   }
+  //   return false
+  // }
 
   pickLocation (location) {
     if (typeof location === 'string') {
@@ -49,10 +51,10 @@ class Results extends Component {
 
     const formatQS = qs => {
       const splitta = qs.split('-')
-      return splitta.map(wd => wd.toUpperCase()).join(' ')
+      return splitta.map(wd => wd.toUpperCase()).join(' ') // parse search from url into usable phrase
     }
 
-    const locationsNearPhrase = () => {
+    const locationsNearPhrase = () => { // switcher for message at top of page
       const defaultErr = 'Please browse this list of all our locations:'
       if (isUserLocationPage || spec === 'my-location') {
         if (hasResults) {

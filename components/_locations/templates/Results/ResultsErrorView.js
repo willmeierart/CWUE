@@ -3,6 +3,8 @@ import PropTypes from 'prop-types'
 import ImperativeRouter from '../../../../server/ImperativeRouter'
 import { binder } from '../../../../lib/_utils'
 
+// probably not using this, just don't want to delete it yet
+
 class ResultsErrorView extends Component {
   constructor (props) {
     super(props)

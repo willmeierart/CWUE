@@ -2,6 +2,8 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import LocateMeBtn from '../LocateMeBtn'
 
+// rendered on error and initial nav to locations page if no user location available
+
 export default class Initial extends Component {
   componentDidMount () {
     const { userLocation, onGetUserLocation, userIsLocated } = this.props
@@ -14,7 +16,7 @@ export default class Initial extends Component {
     const Title = children[0]
     const SearchBar = children[1]
     const Map = children[2]
-    const showBtn = typeof userLocation === 'object' && !userIsLocated
+    const showBtn = typeof userLocation === 'object' && !userIsLocated // only show 'locate me' btn if their location isn't available (it's set to string='denied' if they reject it)
 
     return (
       <div className='template-wrapper'>

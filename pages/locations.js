@@ -10,4 +10,4 @@ const Locations = props => {
   )
 }
 
-export default withData(Locations, 'locations')
+export default withData(Locations, 'locations') // only here do you pass in the extra param for client

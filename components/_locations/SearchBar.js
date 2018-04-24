@@ -7,6 +7,8 @@ import { reverseGeocode } from '../../lib/_locationUtils'
 import { binder } from '../../lib/_utils'
 import SearchManager from './data_managers/Search'
 
+// all mechanics related to searchbar, as well as programmatic control of autocomplete api on SSR load
+
 class SearchBar extends Component {
   constructor (props) {
     super(props)
@@ -53,7 +55,7 @@ class SearchBar extends Component {
     }
   }
 
-  handleSearchOnSSR () {
+  handleSearchOnSSR () { // need to parse url if SSR into valid search
     const {
       searchPhrase,
       activeResults,
@@ -96,7 +98,7 @@ class SearchBar extends Component {
           }
         }
       } else {
-        ImperativeRouter.push('locations', { state: 'initial' }, false)
+        ImperativeRouter.push('locations', { state: 'initial' }, false) // fallback
       }
     }
   }
