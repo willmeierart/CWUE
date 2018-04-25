@@ -17,15 +17,19 @@ class GoogleMap extends Component {
     binder(this, ['setCenter', 'setCenterViaMarkers', 'setBounds', 'toggleActiveMarkers', 'setAllMarkers', 'clearAllMarkers'])
   }
 
+  componentWillUnmount () {
+    this.clearAllMarkers()
+  }
+
   componentDidMount () {
     console.log('componentDidMount')
-    const init = async () => {
+    const init = () => {
       const { template, onIdle, initialMapStyles, geoJSONstyles, url } = this.props
       if (!window.google) {
         console.warn('no google')
         setTimeout(init, 500)
       } else {
-        console.log(this.state.zoom, this.props.mapZoomModifier)
+        console.log(this.props.zoom, this.props.mapZoomModifier)
         const { google } = window
         const mapNode = ReactDOM.findDOMNode(this.mapDOM)
         const { center } = this.props
@@ -54,7 +58,7 @@ class GoogleMap extends Component {
           zoom: this.props.zoom,
           center: mapCenter,
           mapTypeId: google.maps.MapTypeId.ROADMAP,
-          disableDefaultUI: true,
+          disableDefaultUI: true, // disable controls:
           // zoomControl: false,
           // mapTypeControl: false,
           // scaleControl: false,
@@ -67,16 +71,15 @@ class GoogleMap extends Component {
         if (template === 'results' || url.asPath.indexOf('results') !== -1) { // behavior different for results view than initial
           if (onIdle) {
             google.maps.event.addListener(this.map, 'idle', () => {
-              // this.setMarkers()
-              // this.setAllMarkers()
-              // this.toggleActiveMarkers()
+              this.setAllMarkers()
+              this.toggleActiveMarkers()
             })
           }
           if (this.props.activeResults.length !== this.props.allMarkers.length || this.props.allMarkers.indexOf(undefined) !== -1) {
-            await this.setAllMarkers() // set markers if they don't exist
+            this.setAllMarkers() // set markers if they don't exist
             console.log('first op')
             
-            this.toggleActiveMarkers()
+            // this.toggleActiveMarkers()
           } else if (this.props.allMarkers.indexOf(undefined) === -1) {
             console.log('second op');
             this.toggleActiveMarkers() // otherwise just pick from all markers which should be displayed
@@ -94,10 +97,6 @@ class GoogleMap extends Component {
     init()
   }
 
-  componentWillUnmount () {
-    this.clearAllMarkers()
-  }
-
   componentDidUpdate (prevProps, prevState) {
     const filteredMarkers = this.props.allMarkers.filter(marker => marker.map === this.map)
     if (!equal(this.props, prevProps)) {
@@ -109,18 +108,21 @@ class GoogleMap extends Component {
           this.map.data.loadGeoJson('/static/geoData/US_GEO.json')
           this.map.data.setStyle(this.props.geoJSONstyles)
           this.props.setCenter({ lat: 39.8283459, lng: -98.57947969999998 }) // hard-coded latlng for geographic center of US
+          this.clearAllMarkers()
         }
       }
-      if (this.props.mapZoomModifier !== prevProps.mapZoomModifier || this.props.zoom !== prevProps.zoom) {
+      if (this.props.zoom !== prevProps.zoom) {
         console.log(this.props.mapZoomModifier)
         if (this.props.mapZoomModifier === 0) {
           this.map.setZoom(this.props.zoom)
-        } else {
-          this.map.setZoom(this.props.zoom)
+          return
+        }
+        if (this.props.activeResults.length <= 1) {
+          this.map.setZoom(this.props.zoom - 2)
         }
       }
       if (this.props.activeResults !== prevProps.activeResults) {
-        this.clearAllMarkers()
+        // this.clearAllMarkers()
         this.toggleActiveMarkers() // if results change, change the markers
       }
       if (this.props.allMarkers !== prevProps.allMarkers) {

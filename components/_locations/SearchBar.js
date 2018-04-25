@@ -180,7 +180,11 @@ class SearchBar extends Component {
       const activeItem = autocompleteItems[0]
       this.selectAddress(activeItem.suggestion, activeItem.placeId)
     } else {
-      console.warn('no active item')
+      if (this.state.val !== '') {
+        this.fetchPredictions()
+      } else {
+        console.warn('no active item')
+      }
     }
   }
 

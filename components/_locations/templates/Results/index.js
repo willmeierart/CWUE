@@ -58,6 +58,7 @@ class Results extends Component {
       const defaultErr = 'Please browse this list of all our locations:'
       if (isUserLocationPage || spec === 'my-location') {
         if (hasResults) {
+          onSetUserNotification({ alert: '', color: '' })
           return 'Locations near me'
         } else {
           // showAllLocationsOnErr()
@@ -70,6 +71,7 @@ class Results extends Component {
       } else {
         if (searchPhrase) {
           if (hasResults) {
+            onSetUserNotification({ alert: '', color: '' })
             return `Locations near ${searchPhrase}`
           } else {
             onSetUserNotification({
@@ -81,6 +83,7 @@ class Results extends Component {
         } else {
           if (spec) {
             if (hasResults) {
+              onSetUserNotification({ alert: '', color: '' })              
               return `Locations near ${formatQS(spec)}`
             } else {
               // showAllLocationsOnErr()

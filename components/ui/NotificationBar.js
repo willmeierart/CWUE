@@ -15,7 +15,10 @@ class NotificationBar extends Component {
     // setTimeout(() => {
     //   this.setState({ in: true })
     // }, 500)
-    this.setState({ in: true })
+    setTimeout(() => {
+      this.setState({ in: true })
+    }, 500)
+    
     setTimeout(() => {
       this.props.onSetUserNotification({ alert: '', color: '' })
       // this.setState({ in: false })

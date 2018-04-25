@@ -40,7 +40,7 @@ class LocationsWrapper extends Component {
     // }
     this.props.onSetMapCenter(center)
   }
-  setMarkers (markers) { this.props.onSetAllMarkers(markers) } // leave in case middleware logic needed
+  setMarkers (markers) { this.props.onSetAllMarkers(markers) } // in case middleware logic needed
 
   showAllLocationsOnErr () {
     this.props.onSetActiveResultsList(this.props.staticLocationList)
