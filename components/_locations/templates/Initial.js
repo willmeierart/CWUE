@@ -16,7 +16,7 @@ export default class Initial extends Component {
     const Title = children[0]
     const SearchBar = children[1]
     const Map = children[2]
-    const showBtn = typeof userLocation === 'object' && !userIsLocated // only show 'locate me' btn if their location isn't available (it's set to string='denied' if they reject it)
+    const showBtn = typeof userLocation === 'object'  // only show 'locate me' btn if their location isn't available (it's set to string='denied' if they reject it)
 
     return (
       <div className='template-wrapper'>
