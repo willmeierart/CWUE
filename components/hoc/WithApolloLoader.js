@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import Loader from 'react-loaders'
+import ApolloError from '../ui/ApolloError'
 
 // render loader if apollo taking forever to load
 
@@ -15,9 +16,10 @@ export default function WithApolloLoader (ComposedComponent) {
       //       !this.props[query].error) { bool = true }
       //   }, false)
       //   : this.props.data.loading && !this.props.data.error
+      if (this.props.data.error) return <ApolloError />
       return (
         <div className='with-apollo-loader' style={{ height: '100%' }}>
-          { this.props.data.loading && !this.props.data.error
+          { this.props.data.loading
             ? (
               <div className='loader-wrapper'>
                 <Loader type='line-spin-fade-loader' active />

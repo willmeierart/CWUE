@@ -15,6 +15,7 @@ class App extends Component {
   }
   render () {
     const { title, children, pageState, onSetLocPageState, url, userNotification: { alert, color }, onSetUserNotification } = this.props
+    // console.log(url)
     return (
       <div className='App'>
         {/* <Head title={title} /> */}

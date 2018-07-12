@@ -27,7 +27,7 @@ const ResultModule = ({ location, pickLocation, detail }) => {
           </div>
           <div className='col col-right'>
             <div className='hours'>HOURS</div>
-            <div>{ openHours.map((hrs, i) => (
+            <div>{ openHours && openHours.map((hrs, i) => (
               <div key={`hrs-${i}`} className='mapped-hrs'>
                 <div className='small-grey-2'>{ hrs.days }</div>
                 <div className='small-grey-2'>{ hrs.time }</div>

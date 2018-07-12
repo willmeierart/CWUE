@@ -3,6 +3,8 @@ import PropTypes from 'prop-types'
 import Images from '../Images'
 import ResultModule from './Results/ResultModule'
 import { binder } from '../../../lib/_utils'
+import ImperativeRouter from '../../../server/ImperativeRouter'
+
 
 class Detail extends Component {
   constructor (props) {
@@ -10,8 +12,14 @@ class Detail extends Component {
     binder(this, ['renderSpecials'])
   }
 
-  componentDidMount () {
-    console.log(this.props)
+  componentWillMount () {
+    // console.log(this.props)
+    console.log('detailwillmount')
+    if (!this.props.activeLocation || this.props.activeLocation === {}) {
+      console.log('THERE IS NO ACTIVE LOCATION')
+      ImperativeRouter.push('locations', { state: 'initial' }, true)
+      this.props.onSetLocPageState('initial')
+    }
   }
 
   renderSpecials (specials) {
@@ -43,6 +51,7 @@ class Detail extends Component {
   }
   render () {
     const { children, activeLocation } = this.props
+    console.log(activeLocation)
     const Title = children[0]
     const Map = children[2]
     return (
@@ -51,7 +60,7 @@ class Detail extends Component {
         <section className='main-content-wrapper'>
           <div className='top-content'>
             <div className='gridsec description-wrapper'>
-              <ResultModule detail location={activeLocation} />
+              { activeLocation && activeLocation !== {} && <ResultModule detail location={activeLocation} /> }
             </div>
             <div className='gridsec images-wrapper'>
               <Images images={[
@@ -144,7 +153,8 @@ class Detail extends Component {
 }
 
 Detail.propTypes = {
-  activeLocation: PropTypes.object.isRequired
+  activeLocation: PropTypes.object.isRequired,
+  onSetLocPageState: PropTypes.func.isRequired
 }
 
 export default Detail

@@ -50,7 +50,7 @@ class SearchBar extends Component {
     }
     if (this.state.specialVal !== prevState.specialVal) {
       console.log(this.state, prevState)
-      this.props.setMapZoomModifier(-2)
+      // this.props.setMapZoomModifier(-2)
       this.generateState(this.state.specialVal)
     }
   }
@@ -87,7 +87,7 @@ class SearchBar extends Component {
               this.setState({specialVal: val})
             )
           }
-          setMapZoomModifier(-2)
+          // setMapZoomModifier(-2)
           console.log('geocode was fired')
         } else {
           const searchVal = asPath.split('results/')[1].replace(/[-]/g, ' ')

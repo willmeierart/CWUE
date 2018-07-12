@@ -69,6 +69,7 @@ export default function SearchManager (ComposedComponent) {
             getLatLng(place).then(latLng => {
               if (makeMarkers) {
                 const marker = makeMarker(latLng, place)
+                // console.log(markers)
                 markers.push(marker)
               }
               this.props.setCenter(latLng)
@@ -82,6 +83,7 @@ export default function SearchManager (ComposedComponent) {
             })
           )
         } else {
+          console.warn('CLEARING MARKERS FROM WITHIN SEARCH COMPONENT')
           this.props.setMarkers([])
         }
       }).catch(err => { console.log(err) })

@@ -21,6 +21,7 @@ class LocationsWrapper extends Component {
     this.fakeData = false
   }
   componentDidMount () {
+    console.log(this.props.data)
     const { data: { _Carwash_USA_Express, _Cloned_CWUE } } = this.props
     this.props.onSetStaticLocList({ _Carwash_USA_Express, _Cloned_CWUE })
     this.setActiveResults()
@@ -63,8 +64,6 @@ class LocationsWrapper extends Component {
       mapCenter,
       mapZoom,
       allMarkers,
-      officialMapMarkers,
-      onSetOfficialMapMarkers,
       onGetUserLocation,
       userLocation,
       userIsLocated,
@@ -84,7 +83,8 @@ class LocationsWrapper extends Component {
       setMapZoomModifier,
       onMakeUserLocationPage,
       isUserLocationPage,
-      onSetUserNotification
+      onSetUserNotification,
+      onSetLocPageState
     } = this.props
 
     const getMapDims = template => {
@@ -118,6 +118,7 @@ class LocationsWrapper extends Component {
           onMakeUserLocationPage={onMakeUserLocationPage}
           isUserLocationPage={isUserLocationPage}
           onSetUserNotification={onSetUserNotification}
+          onSetLocPageState={onSetLocPageState}
           url={url}>
           <h1>LOCATIONS</h1>
           <SearchBar

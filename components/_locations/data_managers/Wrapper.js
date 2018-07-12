@@ -1,13 +1,14 @@
+// this is the datamanager for the entire locations section, handles the route-based-page-view logic, etc
+
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { graphql, compose } from 'react-apollo'
-import { allLocations } from '../../../lib/apollo/queries'
+import { allEachLocations } from '../../../lib/apollo/queries'
 import {
   getUserLocation,
   setMapZoom,
   setAllMarkers,
-  setOfficialMapMarkers,
   setMapCenter,
   setActiveLocation,
   setLocPageState,
@@ -21,7 +22,8 @@ import WithApolloLoader from '../../hoc/WithApolloLoader'
 import ImperativeRouter from '../../../server/ImperativeRouter'
 import { binder } from '../../../lib/_utils'
 
-// this is the datamanager for the entire locations section, handles the route-based-page-view logic, etc
+// import StrictPropTypes from '../../hoc/StrictPropTypesChecker'
+// @StrictPropTypes()
 
 export default function DataManager (ComposedComponent) {
   class WrappedComponent extends Component {
@@ -73,13 +75,21 @@ export default function DataManager (ComposedComponent) {
           this.setPageStateGeoLoc(state)
           break
         case state === 'detail':
-          this.props.onSetActiveLocation(spec) // make sure if the detail view is rendered that there is a location to render data from
-          this.setTemplate(state)
+          console.log('isDetail, activeLocation:', this.props.activeLocation)
+          if (!this.props.activeLocation || !this.props.activeLocation.hasOwnProperty('name')) {
+            console.log('no active location in wrapper catch');
+            this.setTemplate('initial') // make sure if the detail view is rendered that there is a location to render data from
+            ImperativeRouter.push('locations', { state: 'initial' }, true) 
+          } else {
+            console.log('firing else');
+            this.setTemplate(state)
+          }
           break
         default:
           this.setTemplate(state)
           break
       }
+      console.log(state)
     }
 
     setPageStateGeoLoc (state) { // determines whether initial view should be 'initial' or results near user's location, if that's available
@@ -103,6 +113,7 @@ export default function DataManager (ComposedComponent) {
     setTemplate (template) {
       const { onSetLocPageState, pageState, url: { pathname } } = this.props
       if (template === 'initial' || template === 'results' || template === 'detail' || template === 'region') {
+        console.log('setTemplate', template)
         onSetLocPageState(template)
       } else {
         if (pathname.indexOf('region') !== -1) {
@@ -131,7 +142,7 @@ export default function DataManager (ComposedComponent) {
     }
   }
   return compose(
-    graphql(allLocations)
+    graphql(allEachLocations)
   )(
     connect(mapStateToProps, mapDispatchToProps)(
       WithApolloLoader(
@@ -149,7 +160,6 @@ function mapStateToProps (state) {
       mapCenter,
       mapZoom,
       allMarkers,
-      officialMapMarkers,
       activeLocation,
       pageState,
       activeResults,
@@ -165,7 +175,6 @@ function mapStateToProps (state) {
     isUserLocationPage,
     mapCenter,
     mapZoom,
-    officialMapMarkers,
     allMarkers,
     activeLocation,
     pageState,
@@ -182,7 +191,6 @@ function mapDispatchToProps (dispatch) {
     onSetMapCenter: center => dispatch(setMapCenter(center)),
     onSetMapZoom: zoom => dispatch(setMapZoom(zoom)),
     onSetAllMarkers: markers => dispatch(setAllMarkers(markers)),
-    onSetOfficialMapMarkers: markers => dispatch(setOfficialMapMarkers(markers)),
     onSetActiveLocation: location => dispatch(setActiveLocation(location)),
     onSetLocPageState: pageState => dispatch(setLocPageState(pageState)),
     onSetActiveResultsList: list => dispatch(setActiveResultsList(list)),
@@ -201,7 +209,6 @@ DataManager.propTypes = {
   mapCenter: PropTypes.object,
   mapZoom: PropTypes.number,
   allMarkers: PropTypes.array,
-  officialMapMarkers: PropTypes.array,
   onSetAllMarkers: PropTypes.func.isRequired,
   activeLocation: PropTypes.object,
   pageState: PropTypes.string.isRequired,

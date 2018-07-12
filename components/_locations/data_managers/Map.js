@@ -11,12 +11,15 @@ export default function MapManager (ComposedComponent) {
       binder(this, ['setZoomToScreenSize'])
     }
     componentDidMount () {
-      this.setZoomToScreenSize()
+      if (this.props.template === 'initial' && this.props.url.state === 'initial') {
+        this.setZoomToScreenSize()
+      }
       window.addEventListener('resize', this.setZoomToScreenSize)
     }
     setZoomToScreenSize () {
       const { onSetMapZoom } = this.props
       const w = window.innerWidth
+      console.log('setZoomToScreenSize')
       switch (true) {
         case w >= 1900:
           onSetMapZoom(5)
