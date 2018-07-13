@@ -58,7 +58,9 @@ export default function SearchManager (ComposedComponent) {
       this.setState({ nearbyResults: [], isRegion: false, placeBounds: null })
       handleInput(address)
       this.geocode(address)
+      console.warn('SETTING ACTIVE SEARCH PHRASE')
       this.props.onSetActiveSearchPhrase(address)
+      this.props.onSetPromisePendingStatus(false)
     }
 
     geocode (address, makeMarkers) { // makeMarkers = [bool]

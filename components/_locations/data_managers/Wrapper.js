@@ -16,7 +16,8 @@ import {
   setActiveSearchPhrase,
   setStaticLocList,
   makeUserLocationPage,
-  setUserNotification
+  setUserNotification,
+  setPromisePendingStatus
 } from '../../../lib/redux/actions'
 import WithApolloLoader from '../../hoc/WithApolloLoader'
 import ImperativeRouter from '../../../server/ImperativeRouter'
@@ -77,11 +78,11 @@ export default function DataManager (ComposedComponent) {
         case state === 'detail':
           console.log('isDetail, activeLocation:', this.props.activeLocation)
           if (!this.props.activeLocation || !this.props.activeLocation.hasOwnProperty('name')) {
-            console.log('no active location in wrapper catch');
+            console.log('no active location in wrapper catch')
             this.setTemplate('initial') // make sure if the detail view is rendered that there is a location to render data from
-            ImperativeRouter.push('locations', { state: 'initial' }, true) 
+            ImperativeRouter.push('locations', { state: 'initial' }, true)
           } else {
-            console.log('firing else');
+            console.log('firing else')
             this.setTemplate(state)
           }
           break
@@ -89,7 +90,7 @@ export default function DataManager (ComposedComponent) {
           this.setTemplate(state)
           break
       }
-      console.log(state)
+      console.log(state, url)
     }
 
     setPageStateGeoLoc (state) { // determines whether initial view should be 'initial' or results near user's location, if that's available
@@ -165,7 +166,8 @@ function mapStateToProps (state) {
       activeResults,
       activeSearchPhrase,
       staticLocationList,
-      isUserLocationPage
+      isUserLocationPage,
+      promisePendingStatus
     },
     env: { vpDims }
   } = state
@@ -181,7 +183,8 @@ function mapStateToProps (state) {
     activeResults,
     activeSearchPhrase,
     staticLocationList,
-    vpDims
+    vpDims,
+    promisePendingStatus
   }
 }
 
@@ -197,7 +200,8 @@ function mapDispatchToProps (dispatch) {
     onSetActiveSearchPhrase: phrase => dispatch(setActiveSearchPhrase(phrase)),
     onSetStaticLocList: locObj => dispatch(setStaticLocList(locObj)),
     onMakeUserLocationPage: bool => dispatch(makeUserLocationPage(bool)),
-    onSetUserNotification: alertObj => dispatch(setUserNotification(alertObj))
+    onSetUserNotification: alertObj => dispatch(setUserNotification(alertObj)),
+    onSetPromisePendingStatus: bool => dispatch(setPromisePendingStatus(bool))
   }
 }
 
@@ -219,5 +223,7 @@ DataManager.propTypes = {
   onSetStaticLocList: PropTypes.func,
   staticLocationList: PropTypes.array,
   vpDims: PropTypes.object,
-  onSetUserNotification: PropTypes.func.isRequired
+  onSetUserNotification: PropTypes.func.isRequired,
+  onSetPromisePendingStatus: PropTypes.func.isRequired,
+  promisePendingStatus: PropTypes.bool.isRequired
 }

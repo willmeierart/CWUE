@@ -1,4 +1,3 @@
-import { withRouter } from "next/router";
 import React, { Component } from 'react'
 import AppProvider from '../lib/redux/AppProvider'
 import HomeWrapper from '../components/_home-global/HomeWrapper'
@@ -7,9 +6,9 @@ import withData from '../lib/apollo/withData'
 class HomePage extends Component {
   render () {
     return (
-      <AppProvider url={this.props.router} title='Home'>
+      <AppProvider url={this.props.url} title='Home'>
         <div>
-          <HomeWrapper url={this.props.router} />
+          <HomeWrapper url={this.props.url} />
         </div>
         <style jsx>{`
         `}</style>
@@ -18,4 +17,4 @@ class HomePage extends Component {
   }
 }
 
-export default withRouter(withData(HomePage));
+export default withData(HomePage)

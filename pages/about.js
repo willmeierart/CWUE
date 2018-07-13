@@ -1,4 +1,3 @@
-import { withRouter } from "next/router";
 import React, { Component } from 'react'
 import AppProvider from '../lib/redux/AppProvider'
 import AboutWrapper from '../components/_about/AboutWrapper'
@@ -12,13 +11,13 @@ class About extends Component {
   // }
   render () {
     return (
-      <AppProvider url={this.props.router} title='About'>
-        <TopSubMenu url={this.props.router} />
-        <AboutWrapper url={this.props.router} />
+      <AppProvider url={this.props.url} title='About'>
+        <TopSubMenu url={this.props.url} />
+        <AboutWrapper url={this.props.url} />
         <style jsx>{``}</style>
       </AppProvider>
     );
   }
 }
 
-export default withRouter(withData(About))
+export default withData(About)

@@ -64,7 +64,9 @@ class SearchBar extends Component {
       setMapZoomModifier,
       isUserLocationPage,
       userIsLocated,
-      onMakeUserLocationPage
+      onMakeUserLocationPage,
+      onSetPromisePendingStatus,
+      onGetUserLocation
     } = this.props
     const noActiveSearch = !searchPhrase && activeResults.length === 0
     const pathSplitta = asPath.split('results/')[1]
@@ -72,20 +74,31 @@ class SearchBar extends Component {
     // const isUserLocation = pathSplitta === 'my-location'
 
     if (noActiveSearch) {
+      console.log('no active search')
       if (hasQueryString) {
+        console.log('has query string')
         if (isUserLocationPage) {
+          console.log('is user location page')
           // if (typeof userLocation === 'object') {
           if (userIsLocated) {
             console.log('awaiting userlocation', userLocation)
-            this.props.onGetUserLocation(null, () => {
-              reverseGeocode(userLocation, val =>
-                this.setState({ specialVal: val })
-              )
+            onSetPromisePendingStatus(true)
+            onGetUserLocation(null, () => {
+              reverseGeocode(userLocation, val => {
+                console.log(val)
+                this.setState({ specialVal: val }, () => {
+                  // onSetPromisePendingStatus(false)
+                })
+              })
             })
           } else {
-            reverseGeocode(userLocation, (val) =>
-              this.setState({specialVal: val})
-            )
+            onSetPromisePendingStatus(true)
+            console.warn('USER NOT LOCATED BUT STILL GEOCODING USER LOCATION');
+            reverseGeocode(userLocation, (val) => {
+              this.setState({ specialVal: val }, () => {
+                // onSetPromisePendingStatus(false)
+              })
+            })
           }
           // setMapZoomModifier(-2)
           console.log('geocode was fired')
@@ -387,7 +400,8 @@ SearchBar.propTypes = {
   staticLocationList: PropTypes.array.isRequired,
   url: PropTypes.object.isRequired,
   userLocation: PropTypes.oneOfType([PropTypes.object, PropTypes.string]).isRequired,
-  setMapZoomModifier: PropTypes.func.isRequired
+  setMapZoomModifier: PropTypes.func.isRequired,
+  onSetPromisePendingStatus: PropTypes.func.isRequired
 }
 
 export default SearchManager(SearchBar)

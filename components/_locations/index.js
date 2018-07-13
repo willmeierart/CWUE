@@ -84,7 +84,9 @@ class LocationsWrapper extends Component {
       onMakeUserLocationPage,
       isUserLocationPage,
       onSetUserNotification,
-      onSetLocPageState
+      onSetLocPageState,
+      onSetPromisePendingStatus,
+      promisePendingStatus
     } = this.props
 
     const getMapDims = template => {
@@ -119,6 +121,7 @@ class LocationsWrapper extends Component {
           isUserLocationPage={isUserLocationPage}
           onSetUserNotification={onSetUserNotification}
           onSetLocPageState={onSetLocPageState}
+          promisePendingStatus={promisePendingStatus}
           url={url}>
           <h1>LOCATIONS</h1>
           <SearchBar
@@ -135,6 +138,7 @@ class LocationsWrapper extends Component {
             onMakeUserLocationPage={onMakeUserLocationPage}
             isUserLocationPage={isUserLocationPage}
             userIsLocated={userIsLocated}
+            onSetPromisePendingStatus={onSetPromisePendingStatus}
             url={url} />
           <GoogleMap
             staticLocationList={staticLocationList}
@@ -196,7 +200,9 @@ LocationsWrapper.propTypes = {
   mapZoomModifier: PropTypes.number.isRequired,
   setMapZoomModifier: PropTypes.func.isRequired,
   url: PropTypes.object.isRequired,
-  onSetUserNotification: PropTypes.func.isRequired
+  onSetUserNotification: PropTypes.func.isRequired,
+  onSetPromisePendingStatus: PropTypes.func.isRequired,
+  promisePendingStatus: PropTypes.bool.isRequired
 }
 
 export default DataManager(LocationsWrapper)

@@ -9,13 +9,23 @@ import { binder } from '../../../../lib/_utils'
 class Results extends Component {
   constructor (props) {
     super(props)
-    binder(this, ['pickLocation'])
+    this.state = {
+      locationsNearPhrase: ''
+    }
+    binder(this, ['pickLocation', 'setLocationsNearPhrase'])
   }
 
   componentDidMount () {
+    console.warn('COMPONENT DID MOUNT', this.props)
     const { url: { query: { spec } } } = this.props
     if (spec === 'my-location') {
+      console.log(spec)
       this.props.onMakeUserLocationPage(true) // for SSR nav to my-location route
+    }
+    if (this.props.isUserLocationPage || spec === 'my-location') {
+      this.setLocationsNearPhrase(true)
+    } else {
+      this.setLocationsNearPhrase()
     }
   }
   // shouldComponentUpdate (nextProps) {
@@ -24,6 +34,9 @@ class Results extends Component {
   //   }
   //   return false
   // }
+  componentDidUpdate () {
+
+  }
 
   pickLocation (location) {
     if (typeof location === 'string') {
@@ -35,75 +48,110 @@ class Results extends Component {
     }
   }
 
-  render () {
-    const { children,
+  setLocationsNearPhrase (isMyLocationPage) { // switcher for message at top of page
+    const {
       activeResults,
       searchPhrase,
       url: { query: { spec } },
-      isUserLocationPage,
-      staticLocationList,
-      onSetUserNotification
+      onSetUserNotification,
+      userLocation,
+      promisePendingStatus
     } = this.props
     const hasResults = activeResults.length > 0
-    const Title = children[0]
-    const SearchBar = children[1]
-    const Map = children[2]
 
     const formatQS = qs => {
       const splitta = qs.split('-')
       return splitta.map(wd => wd.toUpperCase()).join(' ') // parse search from url into usable phrase
     }
 
-    const locationsNearPhrase = () => { // switcher for message at top of page
-      const defaultErr = 'Please browse this list of all our locations:'
-      if (isUserLocationPage || spec === 'my-location') {
-        if (hasResults) {
-          onSetUserNotification({ alert: '', color: '' })
-          return 'Locations near me'
-        } else {
-          // showAllLocationsOnErr()
+    console.log('checking usernotification: ', 'hasResults - ', hasResults, 'searchPhrase - ', searchPhrase, 'spec - ', spec, 'userlocation - ', userLocation, 'promisePendingStatus', promisePendingStatus)
+    const defaultErr = 'Please browse this list of all our locations:'
+    if (isMyLocationPage) {
+      if (hasResults) {
+        console.log('mylocation has results')
+
+        onSetUserNotification({ alert: '', color: '' })
+        this.setState({ locationsNearPhrase: 'Locations near me' })
+      } else {
+        console.log('mylocation no results')
+
+        // showAllLocationsOnErr()
+        if (!promisePendingStatus) {
           onSetUserNotification({
             alert: 'Sorry, looks like there are no nearby locations',
             color: 'red'
           })
-          return `There are no nearby locations. ${defaultErr}`
+        } else {
+          // setTimeout(this.setLocationsNearPhrase, 1000)
+          return
         }
-      } else {
-        if (searchPhrase) {
-          if (hasResults) {
-            onSetUserNotification({ alert: '', color: '' })
-            return `Locations near ${searchPhrase}`
-          } else {
+        this.setState({ locationsNearPhrase: `There are no nearby locations. ${defaultErr}` })
+      }
+    } else {
+      if (searchPhrase) {
+        if (hasResults) {
+          console.log('searchphrase has results')
+
+          onSetUserNotification({ alert: '', color: '' })
+          this.setState({ locationsNearPhrase: `Locations near ${searchPhrase}` })
+        } else {
+          console.log('searchphrase no results')
+          if (!promisePendingStatus) {
             onSetUserNotification({
               alert: `Sorry, looks like there are no locations near ${searchPhrase}`,
               color: 'red'
             })
-            return `There are no locations near ${searchPhrase}. ${defaultErr}`
+          } else {
+            // setTimeout(this.setLocationsNearPhrase, 1000)
+            return
           }
-        } else {
-          if (spec) {
-            if (hasResults) {
-              onSetUserNotification({ alert: '', color: '' })              
-              return `Locations near ${formatQS(spec)}`
-            } else {
-              // showAllLocationsOnErr()
+          this.setState({ locationsNearPhrase: `There are no locations near ${searchPhrase}. ${defaultErr}` })
+        }
+      } else {
+        if (spec) {
+          if (hasResults) {
+            console.log('no searchphrase has spec has results')
+
+            onSetUserNotification({ alert: '', color: '' })
+            this.setState({ locationsNearPhrase: `Locations near ${formatQS(spec)}` })
+          } else {
+            console.log('no searchphrase has spec no results')
+
+            // showAllLocationsOnErr()
+            if (!promisePendingStatus) {
               onSetUserNotification({
                 alert: `Sorry, looks like there are no locations near ${formatQS(spec)}`,
                 color: 'red'
               })
-              return `There are no locations near ${formatQS(spec)}. ${defaultErr}`
+            } else {
+              setTimeout(this.setLocationsNearPhrase, 1000)
+              return
             }
+            this.setState({ locationsNearPhrase: `There are no locations near ${formatQS(spec)}. ${defaultErr}` })
           }
         }
       }
     }
+  }
+
+  render () {
+    const {
+      children,
+      activeResults,
+      staticLocationList
+    } = this.props
+    const hasResults = activeResults.length > 0
+    const Title = children[0]
+    const SearchBar = children[1]
+    const Map = children[2]
+
     return (
       <section className='template-wrapper'>
         <div className='title-wrapper'>{ Title }</div>
         <section className='content-wrapper'>
           <div className='col col-left'>
             <h2 className='locations-near content'>
-              { locationsNearPhrase() }
+              { this.state.locationsNearPhrase }
               <hr />
             </h2>
             <div className='results-container content'>
@@ -173,7 +221,8 @@ Results.propTypes = {
   searchPhrase: PropTypes.string.isRequired,
   showAllLocationsOnErr: PropTypes.func.isRequired,
   url: PropTypes.object.isRequired,
-  onSetUserNotification: PropTypes.func.isRequired
+  onSetUserNotification: PropTypes.func.isRequired,
+  promisePendingStatus: PropTypes.bool.isRequired
 }
 
 export default UserLocationManager(Results)

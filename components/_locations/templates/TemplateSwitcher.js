@@ -24,6 +24,7 @@ const TemplateSwitcher = ({
   staticLocationList,
   onSetUserNotification,
   onSetLocPageState,
+  promisePendingStatus,
   url
 }) => {
   const componentSwitcher = () => {
@@ -52,6 +53,7 @@ const TemplateSwitcher = ({
             onSetActiveLocation={onSetActiveLocation}
             searchPhrase={searchPhrase}
             onMakeUserLocationPage={onMakeUserLocationPage}
+            promisePendingStatus={promisePendingStatus}
             userLocation={userLocation}
             userIsLocated={userIsLocated}
             url={url}>
@@ -97,7 +99,8 @@ TemplateSwitcher.propTypes = {
   url: PropTypes.object.isRequired,
   showAllLocationsOnErr: PropTypes.func.isRequired,
   onSetUserNotification: PropTypes.func.isRequired,
-  onSetLocPageState: PropTypes.func.isRequired
+  onSetLocPageState: PropTypes.func.isRequired,
+  promisePendingStatus: PropTypes.bool.isRequired
 }
 
 export default TemplateSwitcher
