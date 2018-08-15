@@ -66,6 +66,8 @@ export default function DataManager (ComposedComponent) {
       const { url } = this.props
       const { query: { state, spec } } = url
 
+      console.warn(url)
+
       const initial = !state || state === '' || state === 'initial' // if there is an incomplete route then still render initial view
 
       switch (true) {
@@ -95,7 +97,7 @@ export default function DataManager (ComposedComponent) {
 
     setPageStateGeoLoc (state) { // determines whether initial view should be 'initial' or results near user's location, if that's available
       const { userLocation, userIsLocated, mapZoom, onSetMapZoom } = this.props
-      if (userLocation !== null && userLocation !== 'denied' && userLocation !== {}) {
+      if (userLocation !== null && userLocation !== 'denied' && userLocation !== 'unavailable' && userLocation !== {}) {
         if (!userIsLocated) { // if the user hasn't been located, then try again to locate them
           this.props.onGetUserLocation(null, async () => { 
             console.log('firing ongetuserlocation callback')

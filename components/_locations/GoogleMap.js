@@ -25,7 +25,7 @@ class GoogleMap extends Component {
   }
 
   componentDidMount () {
-    // console.warn('__componentDidMount__')
+    console.warn('__MAP__componentDidMount__')
     const init = () => {
       const { template, onIdle, initialMapStyles, geoJSONstyles, url } = this.props
       if (!window.google) {
@@ -114,13 +114,17 @@ class GoogleMap extends Component {
   }
 
   componentDidUpdate (prevProps, prevState) {
-    // console.log('__componentDidUpdate__')
+    console.log('__MAP__componentDidUpdate__')
+    const { lat, lng } = this.map.center
+    const { center } = this.props
+
     const filteredMarkers = this.props.allMarkers.filter(marker => marker.map === this.map)
     const newMarkersMap = this.props.allMarkers.map(marker => marker.map)
     const prevMarkersMap = prevProps.allMarkers.map(marker => marker.map)
     if (prevProps.activeResults.length === 0 && this.props.activeResults.length > 0) { // handle initial SSR load where active results not yet loaded
       // console.warn('__update__: THERE WERE NO ACTIVE RESULTS BUT NOW THERE ARE')
       this.toggleActiveMarkers()
+      console.warn('SET CENTER VIA MARKERS 1')
       this.setCenterViaMarkers(filteredMarkers)
     }
     if (!equal(this.props, prevProps)) {
@@ -142,46 +146,47 @@ class GoogleMap extends Component {
         this.map.setZoom(this.props.zoom + this.props.mapZoomModifier)
       }
       if (this.props.activeResults !== prevProps.activeResults) {
-        // console.warn('__update__: ACTIVE RESULTS DID UPDATE')
+        console.warn('__update__: ACTIVE RESULTS DID UPDATE')
         this.toggleActiveMarkers() // if results change, change the markers
         console.log(this.props.activeResults)
         if (this.props.activeResults.length === 1) {
-          console.log('only one result');
+          console.log('only one result')
           this.props.onSetMapZoom(14)
         }
       }
-      if (difference(prevMarkersMap, newMarkersMap).length > 0 && prevMarkersMap.length > 0) {
+      if (difference(prevMarkersMap, newMarkersMap).length > 0 /*&& prevMarkersMap.length > 0*/) {
         // console.warn('__update__: MAP MARKERS DID UPDATE', difference(prevMarkersMap, newMarkersMap))
         // this.toggleActiveMarkers()
         if (this.props.template === 'results' || this.props.template === 'detail') {
+          console.warn('SET CENTER VIA MARKERS 2')
           this.setCenterViaMarkers(filteredMarkers)
         }
       }
-      if (this.props.center !== prevProps.center) {
+      if (this.props.center !== prevProps.center || center !== { lat: lat(), lng: lng() }) {
         console.warn('__update__: CENTER DID UPDATE')
-        const { lat, lng } = this.map.center
-        const { center } = this.props
+
+        this.setCenterViaMarkers(filteredMarkers)
+        
         if (center !== { lat: lat(), lng: lng() }) {
+          console.warn('SET CENTER AS:', center)
           this.map.setCenter(center)
         }
       }
       if (this.state.bounds !== prevState.bounds) {
         console.warn('__update__: BOUNDS DID UPDATE')
         if (this.props.template === 'results') {
+          console.warn('SET CENTER VIA MARKERS 3')
           this.setCenterViaMarkers(filteredMarkers)
         }
       }
     }
-    // if (prevState.zoom !== this.state.zoom) {
-    //   // console.log('zoom different:', prevState.zoom, this.state.zoom)
-    //   this.map.setZoom(this.state.zoom)
-    // }
   }
 
   setBounds (marker) {
     const mainAction = () => {
       if (marker) {
         this.setState({ bounds: this.state.bounds.extend(marker) }, () => {
+          console.log('BOUNDS', this.state.bounds)
           this.map.fitBounds(this.state.bounds) // center map around markers
         })
       }

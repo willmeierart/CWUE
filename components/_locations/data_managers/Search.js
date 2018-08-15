@@ -55,12 +55,12 @@ export default function SearchManager (ComposedComponent) {
     }
 
     handleSelection (address, placeId, handleInput) { // passed as props to searchbar component (handleInput lives there), triggers everything below
+      this.props.onSetPromisePendingStatus(true)
       this.setState({ nearbyResults: [], isRegion: false, placeBounds: null })
       handleInput(address)
       this.geocode(address)
       console.warn('SETTING ACTIVE SEARCH PHRASE')
       this.props.onSetActiveSearchPhrase(address)
-      this.props.onSetPromisePendingStatus(false)
     }
 
     geocode (address, makeMarkers) { // makeMarkers = [bool]
@@ -124,6 +124,7 @@ export default function SearchManager (ComposedComponent) {
         })
         this.doDistanceService(LAT_LNG, locationCoords)
       }
+      console.warn(asyncLatLng())
       return asyncLatLng()
     }
 
@@ -135,11 +136,13 @@ export default function SearchManager (ComposedComponent) {
     }
 
     async doDistanceService (coords1, coords2) {
+      console.warn('STARTING DISTANCE SERVICE');
       await this.distanceService.getDistanceMatrix({
         origins: coords1,
         destinations: coords2,
         travelMode: window.google.maps.TravelMode.DRIVING
       }, this.distanceServiceCallback)
+      console.warn('DISTANCE SERVICE PROMISE RETURNED')
       this.setTheResults()
     }
 
@@ -156,10 +159,13 @@ export default function SearchManager (ComposedComponent) {
                 const makeMarkers = true
                 this.geocode(origin, makeMarkers)
                 this.pushNewNearbyResult(location)
+                console.warn(location)
               }
             }
           })
         })
+      } else {
+        // this.props.onSetPromisePendingStatus(false)
       }
     }
 
@@ -201,6 +207,7 @@ export default function SearchManager (ComposedComponent) {
         })
       }
       this.props.setActiveResults(this.state.nearbyResults)
+      this.props.onSetPromisePendingStatus(false)
     }
 
     pushNewNearbyResult (loc) {

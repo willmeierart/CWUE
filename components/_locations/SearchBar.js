@@ -77,12 +77,13 @@ class SearchBar extends Component {
       console.log('no active search')
       if (hasQueryString) {
         console.log('has query string')
+        onSetPromisePendingStatus(true)
+
         if (isUserLocationPage) {
           console.log('is user location page')
           // if (typeof userLocation === 'object') {
           if (userIsLocated) {
             console.log('awaiting userlocation', userLocation)
-            onSetPromisePendingStatus(true)
             onGetUserLocation(null, () => {
               reverseGeocode(userLocation, val => {
                 console.log(val)
@@ -92,7 +93,7 @@ class SearchBar extends Component {
               })
             })
           } else {
-            onSetPromisePendingStatus(true)
+            // onSetPromisePendingStatus(true)
             console.warn('USER NOT LOCATED BUT STILL GEOCODING USER LOCATION');
             reverseGeocode(userLocation, (val) => {
               this.setState({ specialVal: val }, () => {

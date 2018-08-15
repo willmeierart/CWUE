@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
+import Loader from 'react-loaders'
 import UserLocationManager from './UserLocationManager'
 import ResultsList from './ResultsList'
 import { binder } from '../../../../lib/_utils'
@@ -10,32 +11,52 @@ class Results extends Component {
   constructor (props) {
     super(props)
     this.state = {
-      locationsNearPhrase: ''
+      locationsNearPhrase: '',
+      shouldFire: true,
+      timesFired: 0,
+      isMyLocation: true
     }
-    binder(this, ['pickLocation', 'setLocationsNearPhrase'])
+    binder(this, ['pickLocation', 'parseMessageResultsState', 'setLocationsNearPhrase'])
   }
 
   componentDidMount () {
-    console.warn('COMPONENT DID MOUNT', this.props)
-    const { url: { query: { spec } } } = this.props
-    if (spec === 'my-location') {
-      console.log(spec)
-      this.props.onMakeUserLocationPage(true) // for SSR nav to my-location route
-    }
-    if (this.props.isUserLocationPage || spec === 'my-location') {
-      this.setLocationsNearPhrase(true)
-    } else {
-      this.setLocationsNearPhrase()
+    console.warn('COMPONENT DID MOUNT', this.props.url.query)
+
+    this.updateMyLocation()
+
+    if (this.props.activeResults.length > 0 || this.props.userLocation === 'denied' || this.props.userLocation === 'unavailable') {
+      this.parseMessageResultsState()
     }
   }
-  // shouldComponentUpdate (nextProps) {
-  //   if (this.props.activeResults !== nextProps.activeResults) {
-  //     return true
-  //   }
-  //   return false
-  // }
-  componentDidUpdate () {
 
+  componentDidUpdate (prevProps, prevState) {
+    console.log(this.props.activeResults, prevProps.activeResults)
+    if (!this.props.promisePendingStatus) {
+      if (this.props.activeResults !== prevProps.activeResults) {
+        this.parseMessageResultsState()
+      } else {
+        if (this.state.shouldFire) {
+          console.warn('componentdidupdate SETTING TIMEOUT', this.state.shouldFire, this.state.timesFired)
+          setTimeout(this.parseMessageResultsState, 1500)
+        }
+      }
+    }
+    if (this.props.searchPhrase !== prevProps.searchPhrase) {
+      // if (!this.props.isUserLocationPage && !this.state.isMyLocation) {
+      this.updateMyLocation()
+      // }
+      console.log('SEARCHPHRASE NOT SAME')
+      this.setState({ shouldFire: true }, this.parseMessageResultsState)
+    }
+  }
+
+  updateMyLocation () {
+    const { url: { query: { spec } }} = this.props
+    if (spec === 'my-location') {
+      this.props.onMakeUserLocationPage(true) // for SSR nav to my-location route
+    } else {
+      this.setState({ isMyLocation: false })
+    }
   }
 
   pickLocation (location) {
@@ -48,7 +69,7 @@ class Results extends Component {
     }
   }
 
-  setLocationsNearPhrase (isMyLocationPage) { // switcher for message at top of page
+  parseMessageResultsState () { // switcher for message at top of page
     const {
       activeResults,
       searchPhrase,
@@ -57,81 +78,92 @@ class Results extends Component {
       userLocation,
       promisePendingStatus
     } = this.props
+    const {
+      timesFired,
+      isMyLocation,
+      shouldFire
+    } = this.state
+
     const hasResults = activeResults.length > 0
+    const defaultErr = 'Please browse this list of all our locations:'
 
     const formatQS = qs => {
       const splitta = qs.split('-')
       return splitta.map(wd => wd.toUpperCase()).join(' ') // parse search from url into usable phrase
     }
 
-    console.log('checking usernotification: ', 'hasResults - ', hasResults, 'searchPhrase - ', searchPhrase, 'spec - ', spec, 'userlocation - ', userLocation, 'promisePendingStatus', promisePendingStatus)
-    const defaultErr = 'Please browse this list of all our locations:'
-    if (isMyLocationPage) {
-      if (hasResults) {
-        console.log('mylocation has results')
-
-        onSetUserNotification({ alert: '', color: '' })
-        this.setState({ locationsNearPhrase: 'Locations near me' })
-      } else {
-        console.log('mylocation no results')
-
-        // showAllLocationsOnErr()
-        if (!promisePendingStatus) {
-          onSetUserNotification({
-            alert: 'Sorry, looks like there are no nearby locations',
-            color: 'red'
-          })
-        } else {
-          // setTimeout(this.setLocationsNearPhrase, 1000)
-          return
-        }
-        this.setState({ locationsNearPhrase: `There are no nearby locations. ${defaultErr}` })
-      }
-    } else {
-      if (searchPhrase) {
-        if (hasResults) {
-          console.log('searchphrase has results')
-
-          onSetUserNotification({ alert: '', color: '' })
-          this.setState({ locationsNearPhrase: `Locations near ${searchPhrase}` })
-        } else {
-          console.log('searchphrase no results')
-          if (!promisePendingStatus) {
+    if (shouldFire) {
+      this.setState({ timesFired: timesFired + 1 }, () => {
+        console.log('checking usernotification: ', 'hasResults - ', hasResults, 'searchPhrase - ', searchPhrase, 'spec - ', spec, 'userlocation - ', userLocation, 'promisePendingStatus', promisePendingStatus)
+        if (isMyLocation) {
+          if (userLocation === 'unavailable' || userLocation === 'denied') {
             onSetUserNotification({
-              alert: `Sorry, looks like there are no locations near ${searchPhrase}`,
+              alert: 'Sorry, we are unable to get your geolocation',
               color: 'red'
             })
+            this.setState({ locationsNearPhrase: defaultErr, shouldFire: false })
           } else {
-            // setTimeout(this.setLocationsNearPhrase, 1000)
-            return
-          }
-          this.setState({ locationsNearPhrase: `There are no locations near ${searchPhrase}. ${defaultErr}` })
-        }
-      } else {
-        if (spec) {
-          if (hasResults) {
-            console.log('no searchphrase has spec has results')
-
-            onSetUserNotification({ alert: '', color: '' })
-            this.setState({ locationsNearPhrase: `Locations near ${formatQS(spec)}` })
-          } else {
-            console.log('no searchphrase has spec no results')
-
-            // showAllLocationsOnErr()
-            if (!promisePendingStatus) {
-              onSetUserNotification({
-                alert: `Sorry, looks like there are no locations near ${formatQS(spec)}`,
-                color: 'red'
-              })
+            if (hasResults) {
+              console.log('mylocation has results')
+              onSetUserNotification({ alert: '', color: '' })
+              this.setState({ locationsNearPhrase: 'Locations near me', shouldFire: false })
             } else {
-              setTimeout(this.setLocationsNearPhrase, 1000)
-              return
+              console.log('mylocation no results')
+              if (!promisePendingStatus) {
+                onSetUserNotification({
+                  alert: 'Sorry, looks like there are no nearby locations',
+                  color: 'red'
+                })
+                this.setState({ locationsNearPhrase: `There are no nearby locations. ${defaultErr}`, shouldFire: false })
+              }
             }
-            this.setState({ locationsNearPhrase: `There are no locations near ${formatQS(spec)}. ${defaultErr}` })
+          }
+        } else {
+          if (searchPhrase) {
+            if (hasResults) {
+              console.log('searchphrase has results')
+              onSetUserNotification({ alert: '', color: '' })
+              this.setState({ locationsNearPhrase: `Locations near ${searchPhrase}`, shouldFire: false })
+            } else {
+              console.log('searchphrase no results')
+              if (!promisePendingStatus) {
+                onSetUserNotification({
+                  alert: `Sorry, looks like there are no locations near ${searchPhrase}`,
+                  color: 'red'
+                })
+                this.setState({ locationsNearPhrase: `There are no locations near ${searchPhrase}. ${defaultErr}`, shouldFire: false })
+              }
+            }
+          } else {
+            if (spec) {
+              if (hasResults) {
+                console.log('no searchphrase has spec has results')
+                onSetUserNotification({ alert: '', color: '' })
+                this.setState({ locationsNearPhrase: `Locations near ${formatQS(spec)}`, shouldFire: false })
+              } else {
+                console.log('no searchphrase has spec no results')
+                if (!promisePendingStatus) {
+                  onSetUserNotification({
+                    alert: `Sorry, looks like there are no locations near ${formatQS(spec)}`,
+                    color: 'red'
+                  })
+                  this.setState({ locationsNearPhrase: `There are no locations near ${formatQS(spec)}. ${defaultErr}`, shouldFire: false })
+                }
+              }
+            }
           }
         }
-      }
+      })
     }
+  }
+
+  setLocationsNearPhrase (keyword) {
+    // const defaultErr = 'Please browse this list of all our locations:'
+    // let locationsNearPhrase = ''
+    // switch (keyword) {
+
+    // }
+    // this.setState({ locationsNearPhrase })
   }
 
   render () {
@@ -147,6 +179,7 @@ class Results extends Component {
 
     return (
       <section className='template-wrapper'>
+        { this.state.shouldFire && <Loader type='line-spin-fade-loader' active /> }
         <div className='title-wrapper'>{ Title }</div>
         <section className='content-wrapper'>
           <div className='col col-left'>
@@ -168,7 +201,7 @@ class Results extends Component {
             width: 100%;
             box-sizing: border-box;
             position: relative;
-            display: flex;
+            display: ${this.state.shouldFire ? 'none' : 'flex'};
             justify-content: center;
           }
           .template-wrapper {
