@@ -1,20 +1,21 @@
 import PropTypes from 'prop-types'
 import Link from 'next/link'
 
-const Logo = ({ isHomepage }) => (
+const Logo = props => (
   <Link href='/'><a>
     <div className='logo-wrapper'>
       <img src='/static/images/CWUE_logo.png' alt='logo' />
       <style jsx>{`
         .logo-wrapper {
-          margin: 0.5em;
-          border-radius: 5px;
-          width: ${isHomepage ? '20vw' : '100px'};
-          height: ${isHomepage ? '20vw' : '100px'};;
+          margin: 3vw;
+          margin-right: 0;
+          width: 22vw;
+          height: 8vw;
           display: flex;
           justify-content: center;
           align-items: center;
           position:relative;
+          background: var(--color-blue);
         }
         img {
           height: 100%;

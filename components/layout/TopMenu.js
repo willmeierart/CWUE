@@ -11,121 +11,161 @@ export default class TopMenu extends Component {
       showWashSubList: false,
       showAboutSubList: false
     }
-    binder(this, ['renderList', 'renderSubList'])
+    binder(this, ['renderList', 'renderSubList', 'handleHover'])
   }
+
+  handleHover (item) {
+    if (item === 'washes') {
+      this.setState({ showWashSubList: true })
+    } else {
+      this.setState({ showWashSubList: false })
+    }
+    if (item === 'about') {
+      this.setState({ showAboutSubList: true })
+    } else {
+      this.setState({ showAboutSubList: false })
+    }
+  }
+
   renderSubList (route) {
     return (
-      route.children.map((child, i) => {
-        const { title } = child
+      route.children.reduce((a, b, i) => {
+        const { title } = b
         const formattedTitle = title.toLowerCase().replace(' ', '-')
-        return (
-          <li key={i} className='child-route'>
+        console.log(route.page, formattedTitle)
+        // const enter = route.page === 'washes' ? () => { this.setState({ showWashSubList: true }) } : route.page === 'about' ? () => { this.setState({ showAboutSubList: true }) } : null
+        // const leave = route.page === 'washes' ? () => { this.setState({showWashSubList: false}) } : route.page === 'about' ? () => { this.setState({showAboutSubList: false}) } : null
+
+        // MAKE A SEPARATE ELEMENT THAT APPEARS 
+
+        a.push(
+          <li
+            // onMouseLeave={leave} onMouseOver={enter}
+            ref={el => { this[route.page] = el }}
+            key={i} className='child-route'>
             <Link prefetch route={Router.linkPage(route.page, { title: formattedTitle })}>
               <a>{ title }</a>
             </Link>
+            <style jsx>{`
+              li {
+                padding-top: .5em;
+                text-align: center;
+                font-size: .75em;
+                font-weight: normal;
+                color: var(--color-red);
+              }
+              li:hover {
+                color: var(--color-blue);
+              }
+            `}</style>
           </li>
         )
-      })
+        if (i !== route.children.length - 1) {
+          a.push(
+            <div><style jsx>{`
+              div {
+                width: 1px;
+                height: 3em;
+                background: var(--color-blue);
+              }
+            `}</style></div>
+          )
+        }
+        return a
+      }, [])
     )
   }
   renderList () {
     const { onSetLocPageState, pageState } = this.props
     const { showAboutSubList, showWashSubList } = this.state
-    return (
-      <ul>
-        {
-          routes.map(route => {
-            switch (route.title) {
-              case ('Car Washes') :
-                return (
-                  <li key={route.title}
-                    // onMouseOut={() => { this.setState({showWashSubList: false}) }}
-                    onMouseOver={() => { this.setState({ showWashSubList: true }) }}>
-                    <Link prefetch route={Router.linkPage(route.page, { title: route.title })}>
-                      <a>{ route.title }</a>
-                    </Link>
-                    { showWashSubList &&
-                      <ul className='sub-ul'>{ this.renderSubList(route) }</ul>
-                    }
-                  </li>
-                )
-              case ('Fast Pass - Unlimited') :
-                return (
-                  <li key={route.title}>
-                    <Link prefetch route={Router.linkPage(route.page, { title: route.title })}>
-                      <a>{ route.title }</a>
-                    </Link>
-                  </li>
-                )
-              case ('About') :
-                return (
-                  <li key={route.title}
-                    // onMouseOut={() => { this.setState({showAboutSubList: false}) }}
-                    onMouseOver={() => { this.setState({ showAboutSubList: true }) }}>
-                    <Link prefetch route={Router.linkPage(route.page, { title: route.title })}>
-                      <a>{ route.title }</a>
-                    </Link>
-                    { showAboutSubList &&
-                      <ul className='sub-ul'>{ this.renderSubList(route) }</ul>
-                    }
-                  </li>
-                )
-              case 'Locations' :
-                return (
-                  <li key={route.title} onClick={() => { onSetLocPageState('initial') }}>
-                    <Link prefetch route={Router.linkPage(route.page, { state: pageState })}>
-                      <a className='locations'>FIND A LOCATION</a>
-                    </Link>
-                  </li>
-                )
-              case 'My Account' :
-                {/* return (
-                  <li key={route.title}>
-                    <a href=''><span className='account'>{ route.title }</span></a>
-                  </li>
-                ) */}
-                return null
-              default :
-                return null
-            }
-          })
+    return <ul>
+      { routes.map(route => {
+        switch (route.title) {
+          case 'Car Washes':
+            return <li key={route.title} className={showWashSubList && 'active'} onMouseOver={() => { this.handleHover('washes') }}>
+              <Link prefetch route={Router.linkPage(route.page, {
+                title: route.title
+              })}>
+                <a>{route.title}</a>
+              </Link>
+              <ul className='sub-ul'>
+                {showWashSubList && this.renderSubList(route)}
+              </ul>
+            </li>
+          case 'Fast Pass - Unlimited':
+            return <li key={route.title} onMouseOver={this.handleHover}>
+              <Link prefetch route={Router.linkPage(route.page, {
+                title: route.title
+              })}>
+                <a>{route.title}</a>
+              </Link>
+            </li>
+          case 'About':
+            return <li className={showAboutSubList && 'active'} key={route.title} onMouseOver={() => { this.handleHover('about') }}>
+              <Link prefetch route={Router.linkPage(route.page, {
+                title: route.title
+              })}>
+                <a>{route.title}</a>
+              </Link>
+              <ul className='sub-ul'>
+                {showAboutSubList && this.renderSubList(route)}
+              </ul>
+            </li>
+          case 'Locations':
+            return <li key={route.title} onMouseOver={this.handleHover} onClick={() => {
+              onSetLocPageState('initial')
+            }}>
+              <Link prefetch route={Router.linkPage(route.page, {
+                state: pageState
+              })}>
+                <a className='locations'>FIND A LOCATION</a>
+              </Link>
+            </li>
+          case 'My Account':
+            return null
+          default:
+            return null
         }
-        <style jsx>{`
-          ul {
-            display: flex;
-            font-size: .75em;
-            {/* margin-left: 3em; */}
-            justify-content: center;
-            flex-grow: 0;
-            {/* position: fixed; */}
-            width: 100%;
-            left: 0;
-          }
-          .sub-ul {
-            position: relative;
-            flex-direction: column;
-            margin: 0;
-          }
-          li {
-            margin-right: 5em;
-            white-space: nowrap;
-            cursor: pointer;
-          }
-          .account {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            color: grey;
-          }
-          .locations {
-            background-color: lightgrey;
-            border: 1px solid black;
-            border-radius: 5px;
-            padding: .5em;
-          }
-        `}</style>
-      </ul>
-    )
+      })}
+      <style jsx>{`
+        ul {
+          display: flex;
+          font-size: 0.75em;
+          justify-content: space-around;
+          flex-grow: 0;
+          align-items: center;
+          flex-grow: 0;
+          width: 100%;
+          left: 0;
+          position: relative;
+        }
+        .sub-ul {
+          margin: 0;
+          flex-grow: 1;
+          position: absolute;
+          display: flex;
+          align-items: center;
+          margin-top: 1em;
+        }
+        li {
+          margin-right: 2vw;
+          white-space: nowrap;
+          cursor: pointer;
+          text-transform: uppercase;
+          color: var(--color-blue);
+          font-weight: bold;
+          width: 100%;
+          text-align: center;
+        }
+        li.active, li:hover {
+          color: var(--color-red);
+        }
+        .account {
+          top: 5px;
+          right: 5px;
+          color: grey;
+        }`}</style>
+    </ul>
   }
 
   render () {
@@ -134,12 +174,25 @@ export default class TopMenu extends Component {
         <div className='list-wrapper'>
           <div>{ this.renderList() }</div>
         </div>
+        <div className='gate' onMouseOver={this.handleHover} />
+        <div className='gate2' onMouseOver={this.handleHover} />
         <style jsx>{`
           .top-menu {
             width: 100%;
+            position: relative;
           }
-          .list-wrapper{
-            width: ${this.props.url.pathname === '/' ? '100%' : 'calc(100% - 100px)'};
+          .gate {
+            position: absolute;
+            top: 70px;
+            width: 100%;
+            height: 10px;
+          }
+          .gate2 {
+            position: absolute;
+            height: 300%;
+            left: 0;
+            top: -100%;
+            width: 10px;
           }
         `}</style>
       </div>

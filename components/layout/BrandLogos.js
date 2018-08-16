@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-const FooterLogos = ({ images }) => {
+const BrandLogos = ({ images }) => {
   const renderImages = images => (
     images.map(imgSrc => (
       <div key={imgSrc}>
@@ -38,8 +38,8 @@ const FooterLogos = ({ images }) => {
   )
 }
 
-FooterLogos.propTypes = {
+BrandLogos.propTypes = {
   images: PropTypes.array.isRequired
 }
 
-export default FooterLogos
+export default BrandLogos

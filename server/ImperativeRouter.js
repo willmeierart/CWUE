@@ -12,7 +12,11 @@ const ImperativeRouter = {
       },
       Router.linkPage(path, query).as,
       { shallow }
-    )
+    ),
+  onRouteChangeComplete: cb => {
+    console.log(NextRouter)
+    NextRouter.router.events.on('routeChangeComplete', cb)
+  }
 }
 
 export default ImperativeRouter

@@ -1,8 +1,6 @@
 import PropTypes from 'prop-types'
 import { Link } from 'next-url-prettifier'
 import { Router, routes } from '../../server/routes'
-import { AzLogo01 } from '../assets/ZeroLogos'
-import FooterLogos from './FooterLogos'
 
 const Footer = () => {
   const socials = [ { type: 'facebook', link: '' }, { type: 'twitter', link: '' } ]
@@ -39,7 +37,7 @@ const Footer = () => {
   }
   const renderNav = routes => (
     <ul className='top-lvl-routes'>
-      { routes.map(route => (
+      { routes.filter(route => route.page !== 'index' && route.page !== 'legal').map(route => (
         <li key={route.title}>
           <Link prefetch route={Router.linkPage(route.page, { title: route.title })}>
             <span>{ route.title }</span>
@@ -51,6 +49,8 @@ const Footer = () => {
         li {
           line-height: 2em;
           cursor: pointer;
+          border-left: 2px solid white;
+          padding-left: 1.5vw;
         }
         .top-lvl-routes {
           display: flex;
@@ -65,19 +65,9 @@ const Footer = () => {
   )
   return (
     <div className='footer'>
-      <FooterLogos images={[
-        'http://via.placeholder.com/120x120?text=CWUE',
-        'http://via.placeholder.com/120x120?text=CWE',
-        'http://via.placeholder.com/120x120?text=Goo+Goo',
-        'http://via.placeholder.com/120x120?text=Supersonic',
-        'http://via.placeholder.com/120x120?text=Splish+Splash'
-      ]} />
       <div className='footer-content-wrapper'>
         <div className='socials-wrapper'>{ renderSocialIcons(socials) }</div>
         <div className='footer-nav-wrapper'>{ renderNav(routes) }</div>
-        <div className='logo-wrapper'>
-          <AzLogo01 />
-        </div>
       </div>
       <div className='copyright'>Copyright © 2018 ・ All Rights Reserved ・ Carwash USA Express </div>
       <style jsx>{`
@@ -88,6 +78,8 @@ const Footer = () => {
           flex-direction: column;
           flex-grow: 1;
           position: relative;
+          background: var(--color-red);
+          color: white;
         }
         .footer-content-wrapper {
           position: relative;
@@ -100,6 +92,7 @@ const Footer = () => {
           justify-content: space-between;
           margin-left: 10vw;
           margin-top: 30px;
+          margin-bottom: 100px;
         }
         .socials-wrapper {
           display: flex;

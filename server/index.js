@@ -13,12 +13,12 @@ app.prepare()
 
     Router.forEachPattern((page, pattern, defaultParams) => // this function comes from next-url-prettifier
       server.get(pattern, (req, res) => {
-        console.log('\x1b[36m%s\x1b[0m', JSON.stringify(req.params))
-        console.log('\x1b[35m%s\x1b[0m', JSON.stringify(req.query)) // query string
-        console.log('\x1b[32m%s\x1b[0m', JSON.stringify(pattern))
+        // console.log('\x1b[36m%s\x1b[0m', JSON.stringify(req.params))
+        // console.log('\x1b[35m%s\x1b[0m', JSON.stringify(req.query)) // query string
+        // console.log('\x1b[32m%s\x1b[0m', JSON.stringify(pattern))
 
         const objAssigned = Object.assign({}, defaultParams, req.query, req.params)
-        console.log(objAssigned)
+        // console.log(objAssigned)
 
         return app.render(req, res, `/${page}`, objAssigned)
       })
