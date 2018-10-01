@@ -32,17 +32,8 @@ export default class TopMenu extends Component {
       route.children.reduce((a, b, i) => {
         const { title } = b
         const formattedTitle = title.toLowerCase().replace(' ', '-')
-        console.log(route.page, formattedTitle)
-        // const enter = route.page === 'washes' ? () => { this.setState({ showWashSubList: true }) } : route.page === 'about' ? () => { this.setState({ showAboutSubList: true }) } : null
-        // const leave = route.page === 'washes' ? () => { this.setState({showWashSubList: false}) } : route.page === 'about' ? () => { this.setState({showAboutSubList: false}) } : null
-
-        // MAKE A SEPARATE ELEMENT THAT APPEARS 
-
         a.push(
-          <li
-            // onMouseLeave={leave} onMouseOver={enter}
-            ref={el => { this[route.page] = el }}
-            key={i} className='child-route'>
+          <li ref={el => { this[route.page] = el }} key={i} className='child-route'>
             <Link prefetch route={Router.linkPage(route.page, { title: formattedTitle })}>
               <a>{ title }</a>
             </Link>
@@ -62,13 +53,15 @@ export default class TopMenu extends Component {
         )
         if (i !== route.children.length - 1) {
           a.push(
-            <div><style jsx>{`
-              div {
-                width: 1px;
-                height: 3em;
-                background: var(--color-blue);
-              }
-            `}</style></div>
+            <div>
+              <style jsx>{`
+                div {
+                  width: 1px;
+                  height: 3em;
+                  background: var(--color-blue);
+                }
+              `}</style>
+            </div>
           )
         }
         return a
@@ -131,13 +124,15 @@ export default class TopMenu extends Component {
         ul {
           display: flex;
           font-size: 0.75em;
-          justify-content: space-around;
+          justify-content: space-between;
           flex-grow: 0;
           align-items: center;
           flex-grow: 0;
           width: 100%;
           left: 0;
           position: relative;
+          margin-left: 3vw;
+          width: 80%;
         }
         .sub-ul {
           margin: 0;
@@ -146,16 +141,16 @@ export default class TopMenu extends Component {
           display: flex;
           align-items: center;
           margin-top: 1em;
+          justify-content: space-between;
+          width: 90%;
         }
         li {
-          margin-right: 2vw;
+          margin-right: 6vw;
           white-space: nowrap;
           cursor: pointer;
           text-transform: uppercase;
           color: var(--color-blue);
           font-weight: bold;
-          width: 100%;
-          text-align: center;
         }
         li.active, li:hover {
           color: var(--color-red);

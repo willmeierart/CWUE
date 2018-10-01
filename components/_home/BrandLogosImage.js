@@ -8,11 +8,10 @@ const BrandLogosImage = () => (
     <div className='breaker' />
     <div className='inner-wrapper'>
       <BrandLogos images={[
-        'http://via.placeholder.com/120x120?text=CWUE',
-        'http://via.placeholder.com/120x120?text=CWE',
-        'http://via.placeholder.com/120x120?text=Goo+Goo',
-        'http://via.placeholder.com/120x120?text=Supersonic',
-        'http://via.placeholder.com/120x120?text=Splish+Splash'
+        '/static/images/logos/cwe-logo.png',
+        '/static/images/logos/gg-logo.png',
+        '/static/images/logos/ss-logo.png',
+        '/static/images/logos/sscw-logo.png'
       ]} />
     </div>
     <style jsx>{`

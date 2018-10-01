@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="50px" height="50px" viewBox="0 0 50 50" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 51.1 (57501) - http://www.bohemiancoding.com/sketch -->
+    <title>_assets/cta-button</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Desktop---Home" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Home-v2" transform="translate(-46.000000, -468.000000)" fill="#FFFFFF">
+            <g id="CTA" transform="translate(20.000000, 183.000000)">
+                <g id="Hero-Copy" transform="translate(19.000000, 28.000000)">
+                    <g id="_assets/cta-button" transform="translate(7.000000, 257.000000)">
+                        <polygon id="Fill-1" points="23.5034691 13.8301102 23.3932127 13.7254902 17.6496229 13.7254902 28.5778281 24.0196078 17.6470588 34.3137255 23.3932127 34.3137255 34.0393665 24.2823743 34.3085973 24.0196078 34.3085973 24.0196078 34.3137255 24.0147418"></polygon>
+                        <path d="M25.001243,46.1467707 C13.342117,46.1467707 3.85322925,36.6603689 3.85322925,25.001243 C3.85322925,13.3396311 13.342117,3.85322925 25.001243,3.85322925 C36.6603689,3.85322925 46.1467707,13.3396311 46.1467707,25.001243 C46.1467707,36.6603689 36.6603689,46.1467707 25.001243,46.1467707 M25.001243,0 C11.2166261,0 0,11.2141401 0,25.001243 C0,38.7858599 11.2166261,50 25.001243,50 C38.7858599,50 50,38.7858599 50,25.001243 C50,11.2141401 38.7858599,0 25.001243,0" id="Fill-2"></path>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

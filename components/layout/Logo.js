@@ -4,7 +4,7 @@ import Link from 'next/link'
 const Logo = props => (
   <Link href='/'><a>
     <div className='logo-wrapper'>
-      <img src='/static/images/CWUE_logo.png' alt='logo' />
+      <img src='/static/images/logo.png' alt='logo' />
       <style jsx>{`
         .logo-wrapper {
           margin: 3vw;
@@ -15,7 +15,7 @@ const Logo = props => (
           justify-content: center;
           align-items: center;
           position:relative;
-          background: var(--color-blue);
+          // background: var(--color-blue);
         }
         img {
           height: 100%;

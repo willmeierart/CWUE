@@ -18,6 +18,47 @@ const CustomHead = (props = initialProps) => {
     { children }
     {/* <script key='google-map' type='text/javascript' src={`https://maps.googleapis.com/maps/api/js?key=${process.env.GOOGLE_MAPS_KEY}&libraries=places`} async defer /> */}
     {/* <script async src='https://www.googletagmanager.com/gtag/js?id=UA-XXXXXXXX-X' /> */}
+    <style dangerouslySetInnerHTML={{__html: `
+      @font-face {
+        font-family: 'Gotham';
+        src: url('GothamMedium.eot');
+        src: url('GothamMedium.eot?#iefix') format('embedded-opentype'),
+            url('GothamMedium.woff') format('woff');
+        font-weight: 500;
+        font-style: normal;
+      }
+      @font-face {
+        font-family: 'Gotham Book';
+        src: url('GothamBook-Italic.eot');
+        src: url('GothamBook-Italic.eot?#iefix') format('embedded-opentype'),
+            url('GothamBook-Italic.woff') format('woff');
+        font-weight: normal;
+        font-style: italic;
+      }
+      @font-face {
+        font-family: 'Gotham';
+        src: url('GothamBlack.eot');
+        src: url('GothamBlack.eot?#iefix') format('embedded-opentype'),
+            url('GothamBlack.woff') format('woff');
+        font-weight: 900;
+        font-style: normal;
+      }
+      @font-face {
+        font-family: 'Gotham Book';
+        src: url('GothamBook.eot');
+        src: url('GothamBook.eot?#iefix') format('embedded-opentype'),
+            url('GothamBook.woff') format('woff');
+        font-weight: normal;
+        font-style: normal;
+      }
+      @font-face {
+        font-family: 'Montserrat';
+        src: url('/wp-content/themes/CGO/dist/fonts/Montserrat-Bold.eot');
+        src: url('/wp-content/themes/CGO/dist/fonts/Montserrat-Bold.eot?#iefix') format('embedded-opentype'), url('/wp-content/themes/CGO/dist/fonts/Montserrat-Bold.woff') format('woff');
+        font-weight: bold;
+        font-style: normal;
+      }
+    `}} />
   </Head>
 }
 

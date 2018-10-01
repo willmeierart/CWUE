@@ -4,6 +4,7 @@ import TopMenu from './TopMenu'
 import Logo from './Logo'
 import MobileMenu from './MobileMenu'
 import MobileNavBtn from './MobileNavBtn'
+import  { ProfileIcon } from '../assets/SVG'
 import { binder } from '../../lib/_utils'
 
 class Header extends Component {
@@ -32,6 +33,7 @@ class Header extends Component {
         <Logo />
         { this.props.isMobile
           ? <div>
+            
             <MobileNavBtn handleClick={() => { this.handleClick() }} menuOpen={this.state.menuOpen} />
             <div className='menu-wrapper'>{ this.state.menuOpen && <MobileMenu closeMenu={() => { this.handleClick(true) }} /> }</div>
           </div>
