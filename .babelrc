@@ -15,7 +15,8 @@
       {
         "extensions": ["css$", "scss$"]
       }
-    ]
+    ],
+    "@babel/plugin-transform-runtime"
   ],
   "presets": ["next/babel"],
   "ignore": [],
