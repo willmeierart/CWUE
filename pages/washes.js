@@ -4,11 +4,12 @@ import WashWrapper from '../components/_washes/WashWrapper'
 import withData from '../lib/apollo/withData'
 
 const Washes = ({ url }) => (
-  <AppProvider url={url} title='Washes'>
-    <TopSubMenu url={url} />
-    <WashWrapper url={url} />
-    <style jsx>{``}</style>
-  </AppProvider>
+	<section>
+		{/* <AppProvider url={url} title='Washes'/> */}
+		<TopSubMenu url={url} />
+		<WashWrapper url={url} />
+		<style jsx>{``}</style>
+	</section>
 )
 
 export default withData(Washes)

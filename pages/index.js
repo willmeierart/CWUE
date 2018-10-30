@@ -4,13 +4,14 @@ import HomeWrapper from '../components/_home'
 import withData from '../lib/apollo/withData'
 
 class HomePage extends Component {
-  render () {
-    return (
-      <AppProvider url={this.props.url} title='Home'>
-        <HomeWrapper url={this.props.url} />
-      </AppProvider>
-    );
-  }
+	render () {
+		return (
+			<section>
+				{/* <AppProvider url={this.props.url} title='Home' /> */}
+				<HomeWrapper url={this.props.url} />
+			</section>
+		)
+	}
 }
 
 export default withData(HomePage)
