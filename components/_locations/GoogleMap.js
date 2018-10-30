@@ -68,12 +68,6 @@ class GoogleMap extends Component {
 					center: mapCenter,
 					mapTypeId: google.maps.MapTypeId.ROADMAP,
 					disableDefaultUI: true, // disable controls:
-					// zoomControl: false,
-					// mapTypeControl: false,
-					// scaleControl: false,
-					// streetViewControl: false,
-					// rotateControl: false,
-					// fullscreenControl: false,
 					styles: template === 'initial' ? initialMapStyles : null
 					// gestureHandling: 'none'
 				})

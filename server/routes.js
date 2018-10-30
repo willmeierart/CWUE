@@ -7,7 +7,13 @@ const routes = [
 	{
 		page: 'index',
 		title: 'Home',
-		prettyUrl: '/carwash'
+		prettyUrl: '/carwash',
+		prettyUrlPatterns: [
+			{
+				pattern: '/carwash',
+				pattern: '/'
+			}
+		]
 	},
 	{
 		page: 'washes',

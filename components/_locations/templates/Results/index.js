@@ -38,12 +38,13 @@ class Results extends Component {
 		if (!this.props.promisePendingStatus) {
 			if (this.props.activeResults !== prevProps.activeResults) {
 				this.parseMessageResultsState()
-			} else {
-				if (this.state.shouldFire) {
-					console.warn('componentdidupdate SETTING TIMEOUT', this.state.shouldFire, this.state.timesFired)
-					setTimeout(this.parseMessageResultsState, 1500)
-				}
 			}
+			// else {
+			// 	if (this.state.shouldFire) {
+			// 		console.warn('componentdidupdate SETTING TIMEOUT', this.state.shouldFire, this.state.timesFired)
+			// 		setTimeout(this.parseMessageResultsState, 1500)
+			// 	}
+			// }
 		}
 		if (this.props.searchPhrase !== prevProps.searchPhrase) {
 			// if (!this.props.isUserLocationPage && !this.state.isMyLocation) {

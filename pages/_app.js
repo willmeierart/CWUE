@@ -6,7 +6,7 @@ import AppProvider from '../lib/redux/AppProvider'
 import { routes } from '../server/routes'
 
 class MyApp extends App {
-	static async getInitialProps ({ Component, router, ctx }) {
+	static async getInitialProps ({ Component, ctx }) {
 		let pageProps = {}
 		if (Component.getInitialProps) {
 			pageProps = await Component.getInitialProps(ctx)
@@ -22,8 +22,11 @@ class MyApp extends App {
 		const { Component, pageProps, reduxStore, children, router } = this.props
 		const prettySafeUrl = (route) =>
 			typeof route.prettyUrl === 'string' ? route.prettyUrl : route.prettyUrl({ title: '' })
-		const thisRoute = routes.filter((route) => prettySafeUrl(route).indexOf(router.pathname) !== -1).pop()
-		const { prettyUrl, title } = thisRoute
+		const thisRoute =
+			router.asPath === '/' || router.asPath === 'carwash'
+				? routes[0]
+				: routes.filter((route) => prettySafeUrl(route).indexOf(router.pathname) !== -1).pop()
+		const { title } = thisRoute
 
 		return (
 			<Container>

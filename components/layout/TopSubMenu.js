@@ -5,8 +5,7 @@ import ImperativeRouter from '../../server/ImperativeRouter'
 
 const TopSubMenu = ({ url }) => {
 	const route = routes.find((route) => {
-		const matchVal = url.pathname.match(/[a-z]/g).join('')
-		console.log(route, matchVal)
+		const matchVal = url.pathname === '/' ? 'index' : url.pathname.match(/[a-z]/g).join('')
 		return route.page === matchVal
 	})
 	return (

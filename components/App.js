@@ -2,7 +2,15 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { setLocPageState, getVPDims, setUserNotification, checkIfMobile, openMobileMenu } from '../lib/redux/actions'
+import {
+	setLocPageState,
+	getVPDims,
+	setUserNotification,
+	checkIfMobile,
+	openMobileMenu,
+	checkIfIE,
+	checkSWAvailable
+} from '../lib/redux/actions'
 import Header from './layout/Header'
 import Footer from './layout/Footer'
 import NotificationBar from './ui/NotificationBar'
@@ -12,9 +20,11 @@ import NotificationBar from './ui/NotificationBar'
 class App extends Component {
 	componentDidMount () {
 		this.props.onCheckIfMobile()
+		this.props.onCheckIfIE()
+		this.props.onGetVPDims()
+		this.props.onCheckSWAvailable()
 		window.addEventListener('resize', () => {
 			this.props.onGetVPDims()
-
 			this.props.onCheckIfMobile()
 		})
 	}
@@ -103,7 +113,9 @@ function mapStateToProps (state) {
 		vpDims: state.env.vpDims,
 		userNotification: state.env.userNotification,
 		isMobile: state.env.isMobile,
-		menuOpen: state.env.menuOpen
+		menuOpen: state.env.menuOpen,
+		isIE: state.env.isIE,
+		swAvailable: state.env.swAvailable
 	}
 }
 
@@ -113,7 +125,9 @@ function mapDispatchToProps (dispatch) {
 		onGetVPDims: () => dispatch(getVPDims()),
 		onSetUserNotification: (alertObj) => dispatch(setUserNotification(alertObj)),
 		onCheckIfMobile: () => dispatch(checkIfMobile()),
-		onOpenMobileMenu: (bool) => dispatch(openMobileMenu(bool))
+		onOpenMobileMenu: (bool) => dispatch(openMobileMenu(bool)),
+		onCheckIfIE: (bool) => dispatch(checkIfIE(bool)),
+		onCheckSWAvailable: () => dispatch(checkSWAvailable())
 	}
 }
 
@@ -127,5 +141,9 @@ App.propTypes = {
 	userNotification: PropTypes.object.isRequired,
 	onSetUserNotification: PropTypes.func.isRequired,
 	isMobile: PropTypes.bool.isRequired,
-	onOpenMobileMenu: PropTypes.func.isRequired
+	isIE: PropTypes.bool.isRequired,
+	swAvailable: PropTypes.bool.isRequired,
+	onOpenMobileMenu: PropTypes.func.isRequired,
+	onCheckIfIE: PropTypes.func.isRequired,
+	onCheckSWAvailable: PropTypes.func.isRequired
 }

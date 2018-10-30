@@ -2,23 +2,30 @@
 import Head from 'next/head'
 
 const initialProps = {
-  title: 'Carwash USA Express',
-  initialScale: '1.0'
+	title: 'Carwash USA Express',
+	initialScale: '1.0'
 }
 
 const CustomHead = (props = initialProps) => {
-  const { title, initialScale, children } = props
-  return <Head>
-    <title key='title'>{title}</title>
-    <meta key='charSet' charSet='utf-8' />
-    <meta key='viewport' name='viewport' content={`inital-scale=${initialScale || initialProps.initialScale}, width=device-width, shrink-to-fit=no`} />
-    <meta key='meta-title' name='title' content='Carwash USA Express' />
-    <link rel='shortcut icon' href='/static/favicon.ico' />
-    <script defer src='https://use.fontawesome.com/releases/v5.0.6/js/all.js' />
-    { children }
-    {/* <script key='google-map' type='text/javascript' src={`https://maps.googleapis.com/maps/api/js?key=${process.env.GOOGLE_MAPS_KEY}&libraries=places`} async defer /> */}
-    {/* <script async src='https://www.googletagmanager.com/gtag/js?id=UA-XXXXXXXX-X' /> */}
-    <style dangerouslySetInnerHTML={{__html: `
+	const { title, initialScale, children } = props
+	return (
+		<Head>
+			<title key='title'>{title}</title>
+			<meta key='charSet' charSet='utf-8' />
+			<meta
+				key='viewport'
+				name='viewport'
+				content={`inital-scale=${initialScale || initialProps.initialScale}, width=device-width, shrink-to-fit=no`}
+			/>
+			<meta key='meta-title' name='title' content='Carwash USA Express' />
+			<link rel='shortcut icon' href='/static/favicon.ico' />
+			<script defer src='https://use.fontawesome.com/releases/v5.0.6/js/all.js' />
+			{children}
+			{/* <script key='google-map' type='text/javascript' src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY}&libraries=places`} async defer /> */}
+			{/* <script async src='https://www.googletagmanager.com/gtag/js?id=UA-XXXXXXXX-X' /> */}
+			<style
+				dangerouslySetInnerHTML={{
+					__html: `
       @font-face {
         font-family: 'Gotham';
         src: url('GothamMedium.eot');
@@ -58,8 +65,24 @@ const CustomHead = (props = initialProps) => {
         font-weight: bold;
         font-style: normal;
       }
-    `}} />
-  </Head>
+      .loader-wrapper {
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .loader-hidden { display: none; }
+
+      .loader-active { display: block; }
+
+      .loader-active .loader-inner div { background-color: #970d11; }
+    `
+				}}
+			/>
+		</Head>
+	)
 }
 
 export default CustomHead
