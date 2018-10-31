@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import equal from 'deep-equal'
-import ImperativeRouter from '../../../server/ImperativeRouter'
-import { geocodeByAddress, getLatLng, makeMarker, normalizeRegionInputs } from '../../../lib/_locationUtils'
-import { binder } from '../../../lib/_utils'
+import ImperativeRouter from '../../server/ImperativeRouter'
+import { geocodeByAddress, getLatLng, makeMarker, normalizeRegionInputs } from '../../lib/_locationUtils'
+import { binder } from '../../lib/_utils'
 
 // most places-autocomplete api data held here
 
@@ -48,9 +48,8 @@ export default function SearchManager (ComposedComponent) {
 		routeToResults (place) {
 			// control programmatic url
 			const spec = place.formatted_address.toLowerCase().replace(/(,)/g, '').replace(/( )/g, '-')
-			const query = { state: 'results', spec }
 
-			ImperativeRouter.push('locations', query, false)
+			ImperativeRouter.push('locationsResults', { spec }, false)
 		}
 
 		handleSelection (address, placeId, handleInput) {
@@ -112,6 +111,7 @@ export default function SearchManager (ComposedComponent) {
 		findResultsInRadius (place, locations) {
 			this.setState({ searchIsRegion: this.searchIsRegion(place.types) })
 			const locationCoords = locations.map((location) => location.coordinates)
+			console.log(locations)
 			this.getRelevantCoords(place, locationCoords)
 		}
 
@@ -131,8 +131,8 @@ export default function SearchManager (ComposedComponent) {
 					LAT_LNG = [ latLng ]
 				})
 				this.doDistanceService(LAT_LNG, locationCoords)
+				console.log(LAT_LNG, locationCoords)
 			}
-			console.warn(asyncLatLng())
 			return asyncLatLng()
 		}
 
@@ -146,7 +146,7 @@ export default function SearchManager (ComposedComponent) {
 		}
 
 		async doDistanceService (coords1, coords2) {
-			console.warn('STARTING DISTANCE SERVICE')
+			console.warn('STARTING DISTANCE SERVICE ', coords1, coords2)
 			await this.distanceService.getDistanceMatrix(
 				{
 					origins: coords1,
@@ -179,6 +179,7 @@ export default function SearchManager (ComposedComponent) {
 				})
 			} else {
 				// this.props.onSetPromisePendingStatus(false)
+				console.error(response, status)
 			}
 		}
 

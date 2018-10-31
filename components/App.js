@@ -3,7 +3,6 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import {
-	setLocPageState,
 	getVPDims,
 	setUserNotification,
 	checkIfMobile,
@@ -30,10 +29,7 @@ class App extends Component {
 	}
 	render () {
 		const {
-			title,
 			children,
-			pageState,
-			onSetLocPageState,
 			url,
 			userNotification: { alert, color },
 			onSetUserNotification,
@@ -45,17 +41,11 @@ class App extends Component {
 		return (
 			<div className='App'>
 				{/* <Head title={title} /> */}
-				<Header
-					openMenu={onOpenMobileMenu}
-					isMobile={isMobile}
-					url={url}
-					pageState={pageState}
-					onSetLocPageState={onSetLocPageState}
-				/>
+				<Header openMenu={onOpenMobileMenu} isMobile={isMobile} url={url} />
 				{alert !== '' &&
 				color !== '' && <NotificationBar onSetUserNotification={onSetUserNotification} alert={alert} color={color} />}
 				<main>{children}</main>
-				<Footer isMobile={isMobile} pageState={pageState} />
+				<Footer isMobile={isMobile} />
 				<style jsx global>{`
 					body {
 						--color-red: #c73a37;
@@ -109,7 +99,6 @@ class App extends Component {
 
 function mapStateToProps (state) {
 	return {
-		pageState: state.location.pageState,
 		vpDims: state.env.vpDims,
 		userNotification: state.env.userNotification,
 		isMobile: state.env.isMobile,
@@ -121,7 +110,6 @@ function mapStateToProps (state) {
 
 function mapDispatchToProps (dispatch) {
 	return {
-		onSetLocPageState: (pageState) => dispatch(setLocPageState(pageState)),
 		onGetVPDims: () => dispatch(getVPDims()),
 		onSetUserNotification: (alertObj) => dispatch(setUserNotification(alertObj)),
 		onCheckIfMobile: () => dispatch(checkIfMobile()),
@@ -134,8 +122,6 @@ function mapDispatchToProps (dispatch) {
 export default connect(mapStateToProps, mapDispatchToProps)(App)
 
 App.propTypes = {
-	pageState: PropTypes.string.isRequired,
-	onSetLocPageState: PropTypes.func.isRequired,
 	title: PropTypes.string.isRequired,
 	vpDims: PropTypes.object.isRequired,
 	userNotification: PropTypes.object.isRequired,

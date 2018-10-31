@@ -73,9 +73,7 @@ class Header extends Component {
 }
 
 Header.propTypes = {
-	url: PropTypes.object.isRequired,
-	pageState: PropTypes.string.isRequired,
-	onSetLocPageState: PropTypes.func.isRequired
+	url: PropTypes.object.isRequired
 }
 
 export default Header

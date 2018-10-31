@@ -5,404 +5,388 @@ import ExecutionEnvironment from 'exenv'
 import ImperativeRouter from '../../server/ImperativeRouter'
 import { reverseGeocode } from '../../lib/_locationUtils'
 import { binder } from '../../lib/_utils'
-import SearchManager from './data_managers/Search'
+import SearchManager from './SearchManager'
 
 // all mechanics related to searchbar, as well as programmatic control of autocomplete api on SSR load
 
 class SearchBar extends Component {
-  constructor (props) {
-    super(props)
-    this.state = { autocompleteItems: [], value: '', isServer: !ExecutionEnvironment.canUseDOM, freshLoad: true, specialVal: '' }
-    binder(this, ['autocompleteCallback',
-      'clearSuggestions',
-      'fetchPredictions',
-      'selectAddress',
-      'handleSelect',
-      'getActiveItem',
-      'selectActiveItemAtIndex',
-      'handleEnterKey',
-      'handleEnterKeyWithoutActiveItem',
-      'handleDownKey',
-      'handleUpKey',
-      'handleInputKeyDown',
-      'setActiveItemAtIndex',
-      'handleInputChange',
-      'handleInputOnBlur',
-      'renderSuggestion',
-      'renderFooter',
-      'handleInput',
-      'getInputProps',
-      'handleSearchOnSSR',
-      'generateState'
-    ])
-    this.debouncedFetchPredictions = debounce(this.fetchPredictions, 800)
-    this.highlightFirstSuggestion = false
-    this.shouldFetchSuggestions = (thing) => { if (thing) return true }
-  }
+	constructor (props) {
+		super(props)
+		this.state = {
+			autocompleteItems: [],
+			value: '',
+			isServer: !ExecutionEnvironment.canUseDOM,
+			freshLoad: true,
+			specialVal: ''
+		}
+		binder(this, [
+			'autocompleteCallback',
+			'clearSuggestions',
+			'fetchPredictions',
+			'selectAddress',
+			'handleSelect',
+			'getActiveItem',
+			'selectActiveItemAtIndex',
+			'handleEnterKey',
+			'handleEnterKeyWithoutActiveItem',
+			'handleDownKey',
+			'handleUpKey',
+			'handleInputKeyDown',
+			'setActiveItemAtIndex',
+			'handleInputChange',
+			'handleInputOnBlur',
+			'renderSuggestion',
+			'renderFooter',
+			'handleInput',
+			'getInputProps',
+			'handleSearchOnSSR',
+			'generateState'
+		])
+		this.debouncedFetchPredictions = debounce(this.fetchPredictions, 800)
+		this.highlightFirstSuggestion = false
+		this.shouldFetchSuggestions = (thing) => {
+			if (thing) return true
+		}
+	}
 
-  componentDidMount () {
-    this.handleSearchOnSSR()
-  }
+	componentDidMount () {
+		this.handleSearchOnSSR()
+	}
 
-  componentDidUpdate (prevProps, prevState) {
-    if (this.props.userLocation !== prevProps.userLocation && this.state.specialVal !== '') {
-      // this.generateState(this.state.specialVal)
-    }
-    if (this.state.specialVal !== prevState.specialVal) {
-      console.log(this.state, prevState)
-      // this.props.setMapZoomModifier(-2)
-      this.generateState(this.state.specialVal)
-    }
-  }
+	componentDidUpdate (prevProps, prevState) {
+		if (this.props.userLocation !== prevProps.userLocation && this.state.specialVal !== '') {
+			// this.generateState(this.state.specialVal)
+		}
+		if (this.state.specialVal !== prevState.specialVal) {
+			console.log(this.state, prevState)
+			this.generateState(this.state.specialVal)
+		}
+	}
 
-  handleSearchOnSSR () { // need to parse url if SSR into valid search
-    const {
-      searchPhrase,
-      activeResults,
-      url: { asPath },
-      userLocation,
-      setMapZoomModifier,
-      isUserLocationPage,
-      userIsLocated,
-      onMakeUserLocationPage,
-      onSetPromisePendingStatus,
-      onGetUserLocation
-    } = this.props
-    const noActiveSearch = !searchPhrase && activeResults.length === 0
-    const pathSplitta = asPath.split('results/')[1]
-    const hasQueryString = pathSplitta && pathSplitta !== ''
-    // const isUserLocation = pathSplitta === 'my-location'
+	handleSearchOnSSR () {
+		// need to parse url if SSR into valid search
+		const { searchPhrase, activeResults, url: { asPath }, onSetPromisePendingStatus } = this.props
+		const noActiveSearch = !searchPhrase && activeResults.length === 0
+		const pathSplitta = asPath.split('results/')[1]
+		const hasQueryString = pathSplitta && pathSplitta !== ''
+		// const isUserLocation = pathSplitta === 'my-location'
 
-    if (noActiveSearch) {
-      console.log('no active search')
-      if (hasQueryString) {
-        console.log('has query string')
-        onSetPromisePendingStatus(true)
+		if (noActiveSearch) {
+			console.log('no active search')
+			if (hasQueryString) {
+				console.log('has query string')
+				onSetPromisePendingStatus(true)
+				const searchVal = asPath.split('results/')[1].replace(/[-]/g, ' ')
+				this.generateState(searchVal)
+			}
+		}
+	}
 
-        if (isUserLocationPage) {
-          console.log('is user location page')
-          // if (typeof userLocation === 'object') {
-          if (userIsLocated) {
-            console.log('awaiting userlocation', userLocation)
-            onGetUserLocation(null, () => {
-              reverseGeocode(userLocation, val => {
-                console.log(val)
-                this.setState({ specialVal: val }, () => {
-                  // onSetPromisePendingStatus(false)
-                })
-              })
-            })
-          } else {
-            // onSetPromisePendingStatus(true)
-            console.warn('USER NOT LOCATED BUT STILL GEOCODING USER LOCATION');
-            reverseGeocode(userLocation, (val) => {
-              this.setState({ specialVal: val }, () => {
-                // onSetPromisePendingStatus(false)
-              })
-            })
-          }
-          // setMapZoomModifier(-2)
-          console.log('geocode was fired')
-        } else {
-          const searchVal = asPath.split('results/')[1].replace(/[-]/g, ' ')
-          if (searchVal !== 'my location') {
-            this.generateState(searchVal)
-          } else {
-            onMakeUserLocationPage(true)
-          }
-        }
-      } else {
-        ImperativeRouter.push('locations', { state: 'initial' }, false) // fallback
-      }
-    }
-  }
+	generateState (searchVal) {
+		console.log(searchVal)
+		this.setState(
+			{
+				value: searchVal,
+				freshLoad: true
+			},
+			async () => {
+				await this.fetchPredictions()
+			}
+		)
+	}
 
-  generateState (searchVal) {
-    console.log(searchVal)
-    this.setState({
-      value: searchVal,
-      freshLoad: true
-    }, async () => {
-      await this.fetchPredictions()
-    })
-  }
+	fetchPredictions () {
+		// magical google autocomplete connector function
+		const { value } = this.state
+		if (value.length) {
+			this.props.autocompleteService.getPlacePredictions(
+				{ ...this.props.options, input: value },
+				this.autocompleteCallback
+			)
+		}
+	}
 
-  fetchPredictions () {
-    // magical google autocomplete connector function
-    const { value } = this.state
-    if (value.length) {
-      this.props.autocompleteService.getPlacePredictions(
-        { ...this.props.options, input: value },
-        this.autocompleteCallback
-      )
-    }
-  }
+	selectAddress (address, placeId, e) {
+		// called by each handler: enter / mousedown / touchend
+		if (e !== undefined) {
+			e.preventDefault()
+		}
 
-  selectAddress (address, placeId, e) {
-    // called by each handler: enter / mousedown / touchend
-    if (e !== undefined) { e.preventDefault() }
+		this.clearSuggestions()
+		this.handleSelect(address, placeId, this.handleInput) // these are properties on the 'active selection' object
+	}
 
-    this.clearSuggestions()
-    this.handleSelect(address, placeId, this.handleInput) // these are properties on the 'active selection' object
-  }
+	handleSelect (address, placeId, handleInput) {
+		const { isUserLocationPage, onMakeUserLocationPage, handleSelection } = this.props
+		if (isUserLocationPage) {
+			onMakeUserLocationPage(false)
+		}
+		handleSelection(address, placeId, handleInput)
+	}
 
-  handleSelect (address, placeId, handleInput) {
-    const {isUserLocationPage, onMakeUserLocationPage, handleSelection} = this.props
-    if (isUserLocationPage) {
-      onMakeUserLocationPage(false)
-    }
-    handleSelection(address, placeId, handleInput)
-  }
+	handleInput (val) {
+		this.setState({ value: val, freshLoad: this.state.freshLoad && false })
+	} // val = address (active selection)
 
-  handleInput (val) { this.setState({ value: val, freshLoad: this.state.freshLoad && false }) } // val = address (active selection)
+	clearSuggestions () {
+		this.setState({ autocompleteItems: [] })
+	}
 
-  clearSuggestions () { this.setState({ autocompleteItems: [] }) }
+	getActiveItem () {
+		return this.state.autocompleteItems.find((item) => item.active)
+	}
 
-  getActiveItem () { return this.state.autocompleteItems.find(item => item.active) }
+	selectActiveItemAtIndex (index) {
+		// this is what points at a certain item and selects that one specifically
+		const activeName = this.state.autocompleteItems.find((item) => item.index === index).suggestion
+		this.setActiveItemAtIndex(index)
+		this.handleInput(activeName)
+	}
 
-  selectActiveItemAtIndex (index) {
-    // this is what points at a certain item and selects that one specifically
-    const activeName = this.state.autocompleteItems.find(item => item.index === index).suggestion
-    this.setActiveItemAtIndex(index)
-    this.handleInput(activeName)
-  }
+	setActiveItemAtIndex (index) {
+		this.setState({
+			autocompleteItems: this.state.autocompleteItems.map((item, idx) => {
+				if (idx === index) {
+					return { ...item, active: true }
+				} else {
+					return { ...item, active: false }
+				}
+			})
+		})
+	}
 
-  setActiveItemAtIndex (index) {
-    this.setState({
-      autocompleteItems: this.state.autocompleteItems.map((item, idx) => {
-        if (idx === index) {
-          return { ...item, active: true }
-        } else {
-          return { ...item, active: false }
-        }
-      })
-    })
-  }
+	handleEnterKey (val) {
+		const activeItem = this.getActiveItem()
+		if (activeItem === undefined) {
+			this.handleEnterKeyWithoutActiveItem()
+		} else {
+			this.selectAddress(activeItem.suggestion, activeItem.placeId)
+		}
+	}
 
-  handleEnterKey (val) {
-    const activeItem = this.getActiveItem()
-    if (activeItem === undefined) {
-      this.handleEnterKeyWithoutActiveItem()
-    } else {
-      this.selectAddress(activeItem.suggestion, activeItem.placeId)
-    }
-  }
+	handleEnterKeyWithoutActiveItem () {
+		const { autocompleteItems } = this.state
+		if (autocompleteItems.length > 0) {
+			const activeItem = autocompleteItems[0]
+			this.selectAddress(activeItem.suggestion, activeItem.placeId)
+		} else {
+			if (this.state.val !== '') {
+				this.fetchPredictions()
+			} else {
+				console.warn('no active item')
+			}
+		}
+	}
 
-  handleEnterKeyWithoutActiveItem () {
-    const { autocompleteItems } = this.state
-    if (autocompleteItems.length > 0) {
-      const activeItem = autocompleteItems[0]
-      this.selectAddress(activeItem.suggestion, activeItem.placeId)
-    } else {
-      if (this.state.val !== '') {
-        this.fetchPredictions()
-      } else {
-        console.warn('no active item')
-      }
-    }
-  }
+	handleDownKey () {
+		if (this.state.autocompleteItems.length === 0) return
+		const activeItem = this.getActiveItem()
+		if (activeItem === undefined) {
+			this.selectActiveItemAtIndex(0)
+		} else {
+			const nextIndex = (activeItem.index + 1) % this.state.autocompleteItems.length
+			this.selectActiveItemAtIndex(nextIndex)
+		}
+	}
 
-  handleDownKey () {
-    if (this.state.autocompleteItems.length === 0) return
-    const activeItem = this.getActiveItem()
-    if (activeItem === undefined) {
-      this.selectActiveItemAtIndex(0)
-    } else {
-      const nextIndex = (activeItem.index + 1) % this.state.autocompleteItems.length
-      this.selectActiveItemAtIndex(nextIndex)
-    }
-  }
+	handleUpKey () {
+		if (this.state.autocompleteItems.length === 0) return
+		const activeItem = this.getActiveItem()
+		if (activeItem === undefined) {
+			this.selectActiveItemAtIndex(this.state.autocompleteItems.length - 1)
+		} else {
+			let prevIndex
+			if (activeItem.index === 0) {
+				prevIndex = this.state.autocompleteItems.length - 1
+			} else {
+				prevIndex = (activeItem.index - 1) % this.state.autocompleteItems.length
+			}
+			this.selectActiveItemAtIndex(prevIndex)
+		}
+	}
 
-  handleUpKey () {
-    if (this.state.autocompleteItems.length === 0) return
-    const activeItem = this.getActiveItem()
-    if (activeItem === undefined) {
-      this.selectActiveItemAtIndex(this.state.autocompleteItems.length - 1)
-    } else {
-      let prevIndex
-      if (activeItem.index === 0) {
-        prevIndex = this.state.autocompleteItems.length - 1
-      } else {
-        prevIndex = (activeItem.index - 1) % this.state.autocompleteItems.length
-      }
-      this.selectActiveItemAtIndex(prevIndex)
-    }
-  }
+	handleInputKeyDown (event) {
+		switch (event.key) {
+			case 'Enter':
+				event.preventDefault()
+				this.handleEnterKey(event.target.value)
+				break
+			case 'ArrowDown':
+				event.preventDefault()
+				this.handleDownKey()
+				break
+			case 'ArrowUp':
+				event.preventDefault()
+				this.handleUpKey()
+				break
+			case 'Escape':
+				this.clearSuggestions()
+				break
+			default:
+				break
+		}
+		// if (this.props.inputProps.onKeyDown) { this.props.inputProps.onKeyDown(event) }
+	}
 
-  handleInputKeyDown (event) {
-    switch (event.key) {
-      case 'Enter' :
-        event.preventDefault()
-        this.handleEnterKey(event.target.value)
-        break
-      case 'ArrowDown' :
-        event.preventDefault()
-        this.handleDownKey()
-        break
-      case 'ArrowUp' :
-        event.preventDefault()
-        this.handleUpKey()
-        break
-      case 'Escape' :
-        this.clearSuggestions()
-        break
-      default :
-        break
-    }
-    // if (this.props.inputProps.onKeyDown) { this.props.inputProps.onKeyDown(event) }
-  }
+	handleInputChange (event) {
+		const { value } = event.target
+		this.handleInput(value)
+		if (!value) {
+			this.clearSuggestions()
+			return
+		}
+		if (this.shouldFetchSuggestions({ value })) {
+			this.debouncedFetchPredictions()
+		}
+	}
 
-  handleInputChange (event) {
-    const { value } = event.target
-    this.handleInput(value)
-    if (!value) {
-      this.clearSuggestions()
-      return
-    }
-    if (this.shouldFetchSuggestions({ value })) {
-      this.debouncedFetchPredictions()
-    }
-  }
+	handleInputOnBlur (event) {
+		this.clearSuggestions()
+	}
 
-  handleInputOnBlur (event) { this.clearSuggestions() }
+	getInputProps () {
+		const defaultInputProps = {
+			type: 'text',
+			autoComplete: 'off'
+		}
+		return {
+			...defaultInputProps,
+			onChange: (e) => {
+				this.handleInputChange(e)
+			},
+			onKeyDown: (e) => {
+				this.handleInputKeyDown(e)
+			},
+			onBlur: (e) => {
+				this.handleInputOnBlur(e)
+			},
+			value: this.state.value
+		}
+	}
 
-  getInputProps () {
-    const defaultInputProps = {
-      type: 'text',
-      autoComplete: 'off'
-    }
-    return {
-      ...defaultInputProps,
-      onChange: e => { this.handleInputChange(e) },
-      onKeyDown: e => { this.handleInputKeyDown(e) },
-      onBlur: e => { this.handleInputOnBlur(e) },
-      value: this.state.value
-    }
-  }
+	autocompleteCallback (predictions, status) {
+		// called by this.fetchPredictions, used as callback to native google autocomplete func
+		// predictions are each full object returned from autocompleteservice
+		if (status !== this.props.autocompleteOK) {
+			this.clearSuggestions()
+			return
+		}
+		const formattedSuggestion = (format) => ({
+			main: format.main_text,
+			secondary: format.secondary_text
+		})
+		this.setState({
+			autocompleteItems: predictions.map((p, idx) => ({
+				suggestion: p.description,
+				placeId: p.place_id,
+				active: this.highlightFirstSuggestion && idx === 0,
+				index: idx,
+				formattedSuggestion: formattedSuggestion(p.structured_formatting)
+			}))
+		})
+		if (this.state.freshLoad && this.props.url.query.state === 'results') {
+			this.handleEnterKeyWithoutActiveItem()
+		}
+	}
 
-  autocompleteCallback (predictions, status) {
-    // called by this.fetchPredictions, used as callback to native google autocomplete func
-    // predictions are each full object returned from autocompleteservice
-    if (status !== this.props.autocompleteOK) {
-      this.clearSuggestions()
-      return
-    }
-    const formattedSuggestion = format => ({
-      main: format.main_text,
-      secondary: format.secondary_text
-    })
-    this.setState({
-      autocompleteItems: predictions.map((p, idx) => ({
-        suggestion: p.description,
-        placeId: p.place_id,
-        active: this.highlightFirstSuggestion && idx === 0,
-        index: idx,
-        formattedSuggestion: formattedSuggestion(p.structured_formatting)
-      }))
-    })
-    if (this.state.freshLoad && this.props.url.query.state === 'results') {
-      this.handleEnterKeyWithoutActiveItem()
-    }
-  }
+	renderSuggestion ({ suggestion }) {
+		return <div>{suggestion}</div>
+	}
 
-  renderSuggestion ({ suggestion }) { return <div>{ suggestion }</div> }
+	renderFooter () {}
 
-  renderFooter () {}
+	render () {
+		const { autocompleteItems } = this.state
+		const inputProps = this.getInputProps()
 
-  render () {
-    const { autocompleteItems } = this.state
-    const inputProps = this.getInputProps()
+		return (
+			<div className='searchbar-wrapper'>
+				<div className='searchbar-root'>
+					<input className='searchbar-input' {...inputProps} placeholder='Please enter a location' />
+					<div className='searchbar-autocompleteContainer'>
+						{autocompleteItems.map((p, idx) => (
+							<div
+								key={p.placeId}
+								className={p.active ? 'searchbar-autocompleteItemActive' : 'searchbar-autocompleteItem'}
+								onMouseOver={() => this.setActiveItemAtIndex(p.index)}
+								onMouseDown={(e) => this.selectAddress(p.suggestion, p.placeId, e)}
+								onTouchStart={() => this.setActiveItemAtIndex(p.index)}
+								onTouchEnd={(e) => this.selectAddress(p.suggestion, p.placeId, e)}
+							>
+								{this.renderSuggestion({
+									suggestion: p.suggestion,
+									formattedSuggestion: p.formattedSuggestion
+								})}
+							</div>
+						))}
+						{this.renderFooter()}
+					</div>
+				</div>
+				<style jsx>{`
+					.searchbar-wrapper {
+						margin-bottom: 2vh;
+						width: 100%;
+						display: flex;
+					}
 
-    return (
-      <div className='searchbar-wrapper'>
-        <div className='searchbar-root'>
-          <input className='searchbar-input' {...inputProps} placeholder='Please enter a location' />
-          <div className='searchbar-autocompleteContainer'>
-            { autocompleteItems.map((p, idx) => (
-              <div key={p.placeId} className={p.active ? 'searchbar-autocompleteItemActive' : 'searchbar-autocompleteItem'}
-                onMouseOver={() => this.setActiveItemAtIndex(p.index)}
-                onMouseDown={e => this.selectAddress(p.suggestion, p.placeId, e)}
-                onTouchStart={() => this.setActiveItemAtIndex(p.index)}
-                onTouchEnd={e => this.selectAddress(p.suggestion, p.placeId, e)}>
-                { this.renderSuggestion({
-                  suggestion: p.suggestion,
-                  formattedSuggestion: p.formattedSuggestion
-                }) }
-              </div>
-            )) }
-            { this.renderFooter() }
-          </div>
-        </div>
-        <style jsx>{`
-          .searchbar-wrapper {
-            margin-bottom: 2vh;
-            width: 100%;
-            display: flex;
-          }
+					.searchbar-root {
+						position: relative;
+						padding-bottom: 0px;
+						z-index: 10;
+						width: 100vw;
+						display: flex;
+						flex-direction: column;
+						align-items: center;
+					}
 
-          .searchbar-root {
-            position: relative;
-            padding-bottom: 0px;
-            z-index: 10;
-            width: 100vw;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-          }
+					.searchbar-input {
+						display: inline-block;
+						padding: 10px;
+						width: 50%;
+						left: 25%;
+						border-radius: 3px;
+						border: 1px solid black;
+					}
 
-          .searchbar-input {
-            display: inline-block;
-            padding: 10px;
-            width: 50%;
-            left:25%;
-            border-radius: 3px;
-            border: 1px solid black;
-          }
-
-          .searchbar-autocompleteContainer {
-            position: absolute;
-            top: 99%;
-            background-color: white;
-            border: 1px solid #555555;
-            width: 50%;
-            display: flex;
-            flex-direction: column;
-          };
-          .searchbar-autocompleteItem{
-            background-color: #ffffff;
-          }
-          .searchbar-autocompleteItem, 
-          .searchbar-autocompleteItemActive {
-            padding: 10px;
-            color:black;
-            cursor: pointer;
-          };
-          .searchbar-autocompleteItemActive {
-            background-color: #fafafa;
-          }
-
-        `}</style>
-      </div>
-    )
-  }
+					.searchbar-autocompleteContainer {
+						position: absolute;
+						top: 99%;
+						background-color: white;
+						border: 1px solid #555555;
+						width: 50%;
+						display: flex;
+						flex-direction: column;
+					}
+					.searchbar-autocompleteItem {
+						background-color: #ffffff;
+					}
+					.searchbar-autocompleteItem,
+					.searchbar-autocompleteItemActive {
+						padding: 10px;
+						color: black;
+						cursor: pointer;
+					}
+					.searchbar-autocompleteItemActive {
+						background-color: #fafafa;
+					}
+				`}</style>
+			</div>
+		)
+	}
 }
 
 SearchBar.propTypes = {
-  activeResults: PropTypes.array.isRequired,
-  autocompleteOK: PropTypes.string,
-  autocompleteService: PropTypes.object,
-  data: PropTypes.object.isRequired,
-  distanceService: PropTypes.object,
-  onSetActiveSearchPhrase: PropTypes.func.isRequired,
-  onGetUserLocation: PropTypes.func.isRequired,
-  setActiveResults: PropTypes.func.isRequired,
-  setCenter: PropTypes.func.isRequired,
-  setTemplate: PropTypes.func.isRequired,
-  staticLocationList: PropTypes.array.isRequired,
-  url: PropTypes.object.isRequired,
-  userLocation: PropTypes.oneOfType([PropTypes.object, PropTypes.string]).isRequired,
-  setMapZoomModifier: PropTypes.func.isRequired,
-  onSetPromisePendingStatus: PropTypes.func.isRequired
+	activeResults: PropTypes.array.isRequired,
+	autocompleteOK: PropTypes.string,
+	autocompleteService: PropTypes.object,
+	data: PropTypes.object.isRequired,
+	distanceService: PropTypes.object,
+	onSetActiveSearchPhrase: PropTypes.func.isRequired,
+	setActiveResults: PropTypes.func.isRequired,
+	setCenter: PropTypes.func.isRequired,
+	staticLocationList: PropTypes.array.isRequired,
+	url: PropTypes.object.isRequired,
+	onSetPromisePendingStatus: PropTypes.func.isRequired
 }
 
 export default SearchManager(SearchBar)

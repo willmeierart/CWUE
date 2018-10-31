@@ -3,14 +3,35 @@ import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 // import { updatedDiff } from 'deep-object-diff'
 import difference from 'lodash.difference'
-import MapManager from './data_managers/Map'
 import { binder } from '../../lib/_utils'
 import { getCoordsFromAddress, makeMarker, reverseGeocode } from '../../lib/_locationUtils'
 import equal from 'deep-equal'
 
 // all mechanics relating to map, markers, etc
 
-class GoogleMap extends Component {
+const initialMapStyles = [
+	{
+		stylers: [ { color: '#ffffff' } ]
+	},
+	{
+		featureType: 'road',
+		stylers: [ { visibility: 'off' } ]
+	},
+	{
+		featureType: 'poi',
+		stylers: [ { visibility: 'off' } ]
+	},
+	{
+		featureType: 'administrative',
+		stylers: [ { visibility: 'off' } ]
+	},
+	{
+		elementType: 'labels',
+		stylers: [ { visibility: 'off' } ]
+	}
+]
+
+export default class GoogleMap extends Component {
 	constructor (props) {
 		super(props)
 		this.state = {
@@ -34,14 +55,14 @@ class GoogleMap extends Component {
 	componentDidMount () {
 		console.warn('__MAP__componentDidMount__')
 		const init = () => {
-			const { template, onIdle, initialMapStyles, geoJSONstyles, url } = this.props
+			const { page, onIdle, initialMapStyles, geoJSONstyles, url } = this.props
 			if (!window.google) {
 				console.warn('no google')
 				setTimeout(init, 500)
 			} else {
 				const { google } = window
 				const mapNode = ReactDOM.findDOMNode(this.mapDOM)
-				const { center, allMarkers, activeResults, zoom, mapZoomModifier } = this.props
+				const { center, allMarkers, activeResults } = this.props
 
 				let mapCenter
 				if (typeof center === 'object') {
@@ -64,23 +85,16 @@ class GoogleMap extends Component {
 
 				this.map = new google.maps.Map(mapNode, {
 					// init the map
-					zoom: zoom + mapZoomModifier,
 					center: mapCenter,
 					mapTypeId: google.maps.MapTypeId.ROADMAP,
-					disableDefaultUI: true, // disable controls:
-					styles: template === 'initial' ? initialMapStyles : null
+					disableDefaultUI: true // disable controls:
 					// gestureHandling: 'none'
 				})
-				if (
-					template === 'results' ||
-					url.asPath.indexOf('results') !== -1
-					// || (template === 'detail' || url.asPath.indexOf('detail') !== -1)
-				) {
+				if (page === 'results' || url.asPath.indexOf('results') !== -1) {
 					// behavior different for results view than initial
 					if (onIdle) {
 						google.maps.event.addListener(this.map, 'idle', () => {
 							console.warn('__mount__: MAP IS IDLING')
-							// this.setAllMarkers()
 							this.toggleActiveMarkers()
 						})
 					}
@@ -89,9 +103,7 @@ class GoogleMap extends Component {
 						activeResults.length !== allMarkers.length ||
 						allMarkers.indexOf(undefined) !== -1
 					) {
-						// console.warn('__mount__: SET ALL MARKERS')
 						this.setAllMarkers() // set markers if they don't exist
-						// console.log('componentDidMount first op')
 						if (activeResults.length === 1) {
 							this.props.onSetMapZoom(14)
 						}
@@ -106,12 +118,7 @@ class GoogleMap extends Component {
 							this.toggleActiveMarkers() // otherwise just pick from all markers which should be displayed
 						}
 					}
-				} else if (template === 'initial') {
-					// load geojson mask into map if initial view
-					this.map.data.loadGeoJson('/static/geoData/US_GEO.json')
-					this.map.data.setStyle(geoJSONstyles)
-				} else if (template === 'detail' || url.asPath.indexOf('detail') !== -1) {
-					// console.warn('__mount__: TEMPLATE DETAIL, TOGGLE ACTIVE MARKERS')
+				} else if (page === 'detail' || url.asPath.indexOf('detail') !== -1) {
 					this.toggleActiveMarkers()
 				}
 			}
@@ -137,21 +144,9 @@ class GoogleMap extends Component {
 		if (!equal(this.props, prevProps)) {
 			// console.log('not all props same')
 			// console.warn('props not same - UPDATED: ', updatedDiff(this.props, prevProps), this.props, prevProps)
-
-			if (this.props.url.query.state !== 'results') {
-				// this.toggleActiveMarkers()
-				if (this.props.template === 'initial' && this.props.url.state === 'initial') {
-					// make sure geojson data loaded back in on clientside nav to initial view
-					// console.warn('__update__: IS INITIAL VIEW')
-					this.map.data.loadGeoJson('/static/geoData/US_GEO.json')
-					this.map.data.setStyle(this.props.geoJSONstyles)
-					this.props.setCenter({ lat: 39.8283459, lng: -98.57947969999998 }) // hard-coded latlng for geographic center of US
-					this.clearAllMarkers()
-				}
-			}
-			if (this.props.zoom !== prevProps.zoom || this.props.mapZoomModifier !== prevProps.mapZoomModifier) {
+			if (this.props.zoom !== prevProps.zoom) {
 				console.warn('__update__: ZOOM DID UPDATE')
-				this.map.setZoom(this.props.zoom + this.props.mapZoomModifier)
+				this.map.setZoom(this.props.zoom)
 			}
 			if (this.props.activeResults !== prevProps.activeResults) {
 				console.warn('__update__: ACTIVE RESULTS DID UPDATE')
@@ -165,10 +160,8 @@ class GoogleMap extends Component {
 			if (difference(prevMarkersMap, newMarkersMap).length > 0 /*&& prevMarkersMap.length > 0*/) {
 				// console.warn('__update__: MAP MARKERS DID UPDATE', difference(prevMarkersMap, newMarkersMap))
 				// this.toggleActiveMarkers()
-				if (this.props.template === 'results' || this.props.template === 'detail') {
-					console.warn('SET CENTER VIA MARKERS 2')
-					this.setCenterViaMarkers(filteredMarkers)
-				}
+				console.warn('SET CENTER VIA MARKERS 2')
+				this.setCenterViaMarkers(filteredMarkers)
 			}
 			if (this.props.center !== prevProps.center || center !== { lat: lat(), lng: lng() }) {
 				console.warn('__update__: CENTER DID UPDATE')
@@ -182,15 +175,13 @@ class GoogleMap extends Component {
 			}
 			if (this.state.bounds !== prevState.bounds) {
 				console.warn('__update__: BOUNDS DID UPDATE')
-				if (this.props.template === 'results') {
+				if (this.props.page === 'results') {
 					console.warn('SET CENTER VIA MARKERS 3')
 					this.setCenterViaMarkers(filteredMarkers)
 				}
 			}
 		}
 	}
-
-	shouldComponentUpdate (nextProps) {}
 
 	setBounds (marker) {
 		const mainAction = () => {
@@ -263,10 +254,6 @@ class GoogleMap extends Component {
 			console.warn('no center, using props.center')
 			setCenterType(this.props.center)
 		}
-		if (this.props.mapZoomModifier !== 0) {
-			const zoom = this.props.zoom + this.props.mapZoomModifier
-			this.map.setZoom(zoom)
-		}
 	}
 
 	setAllMarkers () {
@@ -302,13 +289,10 @@ class GoogleMap extends Component {
 	}
 
 	toggleActiveMarkers () {
-		const { activeResults, allMarkers, setMarkers, template } = this.props
+		const { activeResults, allMarkers, setMarkers, page } = this.props
 		const activeMarkerTitles = activeResults.map((result) => result.name)
 		const newMarkers = allMarkers.map((marker) => {
-			if (
-				activeMarkerTitles.indexOf(marker.title) !== -1 &&
-				(template === 'results' || template === 'detail' || template === 'region')
-			) {
+			if (activeMarkerTitles.indexOf(marker.title) !== -1 && (page === 'results' || page === 'detail')) {
 				marker.map = this.map
 				marker.setMap(this.map)
 			} else {
@@ -322,7 +306,7 @@ class GoogleMap extends Component {
 	}
 
 	render () {
-		const { dims: { width, height }, template } = this.props
+		const { dims: { width, height }, page } = this.props
 		return (
 			<div className='map-container'>
 				<div
@@ -335,7 +319,6 @@ class GoogleMap extends Component {
 				/>
 				<style jsx>{`
 					.map-container {
-						pointer-events: ${template === 'initial' ? 'none' : 'all'};
 						cursor: default !important;
 						width: ${width};
 						height: ${height};
@@ -349,20 +332,14 @@ class GoogleMap extends Component {
 GoogleMap.propTypes = {
 	center: PropTypes.oneOfType([ PropTypes.string, PropTypes.object ]),
 	dims: PropTypes.object.isRequired,
-	geoJSONstyles: PropTypes.object.isRequired,
-	initialMapStyles: PropTypes.array.isRequired,
 	allMarkers: PropTypes.array.isRequired,
 	onIdle: PropTypes.bool,
 	onSetMapZoom: PropTypes.func.isRequired,
-	setTemplate: PropTypes.func.isRequired,
-	template: PropTypes.string.isRequired,
+	page: PropTypes.string.isRequired,
 	url: PropTypes.object.isRequired,
 	vpDims: PropTypes.object.isRequired,
-	mapZoomModifier: PropTypes.number.isRequired,
 	zoom: PropTypes.number.isRequired,
 	activeResults: PropTypes.array.isRequired,
 	setCenter: PropTypes.func.isRequired,
 	setMarkers: PropTypes.func.isRequired
 }
-
-export default MapManager(GoogleMap)

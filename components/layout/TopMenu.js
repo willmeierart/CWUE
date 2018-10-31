@@ -73,7 +73,6 @@ export default class TopMenu extends Component {
 		}, [])
 	}
 	renderList () {
-		const { onSetLocPageState, pageState } = this.props
 		const { showAboutSubList, showWashSubList } = this.state
 		return (
 			<ul>
@@ -134,19 +133,8 @@ export default class TopMenu extends Component {
 							)
 						case 'Locations':
 							return (
-								<li
-									key={route.title}
-									onMouseOver={this.handleHover}
-									onClick={() => {
-										onSetLocPageState('initial')
-									}}
-								>
-									<Link
-										prefetch
-										route={Router.linkPage(route.page, {
-											state: pageState
-										})}
-									>
+								<li key={route.title} onMouseOver={this.handleHover}>
+									<Link prefetch route={Router.linkPage(route.page, {})}>
 										<a className='locations'>FIND A LOCATION</a>
 									</Link>
 								</li>
@@ -236,7 +224,5 @@ export default class TopMenu extends Component {
 }
 
 TopMenu.propTypes = {
-	pageState: PropTypes.string.isRequired,
-	onSetLocPageState: PropTypes.func.isRequired,
 	url: PropTypes.object.isRequired
 }

@@ -20,13 +20,25 @@ class MyApp extends App {
 
 	render () {
 		const { Component, pageProps, reduxStore, children, router } = this.props
-		const prettySafeUrl = (route) =>
-			typeof route.prettyUrl === 'string' ? route.prettyUrl : route.prettyUrl({ title: '' })
+		const prettySafeUrl = (route) => {
+			// console.log(route)
+			return route.page
+				? typeof route.prettyUrl === 'string' ? route.prettyUrl : route.prettyUrl({ title: '' })
+				: '/my-account'
+		}
 		const thisRoute =
 			router.asPath === '/' || router.asPath === 'carwash'
 				? routes[0]
-				: routes.filter((route) => prettySafeUrl(route).indexOf(router.pathname) !== -1).pop()
-		const { title } = thisRoute
+				: routes
+						.filter((route) => {
+							// console.log(prettySafeUrl(route), router.asPath)
+							return router.asPath.indexOf(prettySafeUrl(route)) !== -1
+						})
+						.pop()
+
+		console.log(thisRoute, router)
+		// const title = ''
+		const title = thisRoute.title || ''
 
 		return (
 			<Container>

@@ -49,7 +49,7 @@ const routes = [
 	{
 		page: 'fastpass',
 		title: 'Fast Pass - Unlimited',
-		prettyUrl: '/fastpass'
+		prettyUrl: '/carwash/fastpass'
 	},
 	{
 		page: 'about',
@@ -77,81 +77,45 @@ const routes = [
 		]
 	},
 	{
-		page: 'locations',
+		page: 'locationsInitial',
 		title: 'Locations',
-		prettyUrl: ({ state = '', spec = '', spec2 = '' }) => {
-			switch (state) {
-				case 'initial':
-					return '/carwash/locations'
-				case 'results':
-					if (spec && spec !== '') {
-						// trying to handle a variety of error cases here
-						return `/carwash/locations/results/${spec.toLowerCase().replace(/( )/g, '-')}`
-					} else {
-						return '/carwash/locations'
-					}
-				case 'region':
-					if (spec && spec !== '') {
-						if (spec2 && spec2 !== '') {
-							return `/carwash/locations/region/${spec}/${spec2}`
-						} else {
-							return `/carwash/locations/region/${spec}`
-						}
-					} else {
-						return `/carwash/locations/region/state`
-					}
-				case 'detail':
-					console.log(state, spec)
-					if (spec && spec !== '') {
-						return `/carwash/locations/detail/${spec.toLowerCase().replace(/( )/g, '-')}`
-					} else {
-						return '/carwash/locations'
-					}
-				default:
-					return '/carwash/locations'
+		prettyUrl: '/carwash/locations'
+	},
+	{
+		page: 'locationsResults',
+		title: 'Location Results',
+		prettyUrl: ({ spec = '' }) => {
+			if (spec && spec !== '') {
+				// trying to handle a variety of error cases here
+				return `/carwash/locations/results/${spec.toLowerCase().replace(/( )/g, '-')}`
+			} else {
+				return '/carwash/locations/results'
 			}
 		},
 		prettyUrlPatterns: [
 			{
-				pattern: '/carwash/locations',
-				defaultParams: {
-					state: 'initial'
-				}
-			},
-			{
 				pattern: '/carwash/locations/results/:spec',
 				defaultParams: {
-					state: 'results'
+					spec: ''
 				}
-			},
-			{
-				pattern: '/carwash/locations/results',
-				defaultParams: {
-					state: 'results'
-				}
-			},
-			{
-				pattern: '/carwash/locations/region/:spec',
-				defaultParams: {
-					state: 'region'
-				}
-			},
-			{
-				pattern: '/carwash/locations/region',
-				defaultParams: {
-					state: 'initial'
-				}
-			},
+			}
+		]
+	},
+	{
+		page: 'locationsDetail',
+		title: 'Location Detail',
+		prettyUrl: ({ spec = '' }) => {
+			if (spec && spec !== '') {
+				return `/carwash/locations/detail/${spec.toLowerCase().replace(/( )/g, '-')}`
+			} else {
+				return '/carwash/locations/detail'
+			}
+		},
+		prettyUrlPatterns: [
 			{
 				pattern: '/carwash/locations/detail/:spec',
 				defaultParams: {
-					state: 'detail'
-				}
-			},
-			{
-				pattern: '/carwash/locations/detail',
-				defaultParams: {
-					state: 'initial'
+					spec: ''
 				}
 			}
 		]
