@@ -190,6 +190,8 @@ class GoogleMap extends Component {
 		}
 	}
 
+	shouldComponentUpdate (nextProps) {}
+
 	setBounds (marker) {
 		const mainAction = () => {
 			if (marker) {

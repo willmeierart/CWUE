@@ -7,12 +7,17 @@ dotenvLoad()
 const withNextEnv = nextEnv()
 
 module.exports = withPlugins([
-	[ withNextEnv ],
-	[ withWorkers ]
+	[ withNextEnv ]
 	// [
-	// 	withOffline,
-	// 	{
-	// 		devGeoSwSrc: '/lib/workers/geo.worker.js'
-	// 	}
+	// 	withWorkers
+	// 	// {
+	// 	// 	workerLoaderOptions: { inline: true }
+	// 	// }
+	// ]
+	// [
+	// 	withOffline
+	// 	// {
+	// 	// 	devSwSrc: '/static/service-worker.js'
+	// 	// }
 	// ]
 ])

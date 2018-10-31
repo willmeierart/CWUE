@@ -21,7 +21,7 @@ import {
 } from '../../../lib/redux/actions'
 import WithApolloLoader from '../../hoc/WithApolloLoader'
 import ImperativeRouter from '../../../server/ImperativeRouter'
-import GeoWorker from '../../../lib/workers.js/geo.worker'
+// import GeoWorker from '../../../lib/workers.js/geo.worker'
 import { binder } from '../../../lib/_utils'
 
 // import StrictPropTypes from '../../hoc/StrictPropTypesChecker'
@@ -42,7 +42,7 @@ export default function DataManager (ComposedComponent) {
 		}
 		componentDidMount () {
 			this.setPageStateViaUrl()
-			if (this.props.swAvailable) {
+			if (this.props.swAvailable && typeof window !== 'undefined') {
 				// this.geoWorker = new GeoWorker()
 				// this.geoWorker.postMessage('from host')
 				// this.geoWorker.addEventListener('message', this.onWorkerMessage)
@@ -62,9 +62,9 @@ export default function DataManager (ComposedComponent) {
 			}
 		}
 
-		onWorkerMessage () {
-			console.log('received worker message')
-		}
+		// onWorkerMessage () {
+		// 	console.log('received worker message')
+		// }
 
 		setUserLocationStatus (userLocationStatus) {
 			// do we have the user's location yet?

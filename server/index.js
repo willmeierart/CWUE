@@ -40,7 +40,8 @@ app.prepare().then(() => {
 	server.get('*', (req, res) => {
 		// const parsedUrl = parse(req.url, true)
 		// const { pathname } = parsedUrl
-		// if (pathname.indexOf('workers') !== -1) {
+		// if (pathname === '/service-worker.js') {
+		// // if (pathname.indexOf('workers') !== -1) {
 		// 	// for next-offline
 		// 	const filePath = join(__dirname, '.next', pathname)
 		// 	app.serveStatic(req, res, filePath)

@@ -9,6 +9,8 @@ import DataManager from './data_managers/Wrapper'
 import { getLatLng } from '../../lib/_locationUtils'
 import { binder } from '../../lib/_utils'
 
+// import { diff, updatedDiff } from 'deep-object-diff'
+
 import locData from '../../lib/_data/locData'
 import ImperativeRouter from '../../server/ImperativeRouter'
 
@@ -25,6 +27,10 @@ class LocationsWrapper extends Component {
 		const { data: { _Carwash_USA_Express, _Cloned_CWUE } } = this.props
 		this.props.onSetStaticLocList({ _Carwash_USA_Express, _Cloned_CWUE })
 		this.setActiveResults()
+	}
+
+	componentDidUpdate (prevProps) {
+		// console.log(diff(this.props, prevProps))
 	}
 
 	setCenter (center) {
