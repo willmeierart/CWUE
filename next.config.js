@@ -1,13 +1,15 @@
 const withPlugins = require('next-compose-plugins')
-const withWorkers = require('@zeit/next-workers')
+// const withOffline = require('next-offline')
+// const withWorkers = require('@zeit/next-workers')
 const nextEnv = require('next-env')
-const withOffline = require('next-offline')
 const dotenvLoad = require('dotenv-load')
+const withCSS = require('@zeit/next-css')
 dotenvLoad()
 const withNextEnv = nextEnv()
 
 module.exports = withPlugins([
-	[ withNextEnv ]
+	[ withNextEnv ],
+	[ withCSS ]
 	// [
 	// 	withWorkers
 	// 	// {

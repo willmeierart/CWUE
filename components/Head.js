@@ -26,59 +26,56 @@ const CustomHead = (props = initialProps) => {
 			<style
 				dangerouslySetInnerHTML={{
 					__html: `
-      @font-face {
-        font-family: 'Gotham';
-        src: url('GothamMedium.eot');
-        src: url('GothamMedium.eot?#iefix') format('embedded-opentype'),
-            url('GothamMedium.woff') format('woff');
-        font-weight: 500;
-        font-style: normal;
-      }
-      @font-face {
-        font-family: 'Gotham Book';
-        src: url('GothamBook-Italic.eot');
-        src: url('GothamBook-Italic.eot?#iefix') format('embedded-opentype'),
-            url('GothamBook-Italic.woff') format('woff');
-        font-weight: normal;
-        font-style: italic;
-      }
-      @font-face {
-        font-family: 'Gotham';
-        src: url('GothamBlack.eot');
-        src: url('GothamBlack.eot?#iefix') format('embedded-opentype'),
-            url('GothamBlack.woff') format('woff');
-        font-weight: 900;
-        font-style: normal;
-      }
-      @font-face {
-        font-family: 'Gotham Book';
-        src: url('GothamBook.eot');
-        src: url('GothamBook.eot?#iefix') format('embedded-opentype'),
-            url('GothamBook.woff') format('woff');
-        font-weight: normal;
-        font-style: normal;
-      }
-      @font-face {
-        font-family: 'Montserrat';
-        src: url('/wp-content/themes/CGO/dist/fonts/Montserrat-Bold.eot');
-        src: url('/wp-content/themes/CGO/dist/fonts/Montserrat-Bold.eot?#iefix') format('embedded-opentype'), url('/wp-content/themes/CGO/dist/fonts/Montserrat-Bold.woff') format('woff');
-        font-weight: bold;
-        font-style: normal;
-      }
-      .loader-wrapper {
-        width: 100vw;
-        height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
-
-      .loader-hidden { display: none; }
-
-      .loader-active { display: block; }
-
-      .loader-active .loader-inner div { background-color: #970d11; }
-    `
+            @font-face {
+              font-family: 'Gotham';
+              src: url('GothamMedium.eot');
+              src: url('GothamMedium.eot?#iefix') format('embedded-opentype'),
+                  url('GothamMedium.woff') format('woff');
+              font-weight: 500;
+              font-style: normal;
+            }
+            @font-face {
+              font-family: 'Gotham Book';
+              src: url('GothamBook-Italic.eot');
+              src: url('GothamBook-Italic.eot?#iefix') format('embedded-opentype'),
+                  url('GothamBook-Italic.woff') format('woff');
+              font-weight: normal;
+              font-style: italic;
+            }
+            @font-face {
+              font-family: 'Gotham';
+              src: url('GothamBlack.eot');
+              src: url('GothamBlack.eot?#iefix') format('embedded-opentype'),
+                  url('GothamBlack.woff') format('woff');
+              font-weight: 900;
+              font-style: normal;
+            }
+            @font-face {
+              font-family: 'Gotham Book';
+              src: url('GothamBook.eot');
+              src: url('GothamBook.eot?#iefix') format('embedded-opentype'),
+                  url('GothamBook.woff') format('woff');
+              font-weight: normal;
+              font-style: normal;
+            }
+            @font-face {
+              font-family: 'Montserrat';
+              src: url('/wp-content/themes/CGO/dist/fonts/Montserrat-Bold.eot');
+              src: url('/wp-content/themes/CGO/dist/fonts/Montserrat-Bold.eot?#iefix') format('embedded-opentype'), url('/wp-content/themes/CGO/dist/fonts/Montserrat-Bold.woff') format('woff');
+              font-weight: bold;
+              font-style: normal;
+            }
+            .loader-wrapper {
+              width: 100vw;
+              height: 100vh;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+            }
+            .loader-hidden { display: none; }
+            .loader-active { display: block; }
+            .loader-active .loader-inner div { background-color: #970d11; }
+          `
 				}}
 			/>
 		</Head>

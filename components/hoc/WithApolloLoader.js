@@ -1,32 +1,34 @@
 import React, { Component } from 'react'
-import Loader from 'react-loaders'
+// import { Loader } from 'react-loaders'
+import Loader from 'react-loader'
+// import Loader from 'react-loader-spinner'
 import ApolloError from '../ui/ApolloError'
 
 // render loader if apollo taking forever to load
 
+const options = {
+	lines: 10,
+	fps: 30,
+	color: 'var(--color-blue)',
+	position: 'relative'
+}
+
 export default function WithApolloLoader (ComposedComponent) {
+	// component
 	class WrappedComponent extends Component {
 		render () {
-			// const { queries, data } = this.props
-			// const conditions = queries
-			//   ? queries.reduce((bool, query) => {
-			//     Object.keys(this.props).forEach(prop => console.log(JSON.stringify(this.props[prop])))
-			//     console.log(query)
-			//     if (this.props[query].loading &&
-			//       !this.props[query].error) { bool = true }
-			//   }, false)
-			//   : this.props.data.loading && !this.props.data.error
-			if (this.props.data.error) return <ApolloError />
-			return (
-				<div className='with-apollo-loader' style={{ height: '100%' }}>
-					{this.props.data.loading ? (
-						<div className='loader-wrapper'>
-							LOADING
-							<Loader type='line-spin-fade-loader' active />
-						</div>
-					) : (
+			return this.props.data.error ? (
+				<ApolloError />
+			) : (
+				<div className='loader-wrapper'>
+					<Loader options={options} loaded={!this.props.data.loading}>
 						<ComposedComponent {...this.props} />
-					)}
+					</Loader>
+					<style jsx>{`
+						.loader-wrapper {
+							min-height: 100px;
+						}
+					`}</style>
 				</div>
 			)
 		}

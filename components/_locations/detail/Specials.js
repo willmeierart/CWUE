@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types'
+
 const Specials = ({ specials }) => {
 	return (
 		<div className='specials-img-array'>
@@ -24,6 +26,10 @@ const Specials = ({ specials }) => {
 				`}</style>
 		</div>
 	)
+}
+
+Specials.propTypes = {
+	specials: PropTypes.array.isRequired
 }
 
 export default Specials

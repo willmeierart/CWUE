@@ -9,28 +9,6 @@ import equal from 'deep-equal'
 
 // all mechanics relating to map, markers, etc
 
-const initialMapStyles = [
-	{
-		stylers: [ { color: '#ffffff' } ]
-	},
-	{
-		featureType: 'road',
-		stylers: [ { visibility: 'off' } ]
-	},
-	{
-		featureType: 'poi',
-		stylers: [ { visibility: 'off' } ]
-	},
-	{
-		featureType: 'administrative',
-		stylers: [ { visibility: 'off' } ]
-	},
-	{
-		elementType: 'labels',
-		stylers: [ { visibility: 'off' } ]
-	}
-]
-
 export default class GoogleMap extends Component {
 	constructor (props) {
 		super(props)

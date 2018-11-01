@@ -111,9 +111,9 @@ class ResultsPhrase extends Component {
 ResultsPhrase.propTypes = {
 	activeResults: PropTypes.array.isRequired,
 	searchPhrase: PropTypes.string.isRequired,
-	url: PropTypes.object.isRequired,
 	onSetUserNotification: PropTypes.func.isRequired,
-	promisePendingStatus: PropTypes.bool.isRequired
+	promisePendingStatus: PropTypes.bool.isRequired,
+	url: PropTypes.object.isRequired
 }
 
 export default ResultsPhrase

@@ -3,20 +3,44 @@ import Specials from '../components/_locations/detail/Specials'
 import Images from '../components/_locations/detail/Images'
 import ResultModule from '../components/_locations/results/ResultModule'
 import GoogleMap from '../components/_locations/GoogleMap'
+import SearchBar from '../components/_locations/SearchBar'
 import DataWrapper from '../components/_locations/DataWrapper'
 import withData from '../lib/apollo/withData'
 import ImperativeRouter from '../server/ImperativeRouter'
 
 class Detail extends Component {
+	constructor (props) {
+		super(props)
+	}
 	componentWillMount () {
-		if (!this.props.activeLocation || this.props.activeLocation === {}) {
+		console.log('active location', this.props.activeLocation)
+		if (!this.props.activeLocation || this.props.activeLocation === {} || !this.props.activeLocation.name) {
 			console.warn('NO ACTIVE LOCATION')
-			ImperativeRouter.push('locationsInitial', {}, true)
+			// ImperativeRouter.push('locationsInitial', {}, true)
+			const { data: { _Carwash_USA_Express, _Cloned_CWUE }, onSetStaticLocList } = this.props
+			onSetStaticLocList({ _Carwash_USA_Express, _Cloned_CWUE })
 		}
 	}
+
+	componentDidUpdate (prevProps) {
+		if (prevProps.staticLocationList !== this.props.staticLocationList && prevProps.staticLocationList.length === 0) {
+			this.parseLocationFromURL()
+		}
+	}
+
+	parseLocationFromURL = async () => {
+		const { url: { query: { spec } }, staticLocationList, onSetActiveLocation } = this.props
+		const thisLocation = staticLocationList
+			.filter(loc => {
+				console.log(loc.name.toLowerCase().replace(/( )/g, '-'), spec)
+				return loc.name.toLowerCase().replace(/( )/g, '-') === spec
+			})
+			.pop()
+		onSetActiveLocation(thisLocation.name)
+	}
+
 	render () {
 		const {
-			activeLocation,
 			mapCenter,
 			mapZoom,
 			allMarkers,
@@ -26,7 +50,8 @@ class Detail extends Component {
 			staticLocationList,
 			vpDims,
 			onSetMapCenter,
-			onSetAllMarkers
+			onSetAllMarkers,
+			onSetMapZoom
 		} = this.props
 		const specials = [
 			'http://via.placeholder.com/500x350?text=special+1',
@@ -64,6 +89,7 @@ class Detail extends Component {
 								allMarkers={allMarkers}
 								dims={{ width: '40vw', height: '40vw' }}
 								vpDims={vpDims}
+								onSetMapZoom={onSetMapZoom}
 								page='detail'
 							/>
 						</div>

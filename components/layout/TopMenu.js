@@ -128,7 +128,7 @@ export default class TopMenu extends Component {
 									>
 										<a>{route.title}</a>
 									</Link>
-									<ul className='sub-ul'>{showAboutSubList && this.renderSubList(route)}</ul>
+									<ul className='sub-ul'>{showAboutSubList && route.children && this.renderSubList(route)}</ul>
 								</li>
 							)
 						case 'Locations':
