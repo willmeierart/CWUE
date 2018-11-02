@@ -3,6 +3,7 @@ import React, { Component } from 'react'
 import Loader from 'react-loader'
 // import Loader from 'react-loader-spinner'
 import ApolloError from '../ui/ApolloError'
+import { Transition } from 'react-transition-group'
 
 // render loader if apollo taking forever to load
 
@@ -14,19 +15,51 @@ const options = {
 }
 
 export default function WithApolloLoader (ComposedComponent) {
-	// component
 	class WrappedComponent extends Component {
+		constructor (props) {
+			super(props)
+			this.state = { canRefresh: true }
+		}
+		componentDidMount () {
+			const { data: { loading }, onSetLoadingStatus } = this.props
+			if (loading && onSetLoadingStatus) {
+				onSetLoadingStatus(true)
+			}
+		}
+		componentDidUpdate (prevProps) {
+			const { data: { loading }, onSetLoadingStatus } = this.props
+			if (prevProps.loading !== loading && !loading && onSetLoadingStatus && this.state.canRefresh) {
+				onSetLoadingStatus(false)
+			}
+		}
 		render () {
-			return this.props.data.error ? (
+			const { error, loading } = this.props.data
+			const duration = 1000
+			const defaultStyle = { opacity: 0 }
+			const transitionStyles = {
+				entering: { opacity: 0, transition: `opacity ${duration}ms ease-in-out` },
+				entered: { opacity: 1, transition: `opacity ${duration}ms ease-in-out` },
+				exiting: { opacity: 0, transition: `opacity ${duration}ms ease-in-out` },
+				exited: { opacity: 0, transition: `opacity ${duration}ms ease-in-out` }
+			}
+			return error ? (
 				<ApolloError />
 			) : (
-				<div className='loader-wrapper'>
-					<Loader options={options} loaded={!this.props.data.loading}>
-						<ComposedComponent {...this.props} />
+				<div className={`${loading ? 'loading' : 'loaded'} apollo-loader-wrapper main-content-height`}>
+					<Loader options={options} loaded={!loading}>
+						<Transition appear in={!loading} timeout={0}>
+							{state => (
+								<div className='outer-wrapper' style={{ ...defaultStyle, ...transitionStyles[state] }}>
+									<ComposedComponent {...this.props} />
+								</div>
+							)}
+						</Transition>
 					</Loader>
 					<style jsx>{`
-						.loader-wrapper {
-							min-height: 100px;
+						.apollo-loader-wrapper.loading {
+							display: flex;
+							justify-content: center;
+							align-items: center;
 						}
 					`}</style>
 				</div>

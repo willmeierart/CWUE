@@ -16,7 +16,8 @@ import {
 	setStaticLocList,
 	makeUserLocationPage,
 	setUserNotification,
-	setPromisePendingStatus
+	setPromisePendingStatus,
+	setLoadingStatus
 } from '../../lib/redux/actions'
 import WithApolloLoader from '../hoc/WithApolloLoader'
 
@@ -46,7 +47,7 @@ function mapStateToProps (state) {
 			isUserLocationPage,
 			promisePendingStatus
 		},
-		env: { vpDims, swAvailable }
+		env: { vpDims, swAvailable, isLoading }
 	} = state
 	return {
 		userLocation,
@@ -61,23 +62,25 @@ function mapStateToProps (state) {
 		staticLocationList,
 		vpDims,
 		promisePendingStatus,
-		swAvailable
+		swAvailable,
+		isLoading
 	}
 }
 
 function mapDispatchToProps (dispatch) {
 	return {
 		onGetUserLocation: (ops, callback) => dispatch(getUserLocation(ops, callback)),
-		onSetMapCenter: (center) => dispatch(setMapCenter(center)),
-		onSetMapZoom: (zoom) => dispatch(setMapZoom(zoom)),
-		onSetAllMarkers: (markers) => dispatch(setAllMarkers(markers)),
-		onSetActiveLocation: (location) => dispatch(setActiveLocation(location)),
-		onSetActiveResultsList: (list) => dispatch(setActiveResultsList(list)),
-		onSetActiveSearchPhrase: (phrase) => dispatch(setActiveSearchPhrase(phrase)),
-		onSetStaticLocList: (locObj) => dispatch(setStaticLocList(locObj)),
-		onMakeUserLocationPage: (bool) => dispatch(makeUserLocationPage(bool)),
-		onSetUserNotification: (alertObj) => dispatch(setUserNotification(alertObj)),
-		onSetPromisePendingStatus: (bool) => dispatch(setPromisePendingStatus(bool))
+		onSetMapCenter: center => dispatch(setMapCenter(center)),
+		onSetMapZoom: zoom => dispatch(setMapZoom(zoom)),
+		onSetAllMarkers: markers => dispatch(setAllMarkers(markers)),
+		onSetActiveLocation: location => dispatch(setActiveLocation(location)),
+		onSetActiveResultsList: list => dispatch(setActiveResultsList(list)),
+		onSetActiveSearchPhrase: phrase => dispatch(setActiveSearchPhrase(phrase)),
+		onSetStaticLocList: locObj => dispatch(setStaticLocList(locObj)),
+		onMakeUserLocationPage: bool => dispatch(makeUserLocationPage(bool)),
+		onSetUserNotification: alertObj => dispatch(setUserNotification(alertObj)),
+		onSetPromisePendingStatus: bool => dispatch(setPromisePendingStatus(bool)),
+		onSetLoadingStatus: bool => dispatch(setLoadingStatus(bool))
 	}
 }
 
@@ -100,5 +103,6 @@ DataManager.propTypes = {
 	onSetUserNotification: PropTypes.func.isRequired,
 	onSetPromisePendingStatus: PropTypes.func.isRequired,
 	promisePendingStatus: PropTypes.bool.isRequired,
-	swAvailable: PropTypes.bool.isRequired
+	swAvailable: PropTypes.bool.isRequired,
+	onSetLoadingStatus: PropTypes.func.isRequired
 }

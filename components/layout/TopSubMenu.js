@@ -4,15 +4,16 @@ import { Router, routes } from '../../server/routes'
 import ImperativeRouter from '../../server/ImperativeRouter'
 
 const TopSubMenu = ({ url }) => {
-	const route = routes.find((route) => {
+	const route = routes.find(route => {
 		const matchVal = url.pathname === '/' ? 'index' : url.pathname.match(/[a-z]/g).join('')
 		return route.page === matchVal
 	})
 	return (
 		<div className='submenu-outer'>
 			<ul>
-				{route.children &&
-					route.children.map((child) => (
+				{route &&
+					route.children &&
+					route.children.map(child => (
 						<li
 							key={child.title}
 							onClick={() => {

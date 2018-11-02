@@ -65,13 +65,13 @@ export default function SearchManager (ComposedComponent) {
 		geocode (address, makeMarkers) {
 			// makeMarkers = [bool]
 			geocodeByAddress(address)
-				.then((res) => {
+				.then(res => {
 					// these helper functions all in locationUtils file
 					if (res.length > 0 && typeof res !== 'string') {
 						const markers = []
-						res.forEach((place) =>
+						res.forEach(place =>
 							getLatLng(place)
-								.then((latLng) => {
+								.then(latLng => {
 									if (makeMarkers) {
 										const marker = makeMarker(latLng, place)
 										// console.log(markers)
@@ -93,7 +93,7 @@ export default function SearchManager (ComposedComponent) {
 						this.props.setMarkers([])
 					}
 				})
-				.catch((err) => {
+				.catch(err => {
 					console.log(err)
 				})
 		}
@@ -110,7 +110,7 @@ export default function SearchManager (ComposedComponent) {
 
 		findResultsInRadius (place, locations) {
 			this.setState({ searchIsRegion: this.searchIsRegion(place.types) })
-			const locationCoords = locations.map((location) => location.coordinates)
+			const locationCoords = locations.map(location => location.coordinates)
 			console.log(locations)
 			this.getRelevantCoords(place, locationCoords)
 		}
@@ -127,7 +127,7 @@ export default function SearchManager (ComposedComponent) {
 			}
 			const asyncLatLng = async () => {
 				let LAT_LNG = []
-				await getLatLng(place).then((latLng) => {
+				await getLatLng(place).then(latLng => {
 					LAT_LNG = [ latLng ]
 				})
 				this.doDistanceService(LAT_LNG, locationCoords)
@@ -188,7 +188,7 @@ export default function SearchManager (ComposedComponent) {
 			const { placeBounds, isRegion } = this.state
 			const { staticLocationList, activeSearchPhrase } = this.props
 			if (placeBounds) {
-				staticLocationList.forEach((loc) => {
+				staticLocationList.forEach(loc => {
 					if (this.isInBounds(placeBounds, loc.coordinates)) {
 						this.pushNewNearbyResult(loc)
 					}
@@ -197,12 +197,12 @@ export default function SearchManager (ComposedComponent) {
 			if (isRegion) {
 				// don't just check against coords of search, use bounds and name of region, too
 				const splitSearch = activeSearchPhrase.toLowerCase().split(/[^a-z]/g)
-				splitSearch.forEach((wd) => {
-					staticLocationList.forEach((loc) => {
+				splitSearch.forEach(wd => {
+					staticLocationList.forEach(loc => {
 						const usableProps = [ loc.addressCity.toLowerCase(), loc.addressState.toLowerCase() ]
 						if (loc.sEOLocationCategories.length > 0) {
 							// also check against backend-associated locales
-							loc.sEOLocationCategories.forEach((seo) => {
+							loc.sEOLocationCategories.forEach(seo => {
 								const lowName = seo.name.toLowerCase()
 								if (usableProps.indexOf(lowName) === -1) {
 									usableProps.push(lowName)
@@ -212,7 +212,7 @@ export default function SearchManager (ComposedComponent) {
 								}
 							})
 						}
-						usableProps.forEach((prop) => {
+						usableProps.forEach(prop => {
 							if (wd === prop) {
 								this.pushNewNearbyResult(loc)
 							}

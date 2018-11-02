@@ -69,8 +69,6 @@
 		"react-apollo": "^2.2.4",
 		"react-dom": "^16.5.2",
 		"react-loader": "^2.4.5",
-		"react-loader-spinner": "^2.0.6",
-		"react-loaders": "^3.0.1",
 		"react-redux": "^5.0.7",
 		"react-strict-prop-types": "^0.8.0",
 		"react-transition-group": "^2.5.0",

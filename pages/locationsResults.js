@@ -1,12 +1,11 @@
 import React, { Component } from 'react'
-import Loader from 'react-loaders'
 import ResultsPhrase from '../components/_locations/results/ResultsPhrase'
 import ResultsList from '../components/_locations/results/ResultsList'
 import SearchBar from '../components/_locations/SearchBar'
 import GoogleMap from '../components/_locations/GoogleMap'
 import DataWrapper from '../components/_locations/DataWrapper'
 import withData from '../lib/apollo/withData'
-import ImperativeRouter from '../server/ImperativeRouter'
+// import ImperativeRouter from '../server/ImperativeRouter'
 
 class Results extends Component {
 	componentWillMount () {
@@ -17,7 +16,7 @@ class Results extends Component {
 			// ImperativeRouter.push('locationsInitial', {}, true)
 		}
 	}
-	pickLocation = (location) => {
+	pickLocation = location => {
 		if (typeof location === 'string') {
 			this.props.onSetActiveLocation(location)
 		} else if (typeof location === 'object' && location.name) {

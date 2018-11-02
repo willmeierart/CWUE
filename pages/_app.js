@@ -4,6 +4,7 @@ import { PageTransition } from 'next-page-transitions'
 import withReduxStore from '../lib/redux/withReduxStore'
 import AppProvider from '../lib/redux/AppProvider'
 import { routes } from '../server/routes'
+import Loader from 'react-loader'
 
 class MyApp extends App {
 	static async getInitialProps ({ Component, ctx }) {
@@ -20,7 +21,7 @@ class MyApp extends App {
 
 	render () {
 		const { Component, pageProps, reduxStore, children, router } = this.props
-		const prettySafeUrl = (route) => {
+		const prettySafeUrl = route => {
 			// console.log(route)
 			return route.page
 				? typeof route.prettyUrl === 'string' ? route.prettyUrl : route.prettyUrl({ title: '' })
@@ -30,7 +31,7 @@ class MyApp extends App {
 			router.asPath === '/' || router.asPath === 'carwash'
 				? routes[0]
 				: routes
-						.filter((route) => {
+						.filter(route => {
 							// console.log(prettySafeUrl(route), router.asPath)
 							return router.asPath.indexOf(prettySafeUrl(route)) !== -1
 						})
@@ -40,13 +41,28 @@ class MyApp extends App {
 		// const title = ''
 		const title = thisRoute.title || ''
 
+		const loaderOptions = {
+			lines: 10,
+			fps: 30,
+			color: 'var(--color-blue)',
+			position: 'relative'
+		}
+
 		return (
 			<Container>
 				<AppProvider store={reduxStore} url={router} title={title}>
-					<PageTransition timeout={300} classNames='page-transition'>
-						<Component url={router} {...pageProps}>
-							{children}
-						</Component>
+					<PageTransition
+						timeout={500}
+						loadingDelay={1000}
+						loadingTimeout={{
+							enter: 800,
+							exit: 0
+						}}
+						loadingClassNames='loading-indicator'
+						loadingComponent={<Loader options={loaderOptions} loaded={false} />}
+						classNames='page-transition'
+					>
+						<Component key={thisRoute.title} url={router} {...pageProps} />
 					</PageTransition>
 				</AppProvider>
 				<style jsx global>{`
@@ -60,14 +76,14 @@ class MyApp extends App {
 					}
 					.page-transition-enter-active {
 						opacity: 1;
-						transition: opacity 300ms;
+						transition: opacity 1000ms;
 					}
 					.page-transition-exit {
 						opacity: 1;
 					}
 					.page-transition-exit-active {
 						opacity: 0;
-						transition: opacity 300ms;
+						transition: opacity 1000ms;
 					}
 					a {
 						text-decoration: none;
