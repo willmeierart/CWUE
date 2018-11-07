@@ -5,7 +5,6 @@ import withReduxStore from '../lib/redux/withReduxStore'
 import AppProvider from '../lib/redux/AppProvider'
 import { routes } from '../server/routes'
 import Loader from 'react-loader'
-import ImperativeRouter from '../server/ImperativeRouter'
 // import Loader from '../components/ui/Loader'
 
 class MyApp extends App {
@@ -22,7 +21,7 @@ class MyApp extends App {
 	}
 
 	render () {
-		const { Component, pageProps, reduxStore, children, router } = this.props
+		const { Component, pageProps, reduxStore, router } = this.props
 		const prettySafeUrl = route => {
 			// console.log(route)
 			return route.page
@@ -38,9 +37,6 @@ class MyApp extends App {
 							return router.asPath.indexOf(prettySafeUrl(route).substring(0, prettySafeUrl(route).length - 2)) !== -1
 						})
 						.pop() || routes[0]
-
-		console.log(thisRoute, router)
-		// const title = ''
 
 		const title = thisRoute.title || ''
 
@@ -62,8 +58,8 @@ class MyApp extends App {
 							exit: 0
 						}}
 						loadingClassNames='loading-indicator'
-						loadingComponent={<Loader />}
-						// loadingComponent={<Loader options={loaderOptions} loaded={false} />}
+						// loadingComponent={<Loader />}
+						loadingComponent={<Loader options={loaderOptions} loaded={false} />}
 						classNames='page-transition'
 					>
 						<Component key={thisRoute.title} url={router} {...pageProps} />

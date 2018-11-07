@@ -9,8 +9,6 @@ const ResultModule = ({ location, pickLocation, detail }) => {
 	const onPickLocation = () => {
 		pickLocation(location)
 		ImperativeRouter.push('locationsDetail', { spec: location.name }, false)
-
-		// if (pickLocation) setTimeout(() => { pickLocation(location) })
 	}
 	return location !== null ? (
 		<div className='result-outer'>

@@ -63,15 +63,8 @@ export default class Layout extends Component {
 }
 
 Layout.propTypes = {
-	title: PropTypes.string.isRequired,
-	vpDims: PropTypes.object.isRequired,
 	userNotification: PropTypes.object.isRequired,
 	onSetUserNotification: PropTypes.func.isRequired,
 	isMobile: PropTypes.bool.isRequired,
-	isIE: PropTypes.bool.isRequired,
-	swAvailable: PropTypes.bool.isRequired,
-	onOpenMobileMenu: PropTypes.func.isRequired,
-	onCheckIfIE: PropTypes.func.isRequired,
-	onCheckSWAvailable: PropTypes.func.isRequired,
-	onSetLoadingStatus: PropTypes.func.isRequired
+	onOpenMobileMenu: PropTypes.func.isRequired
 }
