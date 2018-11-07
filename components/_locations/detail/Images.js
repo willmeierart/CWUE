@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { binder } from '../../../lib/_utils'
 
 class Images extends Component {
 	constructor (props) {
@@ -8,14 +7,13 @@ class Images extends Component {
 		this.state = {
 			activeImg: ''
 		}
-		binder(this, [ 'renderThumbs', 'selectImg' ])
 	}
 
 	componentDidMount () {
 		this.setState({ activeImg: this.props.images[0] })
 	}
 
-	renderThumbs () {
+	renderThumbs = () => {
 		let i = 0
 		return (
 			<div className='thumbs-array'>
@@ -60,7 +58,7 @@ class Images extends Component {
 		)
 	}
 
-	selectImg (img) {
+	selectImg = img => {
 		this.setState({ activeImg: img })
 	}
 
