@@ -5,6 +5,8 @@ import withReduxStore from '../lib/redux/withReduxStore'
 import AppProvider from '../lib/redux/AppProvider'
 import { routes } from '../server/routes'
 import Loader from 'react-loader'
+import ImperativeRouter from '../server/ImperativeRouter'
+// import Loader from '../components/ui/Loader'
 
 class MyApp extends App {
 	static async getInitialProps ({ Component, ctx }) {
@@ -32,13 +34,14 @@ class MyApp extends App {
 				? routes[0]
 				: routes
 						.filter(route => {
-							// console.log(prettySafeUrl(route), router.asPath)
-							return router.asPath.indexOf(prettySafeUrl(route)) !== -1
+							console.log(prettySafeUrl(route), router.asPath)
+							return router.asPath.indexOf(prettySafeUrl(route).substring(0, prettySafeUrl(route).length - 2)) !== -1
 						})
-						.pop()
+						.pop() || routes[0]
 
 		console.log(thisRoute, router)
 		// const title = ''
+
 		const title = thisRoute.title || ''
 
 		const loaderOptions = {
@@ -52,14 +55,15 @@ class MyApp extends App {
 			<Container>
 				<AppProvider store={reduxStore} url={router} title={title}>
 					<PageTransition
-						timeout={500}
-						loadingDelay={1000}
+						timeout={300}
+						loadingDelay={500}
 						loadingTimeout={{
-							enter: 800,
+							enter: 400,
 							exit: 0
 						}}
 						loadingClassNames='loading-indicator'
-						loadingComponent={<Loader options={loaderOptions} loaded={false} />}
+						loadingComponent={<Loader />}
+						// loadingComponent={<Loader options={loaderOptions} loaded={false} />}
 						classNames='page-transition'
 					>
 						<Component key={thisRoute.title} url={router} {...pageProps} />
@@ -67,33 +71,73 @@ class MyApp extends App {
 				</AppProvider>
 				<style jsx global>{`
 					body {
-						height: 100vh;
+						--color-red: #c73a37;
+						--color-blue: #36659a;
+						--color-darkgrey: #b0b0b0;
+						--color-lightgrey: #f0f0f0;
+						--font-body: 'Gotham Book', sans-serif;
+						--font-header: 'Gotham', sans-serif;
+						--font-prices: 'Monterrat', sans-serif;
+						font-family: sans-serif;
+						font-family: 'Gotham Book', sans-serif;
 						width: 100vw;
+						height: 100%;
 						box-sizing: border-box;
+						padding: 0;
+						margin: 0;
+						overflow-x: hidden;
+					}
+					h1 {
+						font-size: 4em;
+						font: var(--font-header);
+					}
+					h2 {
+						font-size: 2.25em;
+						font: var(--font-header);
+					}
+					h3 {
+						font-size: 1.25em;
+						letter-spacing: .04em;
+					}
+					h4 {
+						font-size: .83em;
+						font: var(--font-header);
+					}
+					a {
+						text-decoration: none;
+						color: inherit;
+					}
+					ul,
+					li {
+						list-style: none;
+						padding-left: 0;
+						margin-left: 0;
+						--webkit-padding-before: 0;
 					}
 					.page-transition-enter {
 						opacity: 0;
 					}
 					.page-transition-enter-active {
 						opacity: 1;
-						transition: opacity 1000ms;
+						transition: opacity 300ms;
 					}
 					.page-transition-exit {
 						opacity: 1;
 					}
 					.page-transition-exit-active {
 						opacity: 0;
-						transition: opacity 1000ms;
+						transition: opacity 300ms;
 					}
-					a {
-						text-decoration: none;
-						color: inherit;
+					.loading-indicator-appear,
+					.loading-indicator-enter {
+						opacity: 0;
 					}
-					li {
-						list-style: none;
+					.loading-indicator-appear-active,
+					.loading-indicator-enter-active {
+						opacity: 1;
+						transition: opacity 400ms;
 					}
 				`}</style>
-				{/* <style dangerouslySetInnerHTML={{ __html: globalStyles }} /> */}
 			</Container>
 		)
 	}

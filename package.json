@@ -70,6 +70,7 @@
 		"react-dom": "^16.5.2",
 		"react-loader": "^2.4.5",
 		"react-redux": "^5.0.7",
+		"react-spinkit": "^3.0.0",
 		"react-strict-prop-types": "^0.8.0",
 		"react-transition-group": "^2.5.0",
 		"redux": "^3.7.2",

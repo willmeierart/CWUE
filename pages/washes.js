@@ -1,7 +1,7 @@
-import AppProvider from '../lib/redux/AppProvider'
+import withData from '../lib/apollo/withData'
+
 import TopSubMenu from '../components/layout/TopSubMenu'
 import WashWrapper from '../components/_washes/WashWrapper'
-import withData from '../lib/apollo/withData'
 
 const Washes = ({ url }) => (
 	<section>

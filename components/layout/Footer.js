@@ -4,8 +4,8 @@ import { Router, routes } from '../../server/routes'
 
 const Footer = ({ isMobile }) => {
 	const socials = [ { type: 'facebook', link: '' }, { type: 'twitter', link: '' } ]
-	const renderSocialIcons = (socials) =>
-		socials.map((b) => (
+	const renderSocialIcons = socials =>
+		socials.map(b => (
 			<a key={b.type} href={b.link}>
 				<i className={`fab fa-${b.type}`} />
 				<style jsx>{`
@@ -16,7 +16,7 @@ const Footer = ({ isMobile }) => {
 			</a>
 		))
 
-	const appendChildList = (route) => {
+	const appendChildList = route => {
 		return (
 			<div>
 				<ul className='sub-list'>
@@ -65,7 +65,7 @@ const Footer = ({ isMobile }) => {
 			</div>
 		)
 	}
-	const renderNav = (routes) => {
+	const renderNav = routes => {
 		if (isMobile) {
 			return (
 				<ul>
@@ -80,14 +80,22 @@ const Footer = ({ isMobile }) => {
 		} else {
 			return (
 				<ul className='top-lvl-routes'>
-					{routes.filter((route) => route.page !== 'index' && route.page !== 'legal').map((route) => (
-						<li key={route.title}>
-							<Link prefetch route={Router.linkPage(route.page, { title: route.title })}>
-								<span>{route.title}</span>
-							</Link>
-							{route.children && appendChildList(route)}
-						</li>
-					))}
+					{routes
+						.filter(
+							route =>
+								route.page !== 'index' &&
+								route.page !== 'legal' &&
+								route.page !== 'locationsResults' &&
+								route.page !== 'locationsDetail'
+						)
+						.map(route => (
+							<li key={route.title}>
+								<Link prefetch route={Router.linkPage(route.page, { title: route.title })}>
+									<span>{route.title}</span>
+								</Link>
+								{route.children && appendChildList(route)}
+							</li>
+						))}
 					<style jsx>{`
 						li {
 							line-height: 2em;

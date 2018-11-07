@@ -8,14 +8,13 @@ export default class CustomDocument extends Document {
 		super(props)
 		this.report = false
 	}
-	static getInitialProps ({ renderPage }) {
-		const { html, head, errorHtml, chunks } = renderPage()
-		const styles = flush()
+
+	static async getInitialProps (ctx) {
+		const initialProps = await Document.getInitialProps(ctx)
 		const maps_key = process.env.NEXT_PUBLIC_GEOCODE_KEY
-		return { html, head, errorHtml, chunks, styles, maps_key }
+		return { ...initialProps, maps_key }
 	}
 	render () {
-		console.log(this.props)
 		return (
 			<html>
 				<Head />

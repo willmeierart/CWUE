@@ -16,7 +16,7 @@ import Footer from './layout/Footer'
 import NotificationBar from './ui/NotificationBar'
 import Loader from 'react-loader'
 
-class App extends Component {
+class AppWrapper extends Component {
 	constructor (props) {
 		super(props)
 		this.state = { mainHeight: 0 }
@@ -56,12 +56,12 @@ class App extends Component {
 			onSetUserNotification,
 			isMobile,
 			onOpenMobileMenu,
-			menuOpen,
-			isLoading
+			menuOpen
+			// isLoading
 		} = this.props
 		// console.log(url)
 		return (
-			<div className='App'>
+			<div className='AppWrapper'>
 				<header ref={this.header}>
 					<Header openMenu={onOpenMobileMenu} isMobile={isMobile} url={url} />
 				</header>
@@ -73,48 +73,7 @@ class App extends Component {
 				</footer>
 				<style jsx global>{`
 					body {
-						--color-red: #c73a37;
-						--color-blue: #36659a;
-						--color-darkgrey: #b0b0b0;
-						--color-lightgrey: #f0f0f0;
-						--font-body: 'Gotham Book', sans-serif;
-						--font-header: 'Gotham', sans-serif;
-						--font-prices: 'Monterrat', sans-serif;
-						width: 100vw;
-						height: 100%;
-						padding: 0;
-						margin: 0;
-						font-family: sans-serif;
-						overflow-x: hidden;
 						overflow-y: ${menuOpen ? 'hidden' : 'scroll'};
-						font-family: 'Gotham Book', sans-serif;
-					}
-					a {
-						text-decoration: none;
-						color: inherit;
-					}
-					ul,
-					li {
-						list-style: none;
-						padding-left: 0;
-						margin-left: 0;
-						--webkit-padding-before: 0;
-					}
-					h1 {
-						font-size: 4em;
-						font: var(--font-header);
-					}
-					h2 {
-						font-size: 2.25em;
-						font: var(--font-header);
-					}
-					h3 {
-						font-size: 1.25em;
-						letter-spacing: .04em;
-					}
-					h4 {
-						font-size: .83em;
-						font: var(--font-header);
 					}
 					.main-content-height {
 						min-height: calc(100vh - ${this.state.mainHeight}px);
@@ -149,9 +108,9 @@ function mapDispatchToProps (dispatch) {
 	}
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(App)
+export default connect(mapStateToProps, mapDispatchToProps)(AppWrapper)
 
-App.propTypes = {
+AppWrapper.propTypes = {
 	title: PropTypes.string.isRequired,
 	vpDims: PropTypes.object.isRequired,
 	userNotification: PropTypes.object.isRequired,
