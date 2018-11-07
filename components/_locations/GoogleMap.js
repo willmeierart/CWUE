@@ -3,7 +3,6 @@ import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 // import { updatedDiff } from 'deep-object-diff'
 import difference from 'lodash.difference'
-import { binder } from '../../lib/_utils'
 import { getCoordsFromAddress, makeMarker, reverseGeocode } from '../../lib/_locationUtils'
 import equal from 'deep-equal'
 
@@ -12,30 +11,18 @@ import equal from 'deep-equal'
 export default class GoogleMap extends Component {
 	constructor (props) {
 		super(props)
-		this.state = {
-			bounds: null
-		}
-		binder(this, [
-			'setCenter',
-			'setCenterViaMarkers',
-			'setBounds',
-			'toggleActiveMarkers',
-			'setAllMarkers',
-			'clearAllMarkers'
-		])
+		this.state = { bounds: null }
 	}
 
 	componentWillUnmount () {
-		console.log('unmounting')
-		// this.clearAllMarkers()
+		console.log('unmounting map')
 	}
 
 	componentDidMount () {
-		console.warn('__MAP__componentDidMount__')
 		const init = () => {
 			const { page, onIdle, initialMapStyles, geoJSONstyles, url } = this.props
 			if (!window.google) {
-				console.warn('no google')
+				console.warn('Google not available...')
 				setTimeout(init, 500)
 			} else {
 				const { google } = window
@@ -51,7 +38,7 @@ export default class GoogleMap extends Component {
 						const centerify = new google.maps.LatLng(center.lat, center.lng)
 						const { lat, lng } = centerify
 						mapCenter = { lat: lat(), lng: lng() }
-						console.warn('init: center invalid, being converted to latlng -- ', 'old', center, 'new', mapCenter)
+						// console.warn('init: center invalid, being converted to latlng -- ', 'old', center, 'new', mapCenter)
 					}
 				} else {
 					console.log('init: center is a string, reverse geocoding')
@@ -65,8 +52,8 @@ export default class GoogleMap extends Component {
 					// init the map
 					center: mapCenter,
 					mapTypeId: google.maps.MapTypeId.ROADMAP,
-					disableDefaultUI: true // disable controls:
-					// gestureHandling: 'none'
+					disableDefaultUI: true
+					// gestureHandling: 'none' // << disable controls
 				})
 				if (page === 'results' || url.asPath.indexOf('results') !== -1) {
 					// behavior different for results view than initial
@@ -90,9 +77,6 @@ export default class GoogleMap extends Component {
 							this.props.onSetMapZoom(14)
 						}
 						if (this.props.allMarkers.indexOf(undefined) === -1) {
-							// console.warn('__mount__: TOGGLE ACTIVE MARKERS')
-
-							// console.log('componentDidMount second op')
 							this.toggleActiveMarkers() // otherwise just pick from all markers which should be displayed
 						}
 					}
@@ -105,67 +89,44 @@ export default class GoogleMap extends Component {
 	}
 
 	componentDidUpdate (prevProps, prevState) {
-		console.log('__MAP__componentDidUpdate__')
-		const { lat, lng } = this.map.center
-		const { center } = this.props
-
-		const filteredMarkers = this.props.allMarkers.filter((marker) => marker.map === this.map)
-		const newMarkersMap = this.props.allMarkers.map((marker) => marker.map)
-		const prevMarkersMap = prevProps.allMarkers.map((marker) => marker.map)
-		if (prevProps.activeResults.length === 0 && this.props.activeResults.length > 0) {
-			// handle initial SSR load where active results not yet loaded
-			// console.warn('__update__: THERE WERE NO ACTIVE RESULTS BUT NOW THERE ARE')
-			this.toggleActiveMarkers()
-			console.warn('SET CENTER VIA MARKERS 1')
-			this.setCenterViaMarkers(filteredMarkers)
-		}
 		if (!equal(this.props, prevProps)) {
-			// console.log('not all props same')
-			// console.warn('props not same - UPDATED: ', updatedDiff(this.props, prevProps), this.props, prevProps)
+			const { lat, lng } = this.map.center
+			const { center } = this.props
+			const filteredMarkers = this.props.allMarkers.filter(marker => marker.map === this.map)
+			const newMarkersMap = this.props.allMarkers.map(marker => marker.map)
+			const prevMarkersMap = prevProps.allMarkers.map(marker => marker.map)
+
+			if (prevProps.activeResults.length === 0 && this.props.activeResults.length > 0) {
+				// handle initial SSR load where active results not yet loaded
+				this.toggleActiveMarkers()
+				this.setCenterViaMarkers(filteredMarkers)
+			}
 			if (this.props.zoom !== prevProps.zoom) {
-				console.warn('__update__: ZOOM DID UPDATE')
 				this.map.setZoom(this.props.zoom)
 			}
 			if (this.props.activeResults !== prevProps.activeResults) {
-				console.warn('__update__: ACTIVE RESULTS DID UPDATE')
 				this.toggleActiveMarkers() // if results change, change the markers
-				console.log(this.props.activeResults)
 				if (this.props.activeResults.length === 1) {
-					console.log('only one result')
 					this.props.onSetMapZoom(14)
 				}
 			}
 			if (difference(prevMarkersMap, newMarkersMap).length > 0 /*&& prevMarkersMap.length > 0*/) {
-				// console.warn('__update__: MAP MARKERS DID UPDATE', difference(prevMarkersMap, newMarkersMap))
-				// this.toggleActiveMarkers()
-				console.warn('SET CENTER VIA MARKERS 2')
 				this.setCenterViaMarkers(filteredMarkers)
 			}
 			if (this.props.center !== prevProps.center || center !== { lat: lat(), lng: lng() }) {
-				console.warn('__update__: CENTER DID UPDATE')
-
 				this.setCenterViaMarkers(filteredMarkers)
-
-				if (center !== { lat: lat(), lng: lng() }) {
-					console.warn('SET CENTER AS:', center)
-					this.map.setCenter(center)
-				}
+				this.map.setCenter(center)
 			}
-			if (this.state.bounds !== prevState.bounds) {
-				console.warn('__update__: BOUNDS DID UPDATE')
-				if (this.props.page === 'results') {
-					console.warn('SET CENTER VIA MARKERS 3')
-					this.setCenterViaMarkers(filteredMarkers)
-				}
+			if (this.state.bounds !== prevState.bounds && this.props.page === 'results') {
+				this.setCenterViaMarkers(filteredMarkers)
 			}
 		}
 	}
 
-	setBounds (marker) {
+	setBounds = marker => {
 		const mainAction = () => {
 			if (marker) {
 				this.setState({ bounds: this.state.bounds.extend(marker) }, () => {
-					// console.log('BOUNDS', this.state.bounds)
 					this.map.fitBounds(this.state.bounds) // center map around markers
 				})
 			}
@@ -178,7 +139,7 @@ export default class GoogleMap extends Component {
 		}
 	}
 
-	setCenterViaMarkers (markers) {
+	setCenterViaMarkers = markers => {
 		if (markers.length > 1) {
 			// only calculate bounds frame if more than one marker
 			let maxLat = null
@@ -214,33 +175,31 @@ export default class GoogleMap extends Component {
 		}
 	}
 
-	setCenter (center) {
-		const setCenterType = (center) => {
+	setCenter = center => {
+		const setCenterType = center => {
 			if (typeof center === 'string') {
-				getCoordsFromAddress(center).then((coords) => {
-					console.warn('center was a string, now coords are:', coords)
+				getCoordsFromAddress(center).then(coords => {
+					console.log('center was a string, now coords are:', coords)
 					this.props.setCenter(coords)
 				})
 			} else {
 				this.props.setCenter(center)
-				// this.props.onSetMapZoom(this.props.zoom)
 			}
 		}
 		if (center) {
 			setCenterType(center)
 		} else {
-			console.warn('no center, using props.center')
+			// console.warn('no center, using props.center')
 			setCenterType(this.props.center)
 		}
 	}
 
-	setAllMarkers () {
+	setAllMarkers = () => {
 		// weirdly, this is the way you do it -- not by adding and removing markers but by adding all markers and toggling their 'map' property between null and this.map
 		const { staticLocationList, activeResults, setMarkers } = this.props
-		const activeMarkerTitles = activeResults.map((result) => result.name)
-		const mappedAsMarkers = staticLocationList.map((loc) => {
+		const activeMarkerTitles = activeResults.map(result => result.name)
+		const mappedAsMarkers = staticLocationList.map(loc => {
 			const marker = makeMarker(loc)
-			// console.log(marker)
 			const newMarker = new window.google.maps.Marker({
 				position: marker.position,
 				animation: marker.animation,
@@ -251,14 +210,12 @@ export default class GoogleMap extends Component {
 			})
 			return newMarker
 		})
-		// console.log('setallmarkers: ', mappedAsMarkers, activeMarkerTitles)
 		setMarkers(mappedAsMarkers)
 	}
 
-	clearAllMarkers () {
-		// console.warn('all markers were cleared')
+	clearAllMarkers = () => {
 		const { allMarkers, setMarkers } = this.props
-		const newMarkers = allMarkers.map((marker) => {
+		const newMarkers = allMarkers.map(marker => {
 			marker.map = null
 			marker.setMap(null)
 			return marker
@@ -266,10 +223,10 @@ export default class GoogleMap extends Component {
 		setMarkers(newMarkers)
 	}
 
-	toggleActiveMarkers () {
+	toggleActiveMarkers = () => {
 		const { activeResults, allMarkers, setMarkers, page } = this.props
-		const activeMarkerTitles = activeResults.map((result) => result.name)
-		const newMarkers = allMarkers.map((marker) => {
+		const activeMarkerTitles = activeResults.map(result => result.name)
+		const newMarkers = allMarkers.map(marker => {
 			if (activeMarkerTitles.indexOf(marker.title) !== -1 && (page === 'results' || page === 'detail')) {
 				marker.map = this.map
 				marker.setMap(this.map)
@@ -279,7 +236,6 @@ export default class GoogleMap extends Component {
 			}
 			return marker
 		})
-		// console.log('TOGGLE ACTIVE MARKERS: ', allMarkers, newMarkers, activeMarkerTitles)
 		setMarkers(newMarkers)
 	}
 
@@ -291,7 +247,7 @@ export default class GoogleMap extends Component {
 					onChange={this.updateAllMapProps}
 					id='map'
 					style={{ width: '100%', height: '100%' }}
-					ref={(map) => {
+					ref={map => {
 						this.mapDOM = map
 					}}
 				/>

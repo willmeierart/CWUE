@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { Link } from 'next-url-prettifier'
 import { Router, routes } from '../../server/routes'
-import { binder } from '../../lib/_utils'
 
 export default class TopMenu extends Component {
 	constructor (props) {
@@ -11,10 +10,9 @@ export default class TopMenu extends Component {
 			showWashSubList: false,
 			showAboutSubList: false
 		}
-		binder(this, [ 'renderList', 'renderSubList', 'handleHover' ])
 	}
 
-	handleHover (item) {
+	handleHover = item => {
 		if (item === 'washes') {
 			this.setState({ showWashSubList: true })
 		} else {
@@ -27,19 +25,19 @@ export default class TopMenu extends Component {
 		}
 	}
 
-	renderSubList (route) {
+	renderSubList = route => {
 		return route.children.reduce((a, b, i) => {
 			const { title } = b
 			const formattedTitle = title.toLowerCase().replace(' ', '-')
 			a.push(
 				<li
-					ref={(el) => {
+					ref={el => {
 						this[route.page] = el
 					}}
 					key={i}
 					className='child-route'
 				>
-					<Link prefetch route={Router.linkPage(route.page, { title: formattedTitle })}>
+					<Link prefetch route={Router.getPrettyUrl(route.page, { title: formattedTitle })}>
 						<a>{title}</a>
 					</Link>
 					<style jsx>{`
@@ -72,11 +70,11 @@ export default class TopMenu extends Component {
 			return a
 		}, [])
 	}
-	renderList () {
+	renderList = () => {
 		const { showAboutSubList, showWashSubList } = this.state
 		return (
 			<ul>
-				{routes.map((route) => {
+				{routes.map(route => {
 					switch (route.title) {
 						case 'Car Washes':
 							return (
@@ -89,7 +87,7 @@ export default class TopMenu extends Component {
 								>
 									<Link
 										prefetch
-										route={Router.linkPage(route.page, {
+										route={Router.getPrettyUrl(route.page, {
 											title: route.title
 										})}
 									>
@@ -103,7 +101,7 @@ export default class TopMenu extends Component {
 								<li key={route.title} onMouseOver={this.handleHover}>
 									<Link
 										prefetch
-										route={Router.linkPage(route.page, {
+										route={Router.getPrettyUrl(route.page, {
 											title: route.title
 										})}
 									>
@@ -122,7 +120,7 @@ export default class TopMenu extends Component {
 								>
 									<Link
 										prefetch
-										route={Router.linkPage(route.page, {
+										route={Router.getPrettyUrl(route.page, {
 											title: route.title
 										})}
 									>
@@ -134,7 +132,7 @@ export default class TopMenu extends Component {
 						case 'Locations':
 							return (
 								<li key={route.title} onMouseOver={this.handleHover}>
-									<Link prefetch route={Router.linkPage(route.page, {})}>
+									<Link prefetch route={Router.getPrettyUrl(route.page, {})}>
 										<a className='locations'>FIND A LOCATION</a>
 									</Link>
 								</li>

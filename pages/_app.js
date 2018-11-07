@@ -22,20 +22,17 @@ class MyApp extends App {
 
 	render () {
 		const { Component, pageProps, reduxStore, router } = this.props
-		const prettySafeUrl = route => {
-			// console.log(route)
-			return route.page
+		const prettySafeUrl = route =>
+			route.page
 				? typeof route.prettyUrl === 'string' ? route.prettyUrl : route.prettyUrl({ title: '' })
 				: '/my-account'
-		}
 		const thisRoute =
 			router.asPath === '/' || router.asPath === 'carwash'
 				? routes[0]
 				: routes
-						.filter(route => {
-							console.log(prettySafeUrl(route), router.asPath)
-							return router.asPath.indexOf(prettySafeUrl(route).substring(0, prettySafeUrl(route).length - 2)) !== -1
-						})
+						.filter(
+							route => router.asPath.indexOf(prettySafeUrl(route).substring(0, prettySafeUrl(route).length - 2)) !== -1
+						)
 						.pop() || routes[0]
 
 		const title = thisRoute.title || ''
@@ -58,7 +55,6 @@ class MyApp extends App {
 							exit: 0
 						}}
 						loadingClassNames='loading-indicator'
-						// loadingComponent={<Loader />}
 						loadingComponent={<Loader options={loaderOptions} loaded={false} />}
 						classNames='page-transition'
 					>

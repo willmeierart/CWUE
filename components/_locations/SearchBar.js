@@ -4,7 +4,6 @@ import debounce from 'lodash.debounce'
 import ExecutionEnvironment from 'exenv'
 import ImperativeRouter from '../../server/ImperativeRouter'
 import { reverseGeocode } from '../../lib/_locationUtils'
-import { binder } from '../../lib/_utils'
 import SearchManager from './SearchManager'
 
 // all mechanics related to searchbar, as well as programmatic control of autocomplete api on SSR load
@@ -19,32 +18,9 @@ class SearchBar extends Component {
 			freshLoad: true,
 			specialVal: ''
 		}
-		binder(this, [
-			'autocompleteCallback',
-			'clearSuggestions',
-			'fetchPredictions',
-			'selectAddress',
-			'handleSelect',
-			'getActiveItem',
-			'selectActiveItemAtIndex',
-			'handleEnterKey',
-			'handleEnterKeyWithoutActiveItem',
-			'handleDownKey',
-			'handleUpKey',
-			'handleInputKeyDown',
-			'setActiveItemAtIndex',
-			'handleInputChange',
-			'handleInputOnBlur',
-			'renderSuggestion',
-			'renderFooter',
-			'handleInput',
-			'getInputProps',
-			'handleSearchOnSSR',
-			'generateState'
-		])
 		this.debouncedFetchPredictions = debounce(this.fetchPredictions, 800)
 		this.highlightFirstSuggestion = false
-		this.shouldFetchSuggestions = (thing) => {
+		this.shouldFetchSuggestions = thing => {
 			if (thing) return true
 		}
 	}
@@ -55,21 +31,18 @@ class SearchBar extends Component {
 
 	componentDidUpdate (prevProps, prevState) {
 		if (this.props.userLocation !== prevProps.userLocation && this.state.specialVal !== '') {
-			// this.generateState(this.state.specialVal)
 		}
 		if (this.state.specialVal !== prevState.specialVal) {
-			console.log(this.state, prevState)
 			this.generateState(this.state.specialVal)
 		}
 	}
 
-	handleSearchOnSSR () {
+	handleSearchOnSSR = () => {
 		// need to parse url if SSR into valid search
 		const { searchPhrase, activeResults, url: { asPath }, onSetPromisePendingStatus } = this.props
 		const noActiveSearch = !searchPhrase && activeResults.length === 0
 		const pathSplitta = asPath.split('results/')[1]
 		const hasQueryString = pathSplitta && pathSplitta !== ''
-		// const isUserLocation = pathSplitta === 'my-location'
 
 		if (noActiveSearch) {
 			console.log('no active search')
@@ -82,7 +55,7 @@ class SearchBar extends Component {
 		}
 	}
 
-	generateState (searchVal) {
+	generateState = searchVal => {
 		console.log(searchVal)
 		this.setState(
 			{
@@ -95,7 +68,7 @@ class SearchBar extends Component {
 		)
 	}
 
-	fetchPredictions () {
+	fetchPredictions = () => {
 		// magical google autocomplete connector function
 		const { value } = this.state
 		if (value.length) {
@@ -106,17 +79,15 @@ class SearchBar extends Component {
 		}
 	}
 
-	selectAddress (address, placeId, e) {
+	selectAddress = (address, placeId, e) => {
 		// called by each handler: enter / mousedown / touchend
-		if (e !== undefined) {
-			e.preventDefault()
-		}
+		if (e !== undefined) e.preventDefault()
 
 		this.clearSuggestions()
 		this.handleSelect(address, placeId, this.handleInput) // these are properties on the 'active selection' object
 	}
 
-	handleSelect (address, placeId, handleInput) {
+	handleSelect = (address, placeId, handleInput) => {
 		const { isUserLocationPage, onMakeUserLocationPage, handleSelection } = this.props
 		if (isUserLocationPage) {
 			onMakeUserLocationPage(false)
@@ -124,26 +95,26 @@ class SearchBar extends Component {
 		handleSelection(address, placeId, handleInput)
 	}
 
-	handleInput (val) {
+	handleInput = val => {
 		this.setState({ value: val, freshLoad: this.state.freshLoad && false })
 	} // val = address (active selection)
 
-	clearSuggestions () {
+	clearSuggestions = () => {
 		this.setState({ autocompleteItems: [] })
 	}
 
-	getActiveItem () {
-		return this.state.autocompleteItems.find((item) => item.active)
+	getActiveItem = () => {
+		return this.state.autocompleteItems.find(item => item.active)
 	}
 
-	selectActiveItemAtIndex (index) {
+	selectActiveItemAtIndex = index => {
 		// this is what points at a certain item and selects that one specifically
-		const activeName = this.state.autocompleteItems.find((item) => item.index === index).suggestion
+		const activeName = this.state.autocompleteItems.find(item => item.index === index).suggestion
 		this.setActiveItemAtIndex(index)
 		this.handleInput(activeName)
 	}
 
-	setActiveItemAtIndex (index) {
+	setActiveItemAtIndex = index => {
 		this.setState({
 			autocompleteItems: this.state.autocompleteItems.map((item, idx) => {
 				if (idx === index) {
@@ -155,7 +126,7 @@ class SearchBar extends Component {
 		})
 	}
 
-	handleEnterKey (val) {
+	handleEnterKey = val => {
 		const activeItem = this.getActiveItem()
 		if (activeItem === undefined) {
 			this.handleEnterKeyWithoutActiveItem()
@@ -164,7 +135,7 @@ class SearchBar extends Component {
 		}
 	}
 
-	handleEnterKeyWithoutActiveItem () {
+	handleEnterKeyWithoutActiveItem = () => {
 		const { autocompleteItems } = this.state
 		if (autocompleteItems.length > 0) {
 			const activeItem = autocompleteItems[0]
@@ -173,12 +144,12 @@ class SearchBar extends Component {
 			if (this.state.val !== '') {
 				this.fetchPredictions()
 			} else {
-				console.warn('no active item')
+				console.log('no active item')
 			}
 		}
 	}
 
-	handleDownKey () {
+	handleDownKey = () => {
 		if (this.state.autocompleteItems.length === 0) return
 		const activeItem = this.getActiveItem()
 		if (activeItem === undefined) {
@@ -189,7 +160,7 @@ class SearchBar extends Component {
 		}
 	}
 
-	handleUpKey () {
+	handleUpKey = () => {
 		if (this.state.autocompleteItems.length === 0) return
 		const activeItem = this.getActiveItem()
 		if (activeItem === undefined) {
@@ -205,7 +176,7 @@ class SearchBar extends Component {
 		}
 	}
 
-	handleInputKeyDown (event) {
+	handleInputKeyDown = event => {
 		switch (event.key) {
 			case 'Enter':
 				event.preventDefault()
@@ -225,10 +196,9 @@ class SearchBar extends Component {
 			default:
 				break
 		}
-		// if (this.props.inputProps.onKeyDown) { this.props.inputProps.onKeyDown(event) }
 	}
 
-	handleInputChange (event) {
+	handleInputChange = event => {
 		const { value } = event.target
 		this.handleInput(value)
 		if (!value) {
@@ -240,38 +210,38 @@ class SearchBar extends Component {
 		}
 	}
 
-	handleInputOnBlur (event) {
+	handleInputOnBlur = event => {
 		this.clearSuggestions()
 	}
 
-	getInputProps () {
+	getInputProps = () => {
 		const defaultInputProps = {
 			type: 'text',
 			autoComplete: 'off'
 		}
 		return {
 			...defaultInputProps,
-			onChange: (e) => {
+			onChange: e => {
 				this.handleInputChange(e)
 			},
-			onKeyDown: (e) => {
+			onKeyDown: e => {
 				this.handleInputKeyDown(e)
 			},
-			onBlur: (e) => {
+			onBlur: e => {
 				this.handleInputOnBlur(e)
 			},
 			value: this.state.value
 		}
 	}
 
-	autocompleteCallback (predictions, status) {
+	autocompleteCallback = (predictions, status) => {
 		// called by this.fetchPredictions, used as callback to native google autocomplete func
 		// predictions are each full object returned from autocompleteservice
 		if (status !== this.props.autocompleteOK) {
 			this.clearSuggestions()
 			return
 		}
-		const formattedSuggestion = (format) => ({
+		const formattedSuggestion = format => ({
 			main: format.main_text,
 			secondary: format.secondary_text
 		})
@@ -289,11 +259,11 @@ class SearchBar extends Component {
 		}
 	}
 
-	renderSuggestion ({ suggestion }) {
+	renderSuggestion = ({ suggestion }) => {
 		return <div>{suggestion}</div>
 	}
 
-	renderFooter () {}
+	renderFooter = () => {}
 
 	render () {
 		const { autocompleteItems } = this.state
@@ -309,9 +279,9 @@ class SearchBar extends Component {
 								key={p.placeId}
 								className={p.active ? 'searchbar-autocompleteItemActive' : 'searchbar-autocompleteItem'}
 								onMouseOver={() => this.setActiveItemAtIndex(p.index)}
-								onMouseDown={(e) => this.selectAddress(p.suggestion, p.placeId, e)}
+								onMouseDown={e => this.selectAddress(p.suggestion, p.placeId, e)}
 								onTouchStart={() => this.setActiveItemAtIndex(p.index)}
-								onTouchEnd={(e) => this.selectAddress(p.suggestion, p.placeId, e)}
+								onTouchEnd={e => this.selectAddress(p.suggestion, p.placeId, e)}
 							>
 								{this.renderSuggestion({
 									suggestion: p.suggestion,

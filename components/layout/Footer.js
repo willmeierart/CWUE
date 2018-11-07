@@ -27,7 +27,7 @@ const Footer = ({ isMobile }) => {
 						const isBold = isExterior || isFullService
 						a.push(
 							<li key={title} className={isBold && 'bold'}>
-								<Link prefetch route={Router.linkPage(route.page, { title: title })}>
+								<Link prefetch route={Router.getPrettyUrl(route.page, { title: title })}>
 									<span>{title}</span>
 								</Link>
 							</li>
@@ -35,7 +35,7 @@ const Footer = ({ isMobile }) => {
 						if (isExterior) {
 							a.push(
 								<li key='ext-fp'>
-									<Link prefetch route={Router.linkPage('fastpass', { title: title })}>
+									<Link prefetch route={Router.getPrettyUrl('fastpass', { title: title })}>
 										<span>FAST PASS</span>
 									</Link>
 								</li>
@@ -44,7 +44,7 @@ const Footer = ({ isMobile }) => {
 						if (isFullService) {
 							a.push(
 								<li key='fs-fp'>
-									<Link prefetch route={Router.linkPage('fastpass', { title: title })}>
+									<Link prefetch route={Router.getPrettyUrl('fastpass', { title: title })}>
 										<span>FAST PASS</span>
 									</Link>
 								</li>
@@ -90,7 +90,7 @@ const Footer = ({ isMobile }) => {
 						)
 						.map(route => (
 							<li key={route.title}>
-								<Link prefetch route={Router.linkPage(route.page, { title: route.title })}>
+								<Link prefetch route={Router.getPrettyUrl(route.page, { title: route.title })}>
 									<span>{route.title}</span>
 								</Link>
 								{route.children && appendChildList(route)}

@@ -21,10 +21,8 @@ class HomePage extends Component {
 	}
 
 	render () {
-		if (!this.state.loaded) return null
 		return (
 			<section>
-				{/* <AppProvider url={this.props.url} title='Home' /> */}
 				<HomeWrapper url={this.props.url} />
 			</section>
 		)

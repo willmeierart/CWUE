@@ -13,10 +13,9 @@ class Header extends Component {
 		this.state = {
 			menuOpen: false
 		}
-		binder(this, [ 'handleClick' ])
 	}
 
-	handleClick (close) {
+	handleClick = close => {
 		if (close) {
 			this.setState({ menuOpen: false })
 			this.props.openMenu(false)

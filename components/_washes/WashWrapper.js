@@ -1,12 +1,10 @@
 import React, { Component } from 'react'
-// import ExecutionEnvironment from 'exenv'
 import PropTypes from 'prop-types'
 import { graphql, compose } from 'react-apollo'
 import equal from 'deep-equal'
 import WithApolloLoader from '../hoc/WithApolloLoader'
 import WashesTable from './WashesTable'
 import WashFastPassCallout from './WashFastPassCallout'
-import { binder } from '../../lib/_utils'
 import washData from '../../lib/_data/washData'
 import { allWashes } from '../../lib/apollo/queries'
 
@@ -18,7 +16,6 @@ class WashWrapper extends Component {
 			menuHeaderText: 'EXTERIOR CAR WASH MENU',
 			pageHeaderText: 'EXTERIOR WASHES'
 		}
-		binder(this, [ 'setPageStateViaUrl', 'updateText', 'updateAll', 'filterData' ])
 		this.fakeData = false
 	}
 	componentDidMount () {
@@ -31,7 +28,7 @@ class WashWrapper extends Component {
 		}
 	}
 
-	setPageStateViaUrl () {
+	setPageStateViaUrl = () => {
 		const { query: { title }, asPath, pathname } = this.props.url
 		const splitPath = asPath.split(`${pathname}/`)
 		const backupTitle = splitPath[splitPath.length - 1]
@@ -39,12 +36,12 @@ class WashWrapper extends Component {
 		this.setState({ type: thisTitle })
 	}
 
-	async updateAll () {
+	updateAll = async () => {
 		await this.setPageStateViaUrl()
 		this.updateText()
 	}
 
-	updateText () {
+	updateText = () => {
 		const typeKey = this.state.type.split('-')[0]
 		const { pageHeaderText, menuHeaderText, descriptionText } = washData[typeKey]
 		this.setState({
@@ -54,7 +51,7 @@ class WashWrapper extends Component {
 		})
 	}
 
-	filterData (type) {
+	filterData = type => {
 		const data = this.props.data.allWashes
 		return data.reduce((acc, d) => {
 			const formatted = d.washType.split('_')[0].toLowerCase()

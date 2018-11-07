@@ -1,13 +1,11 @@
 import React, { Component } from 'react'
 import UserLocationLoader from './UserLocationLoader'
-import { binder } from '../../../lib/_utils'
 
 export default function UserLocationManager (ComposedComponent) {
 	class WrappedComponent extends Component {
 		constructor (props) {
 			super(props)
 			this.state = { isUserLocationPage: false }
-			binder(this, [ 'determineComponentState' ])
 		}
 
 		componentDidMount () {
@@ -16,7 +14,7 @@ export default function UserLocationManager (ComposedComponent) {
 			}
 		}
 
-		determineComponentState () {
+		determineComponentState = () => {
 			// manages whether view is of a specific search's results or user location results
 			const { isUserLocationPage, userIsLocated, onMakeUserLocationPage, userLocation } = this.props
 			switch (true) {

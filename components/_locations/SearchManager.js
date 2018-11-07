@@ -3,7 +3,6 @@ import PropTypes from 'prop-types'
 import equal from 'deep-equal'
 import ImperativeRouter from '../../server/ImperativeRouter'
 import { geocodeByAddress, getLatLng, makeMarker, normalizeRegionInputs } from '../../lib/_locationUtils'
-import { binder } from '../../lib/_utils'
 
 // most places-autocomplete api data held here
 
@@ -12,15 +11,6 @@ export default function SearchManager (ComposedComponent) {
 		constructor (props) {
 			super(props)
 			this.state = { searchIsRegion: false, nearbyResults: [], placeBounds: null }
-			binder(this, [
-				'handleSelection',
-				'findResultsInRadius',
-				'getRelevantCoords',
-				'distanceServiceCallback',
-				'setTheResults',
-				'isInBounds',
-				'searchIsRegion'
-			])
 			const mile = 1610
 			this.radius = 5 * mile
 		}
@@ -45,24 +35,22 @@ export default function SearchManager (ComposedComponent) {
 			this.setState({ nearbyResults: [], isRegion: false })
 		}
 
-		routeToResults (place) {
+		routeToResults = place => {
 			// control programmatic url
 			const spec = place.formatted_address.toLowerCase().replace(/(,)/g, '').replace(/( )/g, '-')
-
 			ImperativeRouter.push('locationsResults', { spec }, false)
 		}
 
-		handleSelection (address, placeId, handleInput) {
+		handleSelection = (address, placeId, handleInput) => {
 			// passed as props to searchbar component (handleInput lives there), triggers everything below
 			this.props.onSetPromisePendingStatus(true)
 			this.setState({ nearbyResults: [], isRegion: false, placeBounds: null })
 			handleInput(address)
 			this.geocode(address)
-			console.warn('SETTING ACTIVE SEARCH PHRASE')
 			this.props.onSetActiveSearchPhrase(address)
 		}
 
-		geocode (address, makeMarkers) {
+		geocode = (address, makeMarkers) => {
 			// makeMarkers = [bool]
 			geocodeByAddress(address)
 				.then(res => {
@@ -74,7 +62,6 @@ export default function SearchManager (ComposedComponent) {
 								.then(latLng => {
 									if (makeMarkers) {
 										const marker = makeMarker(latLng, place)
-										// console.log(markers)
 										markers.push(marker)
 									}
 									this.props.setCenter(latLng)
@@ -89,16 +76,15 @@ export default function SearchManager (ComposedComponent) {
 								})
 						)
 					} else {
-						console.warn('CLEARING MARKERS FROM WITHIN SEARCH COMPONENT')
 						this.props.setMarkers([])
 					}
 				})
 				.catch(err => {
-					console.log(err)
+					console.error(err)
 				})
 		}
 
-		searchIsRegion (types) {
+		searchIsRegion = types => {
 			// determine if someone's search is a city, state, etc
 			return types.reduce((bool, type) => {
 				if ((type === 'locality' || type === 'administrative_area_level_1') && type === 'political') {
@@ -108,14 +94,13 @@ export default function SearchManager (ComposedComponent) {
 			}, false)
 		}
 
-		findResultsInRadius (place, locations) {
+		findResultsInRadius = (place, locations) => {
 			this.setState({ searchIsRegion: this.searchIsRegion(place.types) })
 			const locationCoords = locations.map(location => location.coordinates)
-			console.log(locations)
 			this.getRelevantCoords(place, locationCoords)
 		}
 
-		getRelevantCoords (place, locationCoords) {
+		getRelevantCoords = (place, locationCoords) => {
 			// find which places from static list should be returned as valid result (all chained methods below)
 			if (place.geometry.bounds) {
 				const { bounds } = place.geometry
@@ -131,12 +116,11 @@ export default function SearchManager (ComposedComponent) {
 					LAT_LNG = [ latLng ]
 				})
 				this.doDistanceService(LAT_LNG, locationCoords)
-				console.log(LAT_LNG, locationCoords)
 			}
 			return asyncLatLng()
 		}
 
-		isInBounds (bounds, coords) {
+		isInBounds = (bounds, coords) => {
 			return (
 				coords.lat > bounds[0].lat &&
 				coords.lat < bounds[1].lat &&
@@ -145,8 +129,8 @@ export default function SearchManager (ComposedComponent) {
 			)
 		}
 
-		async doDistanceService (coords1, coords2) {
-			console.warn('STARTING DISTANCE SERVICE ', coords1, coords2)
+		doDistanceService = async (coords1, coords2) => {
+			console.log('STARTING DISTANCE SERVICE ', coords1, coords2)
 			await this.distanceService.getDistanceMatrix(
 				{
 					origins: coords1,
@@ -155,11 +139,11 @@ export default function SearchManager (ComposedComponent) {
 				},
 				this.distanceServiceCallback
 			)
-			console.warn('DISTANCE SERVICE PROMISE RETURNED')
+			console.log('DISTANCE SERVICE PROMISE RETURNED')
 			this.setTheResults()
 		}
 
-		distanceServiceCallback (response, status) {
+		distanceServiceCallback = (response, status) => {
 			if (status === 'OK') {
 				const origins = response.originAddresses
 				origins.forEach((origin, i) => {
@@ -172,18 +156,16 @@ export default function SearchManager (ComposedComponent) {
 								const makeMarkers = true
 								this.geocode(origin, makeMarkers)
 								this.pushNewNearbyResult(location)
-								console.warn(location)
 							}
 						}
 					})
 				})
 			} else {
-				// this.props.onSetPromisePendingStatus(false)
 				console.error(response, status)
 			}
 		}
 
-		setTheResults () {
+		setTheResults = () => {
 			// this is where new results are actually set
 			const { placeBounds, isRegion } = this.state
 			const { staticLocationList, activeSearchPhrase } = this.props
@@ -224,7 +206,7 @@ export default function SearchManager (ComposedComponent) {
 			this.props.onSetPromisePendingStatus(false)
 		}
 
-		pushNewNearbyResult (loc) {
+		pushNewNearbyResult = loc => {
 			const isInArr = this.state.nearbyResults.reduce((bool, val) => {
 				if (equal(loc, val)) {
 					bool = true

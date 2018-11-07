@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import { Link } from 'next-url-prettifier'
 import { Router, routes } from '../../server/routes'
 import ImperativeRouter from '../../server/ImperativeRouter'
-import { binder } from '../../lib/_utils'
 
 class MobileMenu extends Component {
 	constructor (props) {
@@ -11,10 +10,9 @@ class MobileMenu extends Component {
 			aboutExpanded: false,
 			washesExpanded: false
 		}
-		binder(this, [ 'handleClick', 'renderSubList', 'renderList' ])
 	}
 
-	handleClick (route, hasChildren) {
+	handleClick = (route, hasChildren) => {
 		console.log('route', route)
 		if (hasChildren) {
 			if (route.page === 'about') {
@@ -27,13 +25,13 @@ class MobileMenu extends Component {
 			ImperativeRouter.onRouteChangeComplete(this.props.closeMenu)
 		}
 	}
-	renderSubList (route) {
+	renderSubList = route => {
 		console.log(route.children)
 		const list = route.children.map((child, i) => {
 			const { title } = child
 			return (
 				<li
-					ref={(el) => {
+					ref={el => {
 						this[route.page] = el
 					}}
 					key={i}
@@ -72,10 +70,10 @@ class MobileMenu extends Component {
 		}
 	}
 
-	renderList () {
+	renderList = () => {
 		return routes
 			.filter(
-				(route) =>
+				route =>
 					route.title.toLowerCase().indexOf('account') === -1 && route.title.toLowerCase().indexOf('legal') === -1
 			)
 			.map((route, i) => {
@@ -88,7 +86,7 @@ class MobileMenu extends Component {
 							this.handleClick(route, hasChildren, null)
 						}}
 					>
-						{/* <Link prefetch route={Router.linkPage(route.page, { title: formattedTitle })}> */}
+						{/* <Link prefetch route={Router.getPrettyUrl(route.page, { title: formattedTitle })}> */}
 						<Link>
 							<a>{route.title.toUpperCase()}</a>
 							<ul className='sublist'>{hasChildren && this.renderSubList(route, hasChildren, null)}</ul>

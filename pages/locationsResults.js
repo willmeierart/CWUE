@@ -5,15 +5,12 @@ import SearchBar from '../components/_locations/SearchBar'
 import GoogleMap from '../components/_locations/GoogleMap'
 import DataWrapper from '../components/_locations/DataWrapper'
 import withData from '../lib/apollo/withData'
-// import ImperativeRouter from '../server/ImperativeRouter'
 
 class Results extends Component {
 	componentWillMount () {
-		// console.log(this.props)
 		const { activeResults, searchPhrase } = this.props
 		if (!activeResults || activeResults.length > 1 || !searchPhrase || searchPhrase === '') {
 			console.warn('NO ACTIVE SEARCH')
-			// ImperativeRouter.push('locationsInitial', {}, true)
 		}
 	}
 	pickLocation = location => {

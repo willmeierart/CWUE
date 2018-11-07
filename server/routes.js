@@ -86,7 +86,6 @@ const routes = [
 		title: 'Location Results',
 		prettyUrl: ({ spec = '' }) => {
 			if (spec && spec !== '') {
-				// trying to handle a variety of error cases here
 				return `/carwash/locations/results/${spec.toLowerCase().replace(/( )/g, '-')}`
 			} else {
 				return '/carwash/locations/results'
@@ -132,9 +131,8 @@ const routes = [
 	}
 ]
 
-// const urlPrettifier = new UrlPrettifier(routes)
 const Router = new UrlPrettifier(routes, {
-	paramsToQueryString: (params) => (params.query ? `?${qs.stringify(params.query)}` : '')
+	paramsToQueryString: params => (params.query ? `?${qs.stringify(params.query)}` : '')
 })
 
 exports.routes = routes

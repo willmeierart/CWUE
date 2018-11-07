@@ -5,7 +5,6 @@ import withData from '../lib/apollo/withData'
 
 class Locations extends Component {
 	componentDidMount () {
-		console.log(this.props.data)
 		const { data: { _Carwash_USA_Express, _Cloned_CWUE } } = this.props
 		this.props.onSetStaticLocList({ _Carwash_USA_Express, _Cloned_CWUE })
 		this.props.onSetActiveResultsList(this.props.staticLocationList)

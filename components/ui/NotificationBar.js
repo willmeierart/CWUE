@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { Transition } from 'react-transition-group'
-import { binder } from '../../lib/_utils'
 
 // popup bar at top of page for user notifications
 
@@ -9,23 +8,17 @@ class NotificationBar extends Component {
 	constructor (props) {
 		super(props)
 		this.state = { in: false }
-		binder(this, [ 'delayExit' ])
 	}
 	componentDidMount () {
-		// setTimeout(() => {
-		//   this.setState({ in: true })
-		// }, 500)
 		setTimeout(() => {
 			this.setState({ in: true })
 		}, 500)
 
 		setTimeout(() => {
 			this.props.onSetUserNotification({ alert: '', color: '' })
-			// this.setState({ in: false })
 		}, 2500)
 	}
-	delayExit () {
-		console.log('delaying exit')
+	delayExit = () => {
 		setTimeout(() => {
 			this.setState({ in: false })
 		}, 500)
@@ -49,7 +42,7 @@ class NotificationBar extends Component {
 		}
 		return (
 			<Transition onExit={this.delayExit} onExiting={this.delayExit} in={this.state.in} timeout={500}>
-				{(state) => (
+				{state => (
 					<div className='outer-container' style={{ ...defaultStyle, ...transitionStyles[state] }}>
 						<div className='inner-container'>{alert}</div>
 						<style jsx>{`

@@ -1,8 +1,6 @@
 import Document, { Head, Main, NextScript } from 'next/document'
 import flush from 'styled-jsx/server'
 
-// expose top-lvl document... can come in handy
-
 export default class CustomDocument extends Document {
 	constructor (props) {
 		super(props)

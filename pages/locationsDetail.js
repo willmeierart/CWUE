@@ -3,10 +3,8 @@ import Specials from '../components/_locations/detail/Specials'
 import Images from '../components/_locations/detail/Images'
 import ResultModule from '../components/_locations/results/ResultModule'
 import GoogleMap from '../components/_locations/GoogleMap'
-import SearchBar from '../components/_locations/SearchBar'
 import DataWrapper from '../components/_locations/DataWrapper'
 import withData from '../lib/apollo/withData'
-import ImperativeRouter from '../server/ImperativeRouter'
 
 class Detail extends Component {
 	constructor (props) {
@@ -15,10 +13,9 @@ class Detail extends Component {
 	componentWillMount () {
 		console.log('active location', this.props.activeLocation)
 		if (!this.props.activeLocation || this.props.activeLocation === {} || !this.props.activeLocation.name) {
-			console.warn('NO ACTIVE LOCATION')
-			// ImperativeRouter.push('locationsInitial', {}, true)
 			const { data: { _Carwash_USA_Express, _Cloned_CWUE }, onSetStaticLocList } = this.props
 			onSetStaticLocList({ _Carwash_USA_Express, _Cloned_CWUE })
+			console.log('NO ACTIVE LOCATION')
 		}
 	}
 
@@ -30,12 +27,7 @@ class Detail extends Component {
 
 	parseLocationFromURL = async () => {
 		const { url: { query: { spec } }, staticLocationList, onSetActiveLocation } = this.props
-		const thisLocation = staticLocationList
-			.filter(loc => {
-				console.log(loc.name.toLowerCase().replace(/( )/g, '-'), spec)
-				return loc.name.toLowerCase().replace(/( )/g, '-') === spec
-			})
-			.pop()
+		const thisLocation = staticLocationList.filter(loc => loc.name.toLowerCase().replace(/( )/g, '-') === spec).pop()
 		onSetActiveLocation(thisLocation.name)
 	}
 

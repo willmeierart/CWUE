@@ -64,16 +64,6 @@ const CustomHead = (props = initialProps) => {
               font-weight: bold;
               font-style: normal;
             }
-            .loader-wrapper {
-              width: 100vw;
-              height: 100vh;
-              display: flex;
-              justify-content: center;
-              align-items: center;
-            }
-            .loader-hidden { display: none; }
-            .loader-active { display: block; }
-            .loader-active .loader-inner div { background-color: #970d11; }
           `
 				}}
 			/>
