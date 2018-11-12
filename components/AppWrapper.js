@@ -17,8 +17,6 @@ class AppWrapper extends Component {
 	constructor (props) {
 		super(props)
 		this.state = { mainHeight: 0 }
-		this.header = React.createRef()
-		this.footer = React.createRef()
 	}
 	componentDidMount () {
 		this.props.onCheckIfMobile()
@@ -28,7 +26,6 @@ class AppWrapper extends Component {
 		window.addEventListener('resize', () => {
 			this.props.onGetVPDims()
 			this.props.onCheckIfMobile()
-			this.setMainHeight()
 		})
 	}
 

@@ -1,11 +1,15 @@
 import React from 'react'
 import App, { Container } from 'next/app'
 import { PageTransition } from 'next-page-transitions'
-import withReduxStore from '../lib/redux/withReduxStore'
-import AppProvider from '../lib/redux/AppProvider'
-import { routes } from '../server/routes'
 import Loader from 'react-loader'
+import withRedux from 'next-redux-wrapper'
+import withReduxStore from '../lib/redux/withReduxStore'
+import withData from '../lib/apollo/withData'
+import { initializeStore } from '../lib/redux/store'
+import { routes } from '../server/routes'
 // import Loader from '../components/ui/Loader'
+import { Provider } from 'react-redux'
+import AppWrapper from '../components/AppWrapper'
 
 class MyApp extends App {
 	static async getInitialProps ({ Component, ctx }) {
@@ -21,7 +25,7 @@ class MyApp extends App {
 	}
 
 	render () {
-		const { Component, pageProps, reduxStore, router } = this.props
+		const { Component, pageProps, reduxStore, store, router } = this.props
 		const prettySafeUrl = route =>
 			route.page
 				? typeof route.prettyUrl === 'string' ? route.prettyUrl : route.prettyUrl({ title: '' })
@@ -46,21 +50,24 @@ class MyApp extends App {
 
 		return (
 			<Container>
-				<AppProvider store={reduxStore} url={router} title={title}>
-					<PageTransition
-						timeout={300}
-						loadingDelay={500}
-						loadingTimeout={{
-							enter: 400,
-							exit: 0
-						}}
-						loadingClassNames='loading-indicator'
-						loadingComponent={<Loader options={loaderOptions} loaded={false} />}
-						classNames='page-transition'
-					>
-						<Component key={thisRoute.title} url={router} {...pageProps} />
-					</PageTransition>
-				</AppProvider>
+				<Provider store={store}>
+					<AppWrapper url={router} title={title}>
+						<PageTransition
+							timeout={300}
+							loadingDelay={500}
+							loadingTimeout={{
+								enter: 400,
+								exit: 0
+							}}
+							loadingClassNames='loading-indicator'
+							loadingComponent={<Loader options={loaderOptions} loaded={false} />}
+							classNames='page-transition'
+						>
+							<Component key={thisRoute.title} url={router} {...pageProps} />
+						</PageTransition>
+					</AppWrapper>
+				</Provider>
+
 				<style jsx global>{`
 					body {
 						--color-red: #c73a37;
@@ -135,4 +142,5 @@ class MyApp extends App {
 	}
 }
 
-export default withReduxStore(MyApp)
+// export default withReduxStore(MyApp)
+export default withRedux(initializeStore)(MyApp)

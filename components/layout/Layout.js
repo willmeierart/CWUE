@@ -14,6 +14,10 @@ export default class Layout extends Component {
 		this.footer = React.createRef()
 	}
 
+	componentDidMount () {
+		window.addEventListener('resize', this.setMainHeight)
+	}
+
 	componentDidUpdate (prevProps, prevState) {
 		if (this.header && this.footer && prevState.mainHeight === 0) {
 			this.setMainHeight()

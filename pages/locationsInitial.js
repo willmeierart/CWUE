@@ -63,4 +63,4 @@ class Locations extends Component {
 	}
 }
 
-export default withData(DataWrapper(Locations), 'locations') // only here do you pass in the extra param for apollo client
+export default withData(DataWrapper(Locations))

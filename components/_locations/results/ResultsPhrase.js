@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 
+// the message regarding user's search at top of results page
+
 class ResultsPhrase extends Component {
 	constructor (props) {
 		super(props)
@@ -13,11 +15,7 @@ class ResultsPhrase extends Component {
 	}
 
 	componentDidMount () {
-		if (
-			this.props.activeResults.length > 0 ||
-			this.props.userLocation === 'denied' ||
-			this.props.userLocation === 'unavailable'
-		) {
+		if (this.props.activeResults.length > 0) {
 			this.parseMessageResultsState()
 		}
 	}
@@ -47,9 +45,9 @@ class ResultsPhrase extends Component {
 		const hasResults = activeResults.length > 0
 		const defaultErr = 'Please browse this list of all our locations:'
 
-		const formatQS = (qs) => {
+		const formatQS = qs => {
 			const splitta = qs.split('-')
-			return splitta.map((wd) => wd.toUpperCase()).join(' ') // parse search from url into usable phrase
+			return splitta.map(wd => wd.toUpperCase()).join(' ') // parse search from url into usable phrase
 		}
 
 		if (shouldFire) {

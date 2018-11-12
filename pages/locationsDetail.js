@@ -159,4 +159,4 @@ class Detail extends Component {
 	}
 }
 
-export default withData(DataWrapper(Detail), 'locations') // only here do you pass in the extra param for client
+export default withData(DataWrapper(Detail))

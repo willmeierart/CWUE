@@ -1,60 +1,48 @@
 {
-  "env": {
-    "development": {
-      "exclude": [],
-      "plugins": [
-        [
-          "module-resolver",
-          {
-            "root": ["."],
-            "alias": {
-              "styles": "./styles"
-            },
-            "cwd": "babelrc"
-          }
-        ],
-        [
-          "wrap-in-js",
-          {
-            "extensions": ["css$", "scss$"]
-          }
-        ]
-      ],
-      "presets": ["next/babel"]
-    },
-    "production": {
-      "exclude": [],
-      "plugins": [
-        [
-          "module-resolver",
-          {
-            "root": ["."],
-            "alias": {
-              "styles": "./styles"
-            },
-            "cwd": "babelrc"
-          }
-        ],
-        [
-          "wrap-in-js",
-          {
-            "extensions": ["css$", "scss$"]
-          }
-        ]
-      ],
-      "presets": ["next/babel"]
-    },
-    "test": {
-      "plugins": [
-        ["transform-es2015-modules-commonjs"]
-      ],
-      "presets": [
-        ["next/babel", {
-          "preset-env": {
-            "modules": "commonjs"
-          }
-        }]
-      ]
-    }
-  }
+	"env": {
+		"development": {
+			"exclude": [],
+			"plugins": [
+				[
+					"module-resolver",
+					{
+						"root": [ "." ],
+						"alias": {
+							"styles": "./styles"
+						},
+						"cwd": "babelrc"
+					}
+				],
+				[
+					"wrap-in-js",
+					{
+						"extensions": [ "css$", "scss$" ]
+					}
+				]
+			],
+			"presets": [ "next/babel" ]
+		},
+		"production": {
+			"exclude": [],
+			"plugins": [
+				[
+					"module-resolver",
+					{
+						"root": [ "." ],
+						"alias": {
+							"styles": "./styles"
+						},
+						"cwd": "babelrc"
+					}
+				],
+				[
+					"wrap-in-js",
+					{
+						"extensions": [ "css$", "scss$" ]
+					}
+				]
+			],
+			"presets": [ "next/babel" ]
+		}
+	}
 }

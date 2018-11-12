@@ -135,4 +135,4 @@ class Results extends Component {
 	}
 }
 
-export default withData(DataWrapper(Results), 'locations') // only here do you pass in the extra param for client
+export default withData(DataWrapper(Results))
